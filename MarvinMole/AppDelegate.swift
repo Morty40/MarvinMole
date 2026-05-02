@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  MarvinMole
 //
-//  Created by Morten Perriard on 01/05/2026.
+//  (c) Morten Perriard 2026
 //
 
 import UIKit
