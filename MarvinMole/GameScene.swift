@@ -9,6 +9,8 @@ import SpriteKit
 
 class GameScene: SKScene {
     
+    private let backgroundImage = SKSpriteNode(imageNamed: "GameBackground")
+
     private var label : SKLabelNode?
     
     override func didMove(to view: SKView) {
@@ -30,6 +32,12 @@ class GameScene: SKScene {
             UISwipeGestureRecognizer(target: self,
                                      action: #selector(onSwipeRight),
                                      direction: .right))
+        
+        anchorPoint = .zero
+        
+        backgroundImage.position = CGPoint(x: frame.size.width / 2, y: frame.size.height / 2)
+        backgroundImage.size = CGSize(width: self.size.width, height: self.size.height)
+        self.addChild(backgroundImage)
         
         // Get label node from scene and store it for use later
         self.label = self.childNode(withName: "//helloLabel") as? SKLabelNode
