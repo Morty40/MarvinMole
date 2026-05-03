@@ -9,6 +9,13 @@ import SpriteKit
 
 class GameScene: SKScene {
         
+    private lazy var backgroundImage = {
+        let node = SKSpriteNode(imageNamed: "GameBackground")
+        node.position = CGPoint(x: frame.size.width / 2, y: frame.size.height / 2)
+        node.size = CGSize(width: size.width, height: size.height)
+        return node
+    }()
+    
     override func didMove(to view: SKView) {
                 
         // setup gesture recognizers for four way navigation
@@ -31,10 +38,7 @@ class GameScene: SKScene {
         
         anchorPoint = .zero
         
-        let backgroundImage = SKSpriteNode(imageNamed: "GameBackground")
-        backgroundImage.position = CGPoint(x: frame.size.width / 2, y: frame.size.height / 2)
-        backgroundImage.size = CGSize(width: self.size.width, height: self.size.height)
-        self.addChild(backgroundImage)                
+        addChild(backgroundImage)
     }
     
     @objc func onSwipeUp() {
