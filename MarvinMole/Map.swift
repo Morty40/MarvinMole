@@ -22,7 +22,7 @@ struct Map {
                 return .wall
             case ".", "*", "+":
                 return .goal
-            case " ", "-", "_":
+            case " ", "-", "_", "@", "$":
                 return .floor
             default:
                 return .none
@@ -62,27 +62,57 @@ struct Map {
     }
     
     static func mapFromXsb(string: String) -> Map? {
-        
+
         // split by newline into list of strings
         let lines = string.split(whereSeparator: \.isNewline).map({ String($0) })
         
-        // parse static tiles
-        var staticTiles: [[StaticTile]] = []
-        for l in lines {
-            staticTiles.append( l.map({ StaticTile.tileFrom(xsb: String($0)) }) )
-        }
-
-        // TODO: fix the floors
+        // parse wall tiles
+        var staticTiles: [[StaticTile]] = lines.map({ $0.map({
+            StaticTile.tileFrom(xsb: String($0)) == .wall ? .wall : .none
+        })})
         
         // parse object tiles
-        var objectTiles: [[ObjectTile]] = []
-        for l in lines {
-            objectTiles.append( l.map({ ObjectTile.tileFrom(xsb: String($0)) }) )
-        }
+        let objectTiles: [[ObjectTile]] = lines.map({ $0.map({
+            ObjectTile.tileFrom(xsb: String($0))
+        })})
+        
+        // find coordinate of hero
+        let heroY = objectTiles.firstIndex(where: { $0.contains(.hero) } )!
+        let heroX = objectTiles[heroY].firstIndex(of: .hero)!
 
+        func fillFloors(_ tiles: inout [[StaticTile]], x: Int, y: Int) {
+            if y >= 0, y < tiles.count {
+                if x >= 0, x < tiles[y].count {
+                    if tiles[y][x] == .none {
+                        tiles[y][x] = .floor
+                        fillFloors(&tiles, x: x - 1, y: y)
+                        fillFloors(&tiles, x: x + 1, y: y)
+                        fillFloors(&tiles, x: x, y: y - 1)
+                        fillFloors(&tiles, x: x, y: y + 1)
+                    }
+                }
+            }
+        }
+        
+        // recursive fill floors inside walls
+        // (xsb data unfortunately has floors both inside and outside the walls)
+        fillFloors(&staticTiles, x: heroX, y: heroY)
+        
+        let staticTiles2: [[StaticTile]] = lines.map({ $0.map({
+            StaticTile.tileFrom(xsb: String($0))
+        })})
+
+        // parse static tiles again, ignore floors
+        staticTiles = zip(staticTiles, staticTiles2).map({
+            zip($0, $1).map({
+                $1 != .floor ? $1 : $0
+            })
+        })
+                                                              
         return Map(staticTiles: staticTiles, objectTiles: objectTiles)
     }
 
+    
     /// Returns the number of occurences of a specific type of tile
     /// - Parameter tile: Tile type
     /// - Returns: Number of occurences in map
@@ -110,6 +140,10 @@ struct Map {
             }
         }
         return .none
+    }
+    
+    func objectsOf(type: ObjectTile) -> [(x: Int, y: Int)] {
+        return [] // TODO: fix me
     }
     
 }
