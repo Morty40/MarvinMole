@@ -7,6 +7,20 @@
 
 import SpriteKit
 
+private let smallXsb = """
+    #####
+    #   #
+    #$  #
+  ###  $##
+  #  $ $ #
+### # ## #   ######
+#   # ## #####  ..#
+# $  $          ..#
+##### ### #@##  ..#
+    #     #########
+    #######
+"""
+
 class GameScene: Scene {
     
     private lazy var backgroundImage = {
@@ -16,10 +30,21 @@ class GameScene: Scene {
         node.zPosition = 1
         return node
     }()
-    
+
+    private lazy var staticTileMap = {
+        let node = StaticTileMapNode()
+        node.position = CGPoint(x: frame.size.width * 0.43, y: frame.size.height * 0.5)
+        node.zPosition = 2
+        
+        let smallMap = Map.mapFromXsb(string: smallXsb)!
+        node.draw(map: smallMap)
+        
+        return node
+    }()
+
     private lazy var quitButton = {
-        let node = Button(target: self, action: #selector(onQuit))
-        node.position = CGPoint(x: frame.size.width / 2, y: frame.size.height / 2)
+        let node = TextButton(title: "Quit", target: self, action: #selector(onQuit))
+        node.position = CGPoint(x: frame.size.width * 0.8, y: frame.size.height * 0.1)
         node.zPosition = 2
         return node
     }()
@@ -53,6 +78,7 @@ class GameScene: Scene {
         anchorPoint = .zero
         
         addChild(backgroundImage)
+        addChild(staticTileMap)
         addChild(quitButton)
         
     }
@@ -80,3 +106,6 @@ class GameScene: Scene {
     override func update(_ currentTime: TimeInterval) {
     }
 }
+
+// sokoban tileset used for testing:
+// https://dani-maccari.itch.io/sokoban-tileset

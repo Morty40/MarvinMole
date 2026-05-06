@@ -10,7 +10,6 @@ import SpriteKit
 class MenuScene: Scene {
     
     private lazy var backgroundImage = {
-        
         let node = SKSpriteNode(imageNamed: "MenuBackground")
         node.position = CGPoint(x: frame.size.width / 2, y: frame.size.height / 2)
         node.size = CGSize(width: size.width, height: size.height)
@@ -19,8 +18,8 @@ class MenuScene: Scene {
     }()
     
     private lazy var startButton = {
-        let node = Button(target: self, action: #selector(onStart))
-        node.position = CGPoint(x: frame.size.width / 2, y: frame.size.height / 2)
+        let node = TextButton(title: "Start", target: self, action: #selector(onStart))
+        node.position = CGPoint(x: frame.size.width * 0.25, y: frame.size.height * 0.4)
         node.zPosition = 2
         return node
     }()
