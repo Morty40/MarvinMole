@@ -12,8 +12,6 @@ class StaticTileMapNode: SKTileMapNode {
     override init() {
         super.init()
         tileSet = StaticTileSet()
-        xScale = 2
-        yScale = 2
     }
 
     func draw(map: Map) {
@@ -36,7 +34,7 @@ class StaticTileMapNode: SKTileMapNode {
                 
                 let tile = map.staticTileAt(x: x, y: y)
                 let tileBelow = map.staticTileAt(x: x, y: y+1)
-                let tileRight = map.staticTileAt(x: x+1, y: y)
+                let tileLeft = map.staticTileAt(x: x-1, y: y)
 
                 switch tile {
                 case .wall:
@@ -47,7 +45,7 @@ class StaticTileMapNode: SKTileMapNode {
                     }
                     
                 case .floor:
-                    if tileRight == .wall {
+                    if tileLeft == .wall {
                         setTileGroup(tileSet.floorShadow, forColumn: x, row: numberOfRows - y - 1)
                     } else {
                         setTileGroup(tileSet.floor, forColumn: x, row: numberOfRows - y - 1)
