@@ -9,7 +9,7 @@ import Foundation
 
 /// Sokoban map representation
 class Map {
-
+    
     enum StaticTile {
         case none
         case wall
@@ -28,8 +28,12 @@ class Map {
                 return .none
             }
         }
+        
+        var isCollidable: Bool {
+            [.wall].contains(self)
+        }
     }
-
+    
     enum ObjectTile {
         case none
         case hero
@@ -46,7 +50,7 @@ class Map {
             }
         }
     }
-
+    
     // Sokoban solution LURD format
     enum Move: String {
         case walkLeft  = "l"
@@ -62,11 +66,11 @@ class Map {
             [.pushLeft, .pushRight, .pushUp, .pushDown].contains(self)
         }
     }
-
+    
     private var staticTiles: [[StaticTile]] = []
     private var objectTiles: [[ObjectTile]] = []
     private var completedMoves: [Move] = []
-
+    
     init(staticTiles: [[StaticTile]], objectTiles: [[ObjectTile]]) {
         self.staticTiles = staticTiles
         self.objectTiles = objectTiles
@@ -78,28 +82,20 @@ class Map {
         (staticTiles.map(\.count).max() ?? 0, staticTiles.count)
     }
         
-    var numberOfMoves: Int {
-        completedMoves.count
-    }
-
-    var numberOfPushes: Int {
-        completedMoves.count(where: \.isPush)
-    }
-
     /// Returns the number of occurences of a specific type of tile
     /// - Parameter tile: Tile type
     /// - Returns: Number of occurences in map
     func count(of tile: StaticTile) -> Int {
         staticTiles.joined().count(where: { $0 == tile })
     }
-
+    
     /// Returns the number of occurences of a specific type of tile
     /// - Parameter tile: Tile type
     /// - Returns: Number of occurences in map
     func count(of tile: ObjectTile) -> Int {
         objectTiles.joined().count(where: { $0 == tile })
     }
-
+    
     /// Returns the static tile at coordinate (x, y)
     /// - Parameters:
     ///   - x: X-coordinate
@@ -114,7 +110,7 @@ class Map {
         }
         return .none
     }
-
+    
     /// Returns the object tile at coordinate (x, y)
     /// - Parameters:
     ///   - x: X-coordinate
@@ -129,7 +125,12 @@ class Map {
         }
         return .none
     }
-
+    
+    /// Put object tile of type at coordinate (x, y)
+    /// - Parameters:
+    ///   - x: X coordinate
+    ///   - y: Y coordinate
+    ///   - tile: Object tile
     func putObjectTileAt(x: Int, y: Int, _ tile: ObjectTile) {
         objectTiles[y][x] = tile
     }
@@ -141,7 +142,7 @@ class Map {
         }
         return nil
     }
- 
+    
     var boxPositions: [(x: Int, y: Int)] {
         var positions: [(x: Int, y: Int)] = []
         
@@ -157,47 +158,74 @@ class Map {
     var legalMoves: [Move] {
         var moves: [Move] = []
         
-        if let (heroX, heroY) = heroPosition {
+        if let (x, y) = heroPosition {
             
-            let staticTile = staticTileAt(x: heroX, y: heroY)
-            let staticTileU = staticTileAt(x: heroX, y: heroY-1)
-            let staticTileD = staticTileAt(x: heroX, y: heroY+1)
-            let staticTileL = staticTileAt(x: heroX-1, y: heroY)
-            let staticTileR = staticTileAt(x: heroX+1, y: heroY)
-            let staticTileUU = staticTileAt(x: heroX, y: heroY-2)
-            let staticTileDD = staticTileAt(x: heroX, y: heroY+2)
-            let staticTileLL = staticTileAt(x: heroX-2, y: heroY)
-            let staticTileRR = staticTileAt(x: heroX+2, y: heroY)
-
-            // TODO: also check for objects...
-            
-            if staticTileU != .wall {
-                moves.append(.walkUp)
-            }
-            if staticTileD != .wall {
-                moves.append(.walkDown)
-            }
-            if staticTileL != .wall {
+            // left
+            if !staticTileAt(x: x-1, y: y).isCollidable &&
+                objectTileAt(x: x-1, y: y) == .none {
                 moves.append(.walkLeft)
+            } else if !staticTileAt(x: x-1, y: y).isCollidable &&
+                        objectTileAt(x: x-1, y: y) == .box &&
+                        !staticTileAt(x: x-2, y: y).isCollidable &&
+                        objectTileAt(x: x-2, y: y) == .none {
+                moves.append(.pushLeft)
             }
-            if staticTileR != .wall {
+
+            // up
+            if !staticTileAt(x: x, y: y-1).isCollidable &&
+                objectTileAt(x: x, y: y-1) == .none {
+                moves.append(.walkUp)
+            } else if !staticTileAt(x: x, y: y-1).isCollidable &&
+                        objectTileAt(x: x, y: y-1) == .box &&
+                        !staticTileAt(x: x, y: y-2).isCollidable &&
+                        objectTileAt(x: x, y: y-2) == .none {
+                moves.append(.pushUp)
+            }
+
+            // right
+            if !staticTileAt(x: x+1, y: y).isCollidable &&
+                objectTileAt(x: x+1, y: y) == .none {
                 moves.append(.walkRight)
+            } else if !staticTileAt(x: x+1, y: y).isCollidable &&
+                        objectTileAt(x: x+1, y: y) == .box &&
+                        !staticTileAt(x: x+2, y: y).isCollidable &&
+                        objectTileAt(x: x+2, y: y) == .none {
+                moves.append(.pushRight)
+            }
+
+            // down
+            if !staticTileAt(x: x, y: y+1).isCollidable &&
+                objectTileAt(x: x, y: y+1) == .none {
+                moves.append(.walkDown)
+            } else if !staticTileAt(x: x, y: y+1).isCollidable &&
+                        objectTileAt(x: x, y: y+1) == .box &&
+                        !staticTileAt(x: x, y: y+2).isCollidable &&
+                        objectTileAt(x: x, y: y+2) == .none {
+                moves.append(.pushDown)
             }
         }
         
         return moves
     }
     
-    private func moveObjectTile(from: (x: Int, y: Int), to: (x: Int, y: Int)) {
+    var numberOfMoves: Int {
+        completedMoves.count
+    }
+    
+    var numberOfPushes: Int {
+        completedMoves.count(where: \.isPush)
+    }
+
+    func moveObjectTile(from: (x: Int, y: Int), to: (x: Int, y: Int)) {
         let objectTile = objectTileAt(x: from.x, y: from.y)
         putObjectTileAt(x: from.x, y: from.y, .none)
         putObjectTileAt(x: to.x, y: to.y, objectTile)
     }
-
+    
     @discardableResult
     func doNextMove(_ move: Move) -> Bool {
         if legalMoves.contains(move), let heroPosition = heroPosition {
-
+            
             let heroX = heroPosition.x
             let heroY = heroPosition.y
             
@@ -223,7 +251,7 @@ class Map {
                 moveObjectTile(from: (heroX, heroY+1), to: (heroX, heroY+2))
                 moveObjectTile(from: heroPosition, to: (heroX, heroY+1))
             }
-
+            
             completedMoves.append(move)
             return true
         }
@@ -232,7 +260,33 @@ class Map {
     
     @discardableResult
     func undoLastMove() -> Bool {
-        if let lastMove = completedMoves.popLast() {
+        if let move = completedMoves.popLast(), let heroPosition = heroPosition {
+            
+            let heroX = heroPosition.x
+            let heroY = heroPosition.y
+            
+            switch move {
+            case .walkLeft:
+                moveObjectTile(from: heroPosition, to: (heroX+1, heroY))
+            case .walkUp:
+                moveObjectTile(from: heroPosition, to: (heroX, heroY+1))
+            case .walkRight:
+                moveObjectTile(from: heroPosition, to: (heroX-1, heroY))
+            case .walkDown:
+                moveObjectTile(from: heroPosition, to: (heroX, heroY-1))
+            case .pushLeft:
+                moveObjectTile(from: (heroX+1, heroY), to: (heroX+2, heroY))
+                moveObjectTile(from: heroPosition, to: (heroX+1, heroY))
+            case .pushUp:
+                moveObjectTile(from: (heroX, heroY+1), to: (heroX, heroY+2))
+                moveObjectTile(from: heroPosition, to: (heroX, heroY+1))
+            case .pushRight:
+                moveObjectTile(from: (heroX-1, heroY), to: (heroX-2, heroY))
+                moveObjectTile(from: heroPosition, to: (heroX-1, heroY))
+            case .pushDown:
+                moveObjectTile(from: (heroX, heroY-1), to: (heroX, heroY-2))
+                moveObjectTile(from: heroPosition, to: (heroX, heroY-1))
+            }
             
             return true
         }
@@ -263,7 +317,7 @@ class Map {
     }
     
     static func mapFromXsb(string: String) -> Map? {
-
+        
         // split by newline into list of strings
         let lines = string.split(whereSeparator: \.isNewline).map({ String($0) })
         
@@ -286,7 +340,7 @@ class Map {
                 heroY = y
             }
         }
-
+        
         func fillFloors(_ tiles: inout [[StaticTile]], x: Int, y: Int) {
             if y >= 0, y < tiles.count {
                 if x >= 0, x < tiles[y].count {
@@ -310,15 +364,18 @@ class Map {
         let staticTiles2: [[StaticTile]] = lines.map({ $0.map({
             StaticTile.tileFrom(xsb: String($0))
         })})
-
+        
         // parse static tiles again, ignore floors
         staticTiles = zip(staticTiles, staticTiles2).map({
             zip($0, $1).map({
                 $1 != .floor ? $1 : $0
             })
         })
-                                                              
+        
         return Map(staticTiles: staticTiles, objectTiles: objectTiles)
     }
-
+    
+    static func empty() -> Map {
+        return Map(staticTiles: [], objectTiles: [])
+    }
 }
