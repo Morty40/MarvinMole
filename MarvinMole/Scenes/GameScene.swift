@@ -73,7 +73,7 @@ class GameScene: Scene {
         let node = SKLabelNode()
         node.fontName = "Avenir-Black"
         node.position = CGPoint(x: frame.size.width * 0.86, y: frame.size.height * 0.73)
-        node.fontColor = .blue
+        node.fontColor = .black
         node.horizontalAlignmentMode = .center
         node.verticalAlignmentMode = .center
         node.zPosition = 2
@@ -85,7 +85,7 @@ class GameScene: Scene {
         let node = SKLabelNode()
         node.fontName = "Avenir-Black"
         node.position = CGPoint(x: frame.size.width * 0.86, y: frame.size.height * 0.62)
-        node.fontColor = .blue
+        node.fontColor = .black
         node.horizontalAlignmentMode = .center
         node.verticalAlignmentMode = .center
         node.zPosition = 2
@@ -96,7 +96,7 @@ class GameScene: Scene {
         let node = SKLabelNode()
         node.fontName = "Avenir-Black"
         node.position = CGPoint(x: frame.size.width * 0.86, y: frame.size.height * 0.50)
-        node.fontColor = .blue
+        node.fontColor = .black
         node.horizontalAlignmentMode = .center
         node.verticalAlignmentMode = .center
         node.zPosition = 2

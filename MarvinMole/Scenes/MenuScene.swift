@@ -20,13 +20,14 @@ class MenuScene: Scene {
     private lazy var introText = {
         let node = SKLabelNode()
         node.fontName = "Avenir-Black"
+        node.fontSize = 30
         node.fontColor = .black
-        node.position = CGPoint(x: frame.size.width * 0.27, y: frame.size.height * 0.6)
+        node.position = CGPoint(x: frame.size.width * 0.09, y: frame.size.height * 0.78)
         node.preferredMaxLayoutWidth = 380
-        node.horizontalAlignmentMode = .center
-        node.verticalAlignmentMode = .center
+        node.horizontalAlignmentMode = .left
+        node.verticalAlignmentMode = .top
         node.zPosition = 2
-        node.text = "Oh dear! Marvin Mole's home is flooded and his food is all over the place.\nHelp him push his food back in the cupboards."
+        node.text = "Oh dear! Marvin Mole's home is flooded and his food is all over the place.\n\nHelp him push his food back in the cupboards."
         node.numberOfLines = 0
         return node
     }()
