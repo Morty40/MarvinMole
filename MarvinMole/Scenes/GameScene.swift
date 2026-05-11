@@ -52,7 +52,7 @@ private let smallXsb = """
 
 class GameScene: Scene {
     
-    private var map: Map? = nil
+    private var map: Map = .empty
     private var boxes: [Box] = []
         
     enum Input {
@@ -187,15 +187,15 @@ class GameScene: Scene {
         // load map
         map = Map.mapFromXsb(string: smallXsb)!
         
-        staticTileMap.draw(map: map!)
+        staticTileMap.draw(map: map)
         
-        if let heroPosition = map!.heroPosition {
+        if let heroPosition = map.heroPosition {
             //hero.position = CGPoint(x: CGFloat(heroPosition.x) + 0.5, y: CGFloat(heroPosition.y) + 0.5)
             hero.mapPosition = heroPosition
             //addChild(hero!)
         }
         
-        for boxPosition in map!.boxPositions {
+        for boxPosition in map.boxPositions {
             let box = Box()
             box.mapPosition = boxPosition
             boxes.append(box)
@@ -221,8 +221,8 @@ class GameScene: Scene {
 
     override func update(_ currentTime: TimeInterval) {
         
-        pushesLabel.text = "\(map!.numberOfPushes)"
-        movesLabel.text = "\(map!.numberOfMoves)"
+        pushesLabel.text = "\(map.numberOfPushes)"
+        movesLabel.text = "\(map.numberOfMoves)"
 
         processInput()
     }
@@ -230,35 +230,39 @@ class GameScene: Scene {
     private func processInput() {
         if !isMoving, let nextInput = pendingInput.first {
             
-            let legalMoves = map!.legalMoves
+            let legalMoves = map.legalMoves
             
             switch nextInput {
             case .left:
-                if legalMoves.contains(.walkLeft) {
-                    map!.doNextMove(.walkLeft)
-                } else if legalMoves.contains(.pushLeft) {
-                    map!.doNextMove(.pushLeft)
+                if let move = legalMoves.first(where: \.isLeft) {
+                    map.doNextMove(move)
+                    hero.run(SKAction.moveBy(x: -32, y: 0, duration: 0.1)) {
+                        self.isMoving = false
+                    }
                 }
             case .up:
-                if legalMoves.contains(.walkUp) {
-                    map!.doNextMove(.walkUp)
-                } else if legalMoves.contains(.pushUp) {
-                    map!.doNextMove(.pushUp)
+                if let move = legalMoves.first(where: \.isUp) {
+                    map.doNextMove(move)
+                    hero.run(SKAction.moveBy(x: 0, y: 32, duration: 0.1)) {
+                        self.isMoving = false
+                    }
                 }
             case .right:
-                if legalMoves.contains(.walkRight) {
-                    map!.doNextMove(.walkRight)
-                } else if legalMoves.contains(.pushRight) {
-                    map!.doNextMove(.pushRight)
+                if let move = legalMoves.first(where: \.isRight) {
+                    map.doNextMove(move)
+                    hero.run(SKAction.moveBy(x: 32, y: 0, duration: 0.1)) {
+                        self.isMoving = false
+                    }
                 }
             case .down:
-                if legalMoves.contains(.walkDown) {
-                    map!.doNextMove(.walkDown)
-                } else if legalMoves.contains(.pushDown) {
-                    map!.doNextMove(.pushDown)
+                if let move = legalMoves.first(where: \.isDown) {
+                    map.doNextMove(move)
+                    hero.run(SKAction.moveBy(x: 0, y: -32, duration: 0.1)) {
+                        self.isMoving = false
+                    }
                 }
             case .undo:
-                map!.undoLastMove()
+                map.undoLastMove()
             }
             
             pendingInput.removeFirst()
