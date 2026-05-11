@@ -33,7 +33,7 @@ struct MapTests {
     let largeMap = Map.mapFromXsb(string: largeXsb)!
 
     @Test func size() async throws {
-        let emptyMap = await Map.empty()
+        let emptyMap = await Map.empty
         #expect(emptyMap.size == (0, 0))
         
         let otherMap = await Map.mapFromXsb(string: largeXsb)!
@@ -41,7 +41,7 @@ struct MapTests {
     }
 
     @Test func count() async throws {
-        let emptyMap = await Map.empty()
+        let emptyMap = await Map.empty
         #expect(emptyMap.count(of: .wall) == 0)
         #expect(emptyMap.count(of: .goal) == 0)
         #expect(emptyMap.count(of: .hero) == 0)
@@ -59,7 +59,7 @@ struct MapTests {
     }
 
     @Test func tileAt() async throws {
-        let emptyMap = await Map.empty()
+        let emptyMap = await Map.empty
         #expect(emptyMap.staticTileAt(x: 0, y: 0) == .none)
         #expect(emptyMap.staticTileAt(x: 1, y: 1) == .none)
         #expect(emptyMap.objectTileAt(x: 0, y: 0) == .none)
@@ -89,9 +89,20 @@ struct MapTests {
         #expect(map.objectTileAt(x: 2, y: 1) == .hero)
         #expect(map.count(of: .hero) == 2)
     }
-    
+
+    @Test func heroPosition() async throws {
+        let emptyMap = await Map.empty
+        #expect(emptyMap.heroPosition == nil)
+
+        let smallMap = await Map.mapFromXsb(string: smallXsb)!
+        #expect(smallMap.heroPosition! == (x: 1, y: 1))
+
+        let largeMap = await Map.mapFromXsb(string: largeXsb)!
+        #expect(largeMap.heroPosition! == (x: 11, y: 8))
+    }
+
     @Test func legalMoves() async throws {
-        let emptyMap = await Map.empty()
+        let emptyMap = await Map.empty
         #expect(emptyMap.legalMoves.isEmpty)
                 
         let largeMap = await Map.mapFromXsb(string: largeXsb)!
@@ -128,7 +139,7 @@ struct MapTests {
     }
 
     @Test func completed() async throws {
-        let emptyMap = await Map.empty()
+        let emptyMap = await Map.empty
         #expect(emptyMap.isCompleted == true)
         
         #expect(smallMap.isCompleted == false)
@@ -136,6 +147,57 @@ struct MapTests {
         // TODO: #expect(smallMap.isCompleted == true)
 
         #expect(largeMap.isCompleted == false)
+    }
+
+    @Test func doNextMove() async throws {
+
+        // four way walk
+        var largeMap = await Map.mapFromXsb(string: largeXsb)!
+        #expect(largeMap.heroPosition! == (x: 11, y: 8))
+        await largeMap.doNextMove(.walkUp)
+        #expect(largeMap.heroPosition! == (x: 11, y: 7))
+        await largeMap.doNextMove(.walkLeft)
+        #expect(largeMap.heroPosition! == (x: 10, y: 7))
+        await largeMap.doNextMove(.walkRight)
+        #expect(largeMap.heroPosition! == (x: 11, y: 7))
+        await largeMap.doNextMove(.walkDown)
+        #expect(largeMap.heroPosition! == (x: 11, y: 8))
+        
+        // push left
+        largeMap = await Map.mapFromXsb(string: largeXsb)!
+        await largeMap.putObjectTileAt(x: 11, y: 8, .none)
+        await largeMap.putObjectTileAt(x: 6, y: 7, .hero)
+        await largeMap.doNextMove(.pushLeft)
+        #expect(largeMap.objectTileAt(x: 4, y: 7) == .box)
+        #expect(largeMap.objectTileAt(x: 5, y: 7) == .hero)
+        #expect(largeMap.objectTileAt(x: 6, y: 7) == .none)
+
+        // push up
+        largeMap = await Map.mapFromXsb(string: largeXsb)!
+        await largeMap.putObjectTileAt(x: 11, y: 8, .none)
+        await largeMap.putObjectTileAt(x: 5, y: 8, .hero)
+        await largeMap.doNextMove(.pushUp)
+        #expect(largeMap.objectTileAt(x: 5, y: 6) == .box)
+        #expect(largeMap.objectTileAt(x: 5, y: 7) == .hero)
+        #expect(largeMap.objectTileAt(x: 5, y: 8) == .none)
+        
+        // push right
+        largeMap = await Map.mapFromXsb(string: largeXsb)!
+        await largeMap.putObjectTileAt(x: 11, y: 8, .none)
+        await largeMap.putObjectTileAt(x: 4, y: 7, .hero)
+        await largeMap.doNextMove(.pushRight)
+        #expect(largeMap.objectTileAt(x: 6, y: 7) == .box)
+        #expect(largeMap.objectTileAt(x: 5, y: 7) == .hero)
+        #expect(largeMap.objectTileAt(x: 4, y: 7) == .none)
+
+        // push down
+        largeMap = await Map.mapFromXsb(string: largeXsb)!
+        await largeMap.putObjectTileAt(x: 11, y: 8, .none)
+        await largeMap.putObjectTileAt(x: 5, y: 6, .hero)
+        await largeMap.doNextMove(.pushDown)
+        #expect(largeMap.objectTileAt(x: 5, y: 8) == .box)
+        #expect(largeMap.objectTileAt(x: 5, y: 7) == .hero)
+        #expect(largeMap.objectTileAt(x: 5, y: 6) == .none)
     }
 
 }

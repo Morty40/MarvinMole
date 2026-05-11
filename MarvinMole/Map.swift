@@ -10,6 +10,7 @@ import Foundation
 /// Sokoban map representation
 class Map {
     
+    /// Static (immovable) tile types
     enum StaticTile {
         case none
         case wall
@@ -34,6 +35,7 @@ class Map {
         }
     }
     
+    /// Object (movable) tile types
     enum ObjectTile {
         case none
         case hero
@@ -51,7 +53,7 @@ class Map {
         }
     }
     
-    // Sokoban solution LURD format
+    /// Move types, using Sokoban solution LURD notation
     enum Move: String {
         case walkLeft  = "l"
         case walkUp    = "u"
@@ -61,7 +63,23 @@ class Map {
         case pushUp    = "U"
         case pushRight = "R"
         case pushDown  = "D"
-        
+
+        var isLeft: Bool {
+            [.walkLeft, .pushLeft].contains(self)
+        }
+
+        var isUp: Bool {
+            [.walkUp, .pushUp].contains(self)
+        }
+
+        var isRight: Bool {
+            [.walkRight, .pushRight].contains(self)
+        }
+
+        var isDown: Bool {
+            [.walkDown, .pushDown].contains(self)
+        }
+
         var isPush: Bool {
             [.pushLeft, .pushRight, .pushUp, .pushDown].contains(self)
         }
@@ -135,26 +153,16 @@ class Map {
         objectTiles[y][x] = tile
     }
     
+    /// Current position of the hero
     var heroPosition: (x: Int, y: Int)? {
-        if let heroY = objectTiles.firstIndex(where: { $0.contains(.hero) } ),
-           let heroX = objectTiles[heroY].firstIndex(of: .hero) {
-            return (heroX, heroY)
+        if let y = objectTiles.firstIndex(where: { $0.contains(.hero) } ),
+           let x = objectTiles[y].firstIndex(of: .hero) {
+            return (x, y)
         }
         return nil
     }
-    
-    var boxPositions: [(x: Int, y: Int)] {
-        var positions: [(x: Int, y: Int)] = []
         
-        for (y, row) in objectTiles.enumerated() {
-            for (x, tile) in row.enumerated() where tile == .box {
-                positions.append((x, y))
-            }
-        }
-        
-        return positions
-    }
-    
+    /// Current legal moves
     var legalMoves: [Move] {
         var moves: [Move] = []
         
@@ -208,91 +216,6 @@ class Map {
         return moves
     }
     
-    var numberOfMoves: Int {
-        completedMoves.count
-    }
-    
-    var numberOfPushes: Int {
-        completedMoves.count(where: \.isPush)
-    }
-
-    func moveObjectTile(from: (x: Int, y: Int), to: (x: Int, y: Int)) {
-        let objectTile = objectTileAt(x: from.x, y: from.y)
-        putObjectTileAt(x: from.x, y: from.y, .none)
-        putObjectTileAt(x: to.x, y: to.y, objectTile)
-    }
-    
-    @discardableResult
-    func doNextMove(_ move: Move) -> Bool {
-        if legalMoves.contains(move), let heroPosition = heroPosition {
-            
-            let heroX = heroPosition.x
-            let heroY = heroPosition.y
-            
-            switch move {
-            case .walkLeft:
-                moveObjectTile(from: heroPosition, to: (heroX-1, heroY))
-            case .walkUp:
-                moveObjectTile(from: heroPosition, to: (heroX, heroY-1))
-            case .walkRight:
-                moveObjectTile(from: heroPosition, to: (heroX+1, heroY))
-            case .walkDown:
-                moveObjectTile(from: heroPosition, to: (heroX, heroY+1))
-            case .pushLeft:
-                moveObjectTile(from: (heroX-1, heroY), to: (heroX-2, heroY))
-                moveObjectTile(from: heroPosition, to: (heroX-1, heroY))
-            case .pushUp:
-                moveObjectTile(from: (heroX, heroY-1), to: (heroX, heroY-2))
-                moveObjectTile(from: heroPosition, to: (heroX, heroY-1))
-            case .pushRight:
-                moveObjectTile(from: (heroX+1, heroY), to: (heroX+2, heroY))
-                moveObjectTile(from: heroPosition, to: (heroX+1, heroY))
-            case .pushDown:
-                moveObjectTile(from: (heroX, heroY+1), to: (heroX, heroY+2))
-                moveObjectTile(from: heroPosition, to: (heroX, heroY+1))
-            }
-            
-            completedMoves.append(move)
-            return true
-        }
-        return false
-    }
-    
-    @discardableResult
-    func undoLastMove() -> Bool {
-        if let move = completedMoves.popLast(), let heroPosition = heroPosition {
-            
-            let heroX = heroPosition.x
-            let heroY = heroPosition.y
-            
-            switch move {
-            case .walkLeft:
-                moveObjectTile(from: heroPosition, to: (heroX+1, heroY))
-            case .walkUp:
-                moveObjectTile(from: heroPosition, to: (heroX, heroY+1))
-            case .walkRight:
-                moveObjectTile(from: heroPosition, to: (heroX-1, heroY))
-            case .walkDown:
-                moveObjectTile(from: heroPosition, to: (heroX, heroY-1))
-            case .pushLeft:
-                moveObjectTile(from: (heroX+1, heroY), to: (heroX+2, heroY))
-                moveObjectTile(from: heroPosition, to: (heroX+1, heroY))
-            case .pushUp:
-                moveObjectTile(from: (heroX, heroY+1), to: (heroX, heroY+2))
-                moveObjectTile(from: heroPosition, to: (heroX, heroY+1))
-            case .pushRight:
-                moveObjectTile(from: (heroX-1, heroY), to: (heroX-2, heroY))
-                moveObjectTile(from: heroPosition, to: (heroX-1, heroY))
-            case .pushDown:
-                moveObjectTile(from: (heroX, heroY-1), to: (heroX, heroY-2))
-                moveObjectTile(from: heroPosition, to: (heroX, heroY-1))
-            }
-            
-            return true
-        }
-        return false
-    }
-    
     /// Check if all goals have a box on top
     var isCompleted: Bool {
         for (y, row) in staticTiles.enumerated() {
@@ -307,6 +230,101 @@ class Map {
         
         // all goals have a box on top, the map is completed
         return true
+    }
+
+    var boxPositions: [(x: Int, y: Int)] {
+        var positions: [(x: Int, y: Int)] = []
+        
+        for (y, row) in objectTiles.enumerated() {
+            for (x, tile) in row.enumerated() where tile == .box {
+                positions.append((x, y))
+            }
+        }
+        
+        return positions
+    }
+
+    private func moveObjectTile(from: (x: Int, y: Int), to: (x: Int, y: Int)) {
+        let objectTile = objectTileAt(x: from.x, y: from.y)
+        putObjectTileAt(x: from.x, y: from.y, .none)
+        putObjectTileAt(x: to.x, y: to.y, objectTile)
+    }
+    
+    @discardableResult
+    func doNextMove(_ move: Move) -> Bool {
+        if legalMoves.contains(move), let heroPosition = heroPosition {
+            
+            let (x, y) = heroPosition
+            
+            switch move {
+            case .walkLeft:
+                moveObjectTile(from: heroPosition, to: (x-1, y))
+            case .walkUp:
+                moveObjectTile(from: heroPosition, to: (x, y-1))
+            case .walkRight:
+                moveObjectTile(from: heroPosition, to: (x+1, y))
+            case .walkDown:
+                moveObjectTile(from: heroPosition, to: (x, y+1))
+            case .pushLeft:
+                moveObjectTile(from: (x-1, y), to: (x-2, y))
+                moveObjectTile(from: heroPosition, to: (x-1, y))
+            case .pushUp:
+                moveObjectTile(from: (x, y-1), to: (x, y-2))
+                moveObjectTile(from: heroPosition, to: (x, y-1))
+            case .pushRight:
+                moveObjectTile(from: (x+1, y), to: (x+2, y))
+                moveObjectTile(from: heroPosition, to: (x+1, y))
+            case .pushDown:
+                moveObjectTile(from: (x, y+1), to: (x, y+2))
+                moveObjectTile(from: heroPosition, to: (x, y+1))
+            }
+            
+            completedMoves.append(move)
+            return true
+        }
+        return false
+    }
+    
+    @discardableResult
+    func undoLastMove() -> Bool {
+        if let move = completedMoves.popLast(), let heroPosition = heroPosition {
+            
+            let (x, y) = heroPosition
+            
+            switch move {
+            case .walkLeft:
+                moveObjectTile(from: heroPosition, to: (x+1, y))
+            case .walkUp:
+                moveObjectTile(from: heroPosition, to: (x, y+1))
+            case .walkRight:
+                moveObjectTile(from: heroPosition, to: (x-1, y))
+            case .walkDown:
+                moveObjectTile(from: heroPosition, to: (x, y-1))
+            case .pushLeft:
+                moveObjectTile(from: (x+1, y), to: (x+2, y))
+                moveObjectTile(from: heroPosition, to: (x+1, y))
+            case .pushUp:
+                moveObjectTile(from: (x, y+1), to: (x, y+2))
+                moveObjectTile(from: heroPosition, to: (x, y+1))
+            case .pushRight:
+                moveObjectTile(from: (x-1, y), to: (x-2, y))
+                moveObjectTile(from: heroPosition, to: (x-1, y))
+            case .pushDown:
+                moveObjectTile(from: (x, y-1), to: (x, y-2))
+                moveObjectTile(from: heroPosition, to: (x, y-1))
+            }
+            
+            return true
+        }
+        return false
+    }
+    
+    var numberOfMoves: Int {
+        completedMoves.count
+    }
+    
+    var numberOfPushes: Int {
+        completedMoves.count(where: \.isPush)
     }
     
     static func mapFromXsb(data: Data) -> Map? {
@@ -375,7 +393,7 @@ class Map {
         return Map(staticTiles: staticTiles, objectTiles: objectTiles)
     }
     
-    static func empty() -> Map {
-        return Map(staticTiles: [], objectTiles: [])
+    static var empty: Map {
+        Map(staticTiles: [], objectTiles: [])
     }
 }
