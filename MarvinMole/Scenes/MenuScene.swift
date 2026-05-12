@@ -45,7 +45,6 @@ class MenuScene: Scene {
     
     override func sceneDidLoad() {
         super.sceneDidLoad()
-        print("sceneDidLoad: MenuScene")
         
         anchorPoint = .zero
         
@@ -55,7 +54,6 @@ class MenuScene: Scene {
     }
 
     override func didMove(to view: SKView) {
-        print("didMoveTo: MenuScene")
     }
     
     override func update(_ currentTime: TimeInterval) {

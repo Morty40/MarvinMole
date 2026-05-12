@@ -143,7 +143,6 @@ class GameScene: Scene {
     
     override func sceneDidLoad() {
         super.sceneDidLoad()
-        print("sceneDidLoad: GameScene")
         
         anchorPoint = .zero
         
@@ -159,7 +158,6 @@ class GameScene: Scene {
     }
     
     override func didMove(to view: SKView) {
-        print("didMoveTo: GameScene")
         
         // remove any old gesture recognizers
         for recognizer in view.gestureRecognizers ?? [] {
