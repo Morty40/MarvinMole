@@ -1,5 +1,5 @@
 //
-//  StaticTileSet.swift
+//  TileSet.swift
 //  MarvinMole
 //
 //  (c) Morten Perriard 2026
@@ -7,7 +7,7 @@
 
 import SpriteKit
 
-class StaticTileSet: SKTileSet {
+class TileSet: SKTileSet {
     
     let wallFront = SKTileGroup(imageNamed: "WallFront")
     let wallTop = SKTileGroup(imageNamed: "WallTop")

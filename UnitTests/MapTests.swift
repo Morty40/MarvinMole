@@ -8,13 +8,7 @@
 import Testing
 @testable import MarvinMole
 
-private let smallXsb = """
- #####
-#@$.*#
-######
-"""
-
-private let largeXsb = """
+private let testXsb = """
     #####
     #   #
     #$  #
@@ -29,14 +23,12 @@ private let largeXsb = """
 """
 
 struct MapTests {
-    let smallMap = Map.mapFromXsb(string: smallXsb)!
-    let largeMap = Map.mapFromXsb(string: largeXsb)!
 
     @Test func size() async throws {
         let emptyMap = await Map.empty
         #expect(emptyMap.size == (0, 0))
         
-        let otherMap = await Map.mapFromXsb(string: largeXsb)!
+        let otherMap = await Map.mapFromXsb(string: testXsb)!
         #expect(otherMap.size == (19, 11))
     }
 
@@ -44,160 +36,161 @@ struct MapTests {
         let emptyMap = await Map.empty
         #expect(emptyMap.count(of: .wall) == 0)
         #expect(emptyMap.count(of: .goal) == 0)
+        #expect(emptyMap.count(of: .floor) == 0)
         #expect(emptyMap.count(of: .hero) == 0)
         #expect(emptyMap.count(of: .box) == 0)
 
-        #expect(smallMap.count(of: .wall) == 13)
-        #expect(smallMap.count(of: .goal) == 2)
-        #expect(smallMap.count(of: .hero) == 1)
-        #expect(smallMap.count(of: .box) == 2)
-
-        #expect(largeMap.count(of: .wall) == 70)
-        #expect(largeMap.count(of: .goal) == 6)
-        #expect(largeMap.count(of: .hero) == 1)
-        #expect(largeMap.count(of: .box) == 6)
+        let testMap = await Map.mapFromXsb(string: testXsb)!
+        #expect(testMap.count(of: .wall) == 70)
+        #expect(testMap.count(of: .goal) == 6)
+        #expect(testMap.count(of: .floor) == 50)
+        #expect(testMap.count(of: .hero) == 1)
+        #expect(testMap.count(of: .box) == 6)
     }
 
     @Test func tileAt() async throws {
         let emptyMap = await Map.empty
-        #expect(emptyMap.staticTileAt(x: 0, y: 0) == .none)
-        #expect(emptyMap.staticTileAt(x: 1, y: 1) == .none)
-        #expect(emptyMap.objectTileAt(x: 0, y: 0) == .none)
-        #expect(emptyMap.objectTileAt(x: 1, y: 1) == .none)
+        #expect(emptyMap.tileAt(x: 0, y: 0) == .void)
+        #expect(emptyMap.tileAt(x: 1, y: 1) == .void)
 
-        let smallMap = await Map.mapFromXsb(string: smallXsb)!
-        #expect(smallMap.staticTileAt(x: 0, y: 0) == .none)
-        #expect(smallMap.staticTileAt(x: 1, y: 0) == .wall)
-        #expect(smallMap.staticTileAt(x: 1, y: 1) == .floor)
-        #expect(smallMap.objectTileAt(x: 1, y: 1) == .hero)
-        #expect(smallMap.objectTileAt(x: 2, y: 1) == .box)
-
-        let largeMap = await Map.mapFromXsb(string: largeXsb)!
-        #expect(largeMap.staticTileAt(x: 0, y: 0) == .none)
-        #expect(largeMap.staticTileAt(x: 4, y: 0) == .wall)
-        #expect(largeMap.staticTileAt(x: 5, y: 1) == .floor)
-        #expect(largeMap.objectTileAt(x: 11, y: 8) == .hero)
-        #expect(largeMap.objectTileAt(x: 5, y: 2) == .box)
+        let testMap = await Map.mapFromXsb(string: testXsb)!
+        #expect(testMap.tileAt(x: 0, y: 0) == .void)
+        #expect(testMap.tileAt(x: 4, y: 0) == .wall)
+        #expect(testMap.tileAt(x: 17, y: 6) == .goal)
+        #expect(testMap.tileAt(x: 5, y: 1) == .floor)
     }
-    
-    @Test func putObjectTileAt() async throws {
-        let map = await Map.mapFromXsb(string: smallXsb)!
-        #expect(map.objectTileAt(x: 2, y: 1) == .box)
-        #expect(map.count(of: .hero) == 1)
-        
-        await map.putObjectTileAt(x: 2, y: 1, .hero)
-        #expect(map.objectTileAt(x: 2, y: 1) == .hero)
-        #expect(map.count(of: .hero) == 2)
+
+    @Test func objectAt() async throws {
+        let emptyMap = await Map.empty
+        await #expect(emptyMap.objectAt(x: 0, y: 0)?.type == nil)
+        await #expect(emptyMap.objectAt(x: 1, y: 1)?.type == nil)
+
+        let testMap = await Map.mapFromXsb(string: testXsb)!
+        await #expect(testMap.objectAt(x: 0, y: 0)?.type == nil)
+        await #expect(testMap.objectAt(x: 11, y: 8)?.type == .hero)
+        await #expect(testMap.objectAt(x: 5, y: 2)?.type == .box)
+    }
+
+    @Test func isObjectAt() async throws {
+        let emptyMap = await Map.empty
+        await #expect(emptyMap.isObjectAt(x: 0, y: 0) == false)
+        await #expect(emptyMap.isObjectAt(x: 1, y: 1) == false)
+
+        let testMap = await Map.mapFromXsb(string: testXsb)!
+        await #expect(testMap.isObjectAt(x: 0, y: 0) == false)
+        await #expect(testMap.isObjectAt(x: 11, y: 8) == true)
+        await #expect(testMap.isObjectAt(x: 5, y: 2) == true)
+    }
+
+    @Test func removeObjectAt() async throws {
+        let testMap = await Map.mapFromXsb(string: testXsb)!
+        await #expect(testMap.isObjectAt(x: 11, y: 8) == true)
+        await testMap.removeObjectAt(x: 11, y: 8)
+        await #expect(testMap.isObjectAt(x: 11, y: 8) == false)
     }
 
     @Test func heroPosition() async throws {
         let emptyMap = await Map.empty
         #expect(emptyMap.heroPosition == nil)
 
-        let smallMap = await Map.mapFromXsb(string: smallXsb)!
-        #expect(smallMap.heroPosition! == (x: 1, y: 1))
-
-        let largeMap = await Map.mapFromXsb(string: largeXsb)!
-        #expect(largeMap.heroPosition! == (x: 11, y: 8))
+        let testMap = await Map.mapFromXsb(string: testXsb)!
+        #expect(testMap.heroPosition! == (x: 11, y: 8))
     }
 
     @Test func legalMoves() async throws {
         let emptyMap = await Map.empty
         #expect(emptyMap.legalMoves.isEmpty)
                 
-        let largeMap = await Map.mapFromXsb(string: largeXsb)!
-        #expect(largeMap.heroPosition! == (x: 11, y: 8))
-        #expect(largeMap.legalMoves == [.walkUp])
+        let testMap = await Map.mapFromXsb(string: testXsb)!
+        #expect(testMap.heroPosition! == (x: 11, y: 8))
+        #expect(testMap.legalMoves == [.walkUp])
         
-        await largeMap.doNextMove(.walkUp)
-        #expect(largeMap.heroPosition! == (x: 11, y: 7))
-        #expect(largeMap.legalMoves == [.walkLeft, .walkRight, .walkDown])
+        await testMap.doNextMove(.walkUp)
+        #expect(testMap.heroPosition! == (x: 11, y: 7))
+        #expect(testMap.legalMoves == [.walkLeft, .walkRight, .walkDown])
 
-        await largeMap.doNextMove(.walkLeft)
-        #expect(largeMap.heroPosition! == (x: 10, y: 7))
-        #expect(largeMap.legalMoves == [.walkLeft, .walkRight])
+        await testMap.doNextMove(.walkLeft)
+        #expect(testMap.heroPosition! == (x: 10, y: 7))
+        #expect(testMap.legalMoves == [.walkLeft, .walkRight])
 
-        await largeMap.doNextMove(.walkLeft)
-        #expect(largeMap.heroPosition! == (x: 9, y: 7))
-        #expect(largeMap.legalMoves == [.walkLeft, .walkRight, .walkDown])
+        await testMap.doNextMove(.walkLeft)
+        #expect(testMap.heroPosition! == (x: 9, y: 7))
+        #expect(testMap.legalMoves == [.walkLeft, .walkRight, .walkDown])
 
-        await largeMap.doNextMove(.walkLeft)
-        #expect(largeMap.heroPosition! == (x: 8, y: 7))
-        #expect(largeMap.legalMoves == [.walkLeft, .walkUp, .walkRight])
+        await testMap.doNextMove(.walkLeft)
+        #expect(testMap.heroPosition! == (x: 8, y: 7))
+        #expect(testMap.legalMoves == [.walkLeft, .walkUp, .walkRight])
 
-        await largeMap.doNextMove(.walkLeft)
-        #expect(largeMap.heroPosition! == (x: 7, y: 7))
-        #expect(largeMap.legalMoves == [.walkLeft, .walkRight])
+        await testMap.doNextMove(.walkLeft)
+        #expect(testMap.heroPosition! == (x: 7, y: 7))
+        #expect(testMap.legalMoves == [.walkLeft, .walkRight])
 
-        await largeMap.doNextMove(.walkLeft)
-        #expect(largeMap.heroPosition! == (x: 6, y: 7))
-        #expect(largeMap.legalMoves == [.pushLeft, .walkRight])
+        await testMap.doNextMove(.walkLeft)
+        #expect(testMap.heroPosition! == (x: 6, y: 7))
+        #expect(testMap.legalMoves == [.pushLeft, .walkRight])
 
-        await largeMap.doNextMove(.pushLeft)
-        #expect(largeMap.heroPosition! == (x: 5, y: 7))
-        #expect(largeMap.legalMoves == [.pushLeft, .walkUp, .walkRight, .walkDown])
+        await testMap.doNextMove(.pushLeft)
+        #expect(testMap.heroPosition! == (x: 5, y: 7))
+        #expect(testMap.legalMoves == [.pushLeft, .walkUp, .walkRight, .walkDown])
     }
 
     @Test func completed() async throws {
         let emptyMap = await Map.empty
         #expect(emptyMap.isCompleted == true)
-        
-        #expect(smallMap.isCompleted == false)
-        await smallMap.doNextMove(.pushRight)
-        // TODO: #expect(smallMap.isCompleted == true)
 
-        #expect(largeMap.isCompleted == false)
+        let testMap = await Map.mapFromXsb(string: testXsb)!
+        #expect(testMap.isCompleted == false)
     }
 
     @Test func doNextMove() async throws {
 
         // four way walk
-        var largeMap = await Map.mapFromXsb(string: largeXsb)!
-        #expect(largeMap.heroPosition! == (x: 11, y: 8))
-        await largeMap.doNextMove(.walkUp)
-        #expect(largeMap.heroPosition! == (x: 11, y: 7))
-        await largeMap.doNextMove(.walkLeft)
-        #expect(largeMap.heroPosition! == (x: 10, y: 7))
-        await largeMap.doNextMove(.walkRight)
-        #expect(largeMap.heroPosition! == (x: 11, y: 7))
-        await largeMap.doNextMove(.walkDown)
-        #expect(largeMap.heroPosition! == (x: 11, y: 8))
+        var testMap = await Map.mapFromXsb(string: testXsb)!
+        #expect(testMap.heroPosition! == (x: 11, y: 8))
+        await testMap.doNextMove(.walkUp)
+        #expect(testMap.heroPosition! == (x: 11, y: 7))
+        await testMap.doNextMove(.walkLeft)
+        #expect(testMap.heroPosition! == (x: 10, y: 7))
+        await testMap.doNextMove(.walkRight)
+        #expect(testMap.heroPosition! == (x: 11, y: 7))
+        await testMap.doNextMove(.walkDown)
+        #expect(testMap.heroPosition! == (x: 11, y: 8))
         
         // push left
-        largeMap = await Map.mapFromXsb(string: largeXsb)!
-        await largeMap.putObjectTileAt(x: 11, y: 8, .none)
-        await largeMap.putObjectTileAt(x: 6, y: 7, .hero)
-        await largeMap.doNextMove(.pushLeft)
-        #expect(largeMap.objectTileAt(x: 4, y: 7) == .box)
-        #expect(largeMap.objectTileAt(x: 5, y: 7) == .hero)
-        #expect(largeMap.objectTileAt(x: 6, y: 7) == .none)
+        testMap = await Map.mapFromXsb(string: testXsb)!
+        await testMap.removeObjectAt(x: 11, y: 8)
+        await testMap.putObjectAt(x: 6, y: 7, type: .hero)
+        await testMap.doNextMove(.pushLeft)
+        await #expect(testMap.objectAt(x: 4, y: 7)?.type == .box)
+        await #expect(testMap.objectAt(x: 5, y: 7)?.type == .hero)
+        await #expect(testMap.isObjectAt(x: 6, y: 7) == false)
 
         // push up
-        largeMap = await Map.mapFromXsb(string: largeXsb)!
-        await largeMap.putObjectTileAt(x: 11, y: 8, .none)
-        await largeMap.putObjectTileAt(x: 5, y: 8, .hero)
-        await largeMap.doNextMove(.pushUp)
-        #expect(largeMap.objectTileAt(x: 5, y: 6) == .box)
-        #expect(largeMap.objectTileAt(x: 5, y: 7) == .hero)
-        #expect(largeMap.objectTileAt(x: 5, y: 8) == .none)
+        testMap = await Map.mapFromXsb(string: testXsb)!
+        await testMap.removeObjectAt(x: 11, y: 8)
+        await testMap.putObjectAt(x: 5, y: 8, type: .hero)
+        await testMap.doNextMove(.pushUp)
+        await #expect(testMap.objectAt(x: 5, y: 6)?.type == .box)
+        await #expect(testMap.objectAt(x: 5, y: 7)?.type == .hero)
+        await #expect(testMap.isObjectAt(x: 5, y: 8) == false)
         
         // push right
-        largeMap = await Map.mapFromXsb(string: largeXsb)!
-        await largeMap.putObjectTileAt(x: 11, y: 8, .none)
-        await largeMap.putObjectTileAt(x: 4, y: 7, .hero)
-        await largeMap.doNextMove(.pushRight)
-        #expect(largeMap.objectTileAt(x: 6, y: 7) == .box)
-        #expect(largeMap.objectTileAt(x: 5, y: 7) == .hero)
-        #expect(largeMap.objectTileAt(x: 4, y: 7) == .none)
+        testMap = await Map.mapFromXsb(string: testXsb)!
+        await testMap.removeObjectAt(x: 11, y: 8)
+        await testMap.putObjectAt(x: 4, y: 7, type: .hero)
+        await testMap.doNextMove(.pushRight)
+        await #expect(testMap.objectAt(x: 6, y: 7)?.type == .box)
+        await #expect(testMap.objectAt(x: 5, y: 7)?.type == .hero)
+        await #expect(testMap.isObjectAt(x: 4, y: 7) == false)
 
         // push down
-        largeMap = await Map.mapFromXsb(string: largeXsb)!
-        await largeMap.putObjectTileAt(x: 11, y: 8, .none)
-        await largeMap.putObjectTileAt(x: 5, y: 6, .hero)
-        await largeMap.doNextMove(.pushDown)
-        #expect(largeMap.objectTileAt(x: 5, y: 8) == .box)
-        #expect(largeMap.objectTileAt(x: 5, y: 7) == .hero)
-        #expect(largeMap.objectTileAt(x: 5, y: 6) == .none)
+        testMap = await Map.mapFromXsb(string: testXsb)!
+        await testMap.removeObjectAt(x: 11, y: 8)
+        await testMap.putObjectAt(x: 5, y: 6, type: .hero)
+        await testMap.doNextMove(.pushDown)
+        await #expect(testMap.objectAt(x: 5, y: 8)?.type == .box)
+        await #expect(testMap.objectAt(x: 5, y: 7)?.type == .hero)
+        await #expect(testMap.isObjectAt(x: 5, y: 6) == false)
     }
 
 }

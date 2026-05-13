@@ -1,5 +1,5 @@
 //
-//  StaticTileMapNode.swift
+//  TileMapNode.swift
 //  MarvinMole
 //
 //  (c) Morten Perriard 2026
@@ -7,11 +7,11 @@
 
 import SpriteKit
 
-class StaticTileMapNode: SKTileMapNode {
+class TileMapNode: SKTileMapNode {
     
     override init() {
         super.init()
-        tileSet = StaticTileSet()
+        tileSet = TileSet()
     }
 
     func draw(map: Map) {
@@ -28,13 +28,13 @@ class StaticTileMapNode: SKTileMapNode {
         numberOfRows = map.size.height
         
         // draw tiles
-        let tileSet = tileSet as! StaticTileSet
+        let tileSet = tileSet as! TileSet
         for y in 0 ..< numberOfRows {
             for x in 0 ..< numberOfColumns {
                 
-                let tile = map.staticTileAt(x: x, y: y)
-                let tileBelow = map.staticTileAt(x: x, y: y+1)
-                let tileLeft = map.staticTileAt(x: x-1, y: y)
+                let tile = map.tileAt(x: x, y: y)
+                let tileBelow = map.tileAt(x: x, y: y+1)
+                let tileLeft = map.tileAt(x: x-1, y: y)
 
                 switch tile {
                 case .wall:

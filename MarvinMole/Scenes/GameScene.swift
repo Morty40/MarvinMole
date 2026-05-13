@@ -33,7 +33,6 @@ class Box: GameObjectNode {
 }
 
 class Hero: GameObjectNode {
-    
 }
 
 private let smallXsb = """
@@ -103,8 +102,8 @@ class GameScene: Scene {
         return node
     }()
     
-    private lazy var staticTileMap = {
-        let node = StaticTileMapNode()
+    private lazy var tileMap = {
+        let node = TileMapNode()
         node.position = CGPoint(x: frame.size.width * 0.43, y: frame.size.height * 0.5)
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         node.zPosition = 2
@@ -150,11 +149,11 @@ class GameScene: Scene {
         addChild(levelLabel)
         addChild(pushesLabel)
         addChild(movesLabel)
-        addChild(staticTileMap)
+        addChild(tileMap)
         addChild(undoButton)
         addChild(quitButton)
 
-        staticTileMap.addChild(hero)
+        tileMap.addChild(hero)
     }
     
     override func didMove(to view: SKView) {
@@ -185,7 +184,7 @@ class GameScene: Scene {
         // load map
         map = Map.mapFromXsb(string: smallXsb)!
         
-        staticTileMap.draw(map: map)
+        tileMap.draw(map: map)
         
         if let heroPosition = map.heroPosition {
             //hero.position = CGPoint(x: CGFloat(heroPosition.x) + 0.5, y: CGFloat(heroPosition.y) + 0.5)
