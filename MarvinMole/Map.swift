@@ -247,9 +247,9 @@ class Map {
         // all goals have a box on top, the map is completed
         return true
     }
-    
-    var boxPositions: [(x: Int, y: Int)] {
-        objects.map { $0.position }
+
+    func objectsOfType(_ type: ObjectType) -> [Object] {
+        objects.filter({ $0.type == type })
     }
     
     private func moveObject(from: (x: Int, y: Int), to: (x: Int, y: Int)) {
@@ -408,7 +408,6 @@ class Map {
             })
         })
         
-        print(objects)
         return Map(tiles: tiles, objects: objects)
     }
     

@@ -1,5 +1,5 @@
 //
-//  TileMapNode.swift
+//  TileMap.swift
 //  MarvinMole
 //
 //  (c) Morten Perriard 2026
@@ -7,7 +7,7 @@
 
 import SpriteKit
 
-class TileMapNode: SKTileMapNode {
+class TileMap: SKTileMapNode {
     
     override init() {
         super.init()
