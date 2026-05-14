@@ -9,6 +9,11 @@ import SpriteKit
 
 extension SKTexture {
     
+    /// Split a texture (e.g. sprite sheet) into multiple textures, by columns x rows
+    /// - Parameters:
+    ///   - columns: Number of columns
+    ///   - rows: Number of rows
+    /// - Returns: Array of textures
     func split(columns: Int = 1, rows: Int = 1) -> [SKTexture] {
         var textures: [SKTexture] = []
         
@@ -18,7 +23,6 @@ extension SKTexture {
                                   y: CGFloat(y) / CGFloat(rows),
                                   width: 1.0 / CGFloat(columns),
                                   height: 1.0 / CGFloat(rows))
-                
                 textures.append(SKTexture(rect: rect, in: self))
             }
         }
