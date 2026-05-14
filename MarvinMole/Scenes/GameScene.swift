@@ -32,12 +32,18 @@ class GameObjectNode: SKSpriteNode {
 
 class Box: GameObjectNode {
     
-    static let boxTexture = SKTexture(imageNamed: "Box")
+    static let boxTextures = [SKTexture(imageNamed: "Box1"),
+                              SKTexture(imageNamed: "Box2"),
+                              SKTexture(imageNamed: "Box3"),
+                              SKTexture(imageNamed: "Box4")]
     static let boxOnGoalTexture = SKTexture(imageNamed: "BoxOnGoal")
+    
+    var boxTexture: SKTexture? = nil
     
     override init() {
         super.init()
-        self.texture = Box.boxTexture
+        boxTexture = Box.boxTextures[Int(arc4random()) % 4]
+        self.texture = boxTexture
     }
     
     @MainActor required init?(coder aDecoder: NSCoder) {
@@ -244,7 +250,7 @@ class GameScene: Scene {
 
         for (obj, box) in zip(map.objectsOfType(.box), boxes) {
             box.mapPosition = obj.position
-            box.texture = map.tileAt(x: obj.position.x, y: obj.position.y) == .goal ? Box.boxOnGoalTexture : Box.boxTexture
+            box.texture = map.tileAt(x: obj.position.x, y: obj.position.y) == .goal ? Box.boxOnGoalTexture : box.boxTexture
         }
 
     }

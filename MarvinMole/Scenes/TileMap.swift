@@ -35,14 +35,19 @@ class TileMap: SKTileMapNode {
                 let tile = map.tileAt(x: x, y: y)
                 let tileBelow = map.tileAt(x: x, y: y+1)
                 let tileLeft = map.tileAt(x: x-1, y: y)
+                let tileBelowLeft = map.tileAt(x: x-1, y: y+1)
 
                 switch tile {
                 case .wall:
                     if tileBelow == .wall {
                         setTileGroup(tileSet.wallTop, forColumn: x, row: numberOfRows - y - 1)
                     } else {
-                        let tile = ((arc4random() & 3) != 0) ? tileSet.wallFront1 : tileSet.wallFront2
-                        setTileGroup(tile, forColumn: x, row: numberOfRows - y - 1)
+                        if tileBelowLeft == .wall {
+                            setTileGroup(tileSet.wallFrontShadow, forColumn: x, row: numberOfRows - y - 1)
+                        } else {
+                            let tile = ((arc4random() & 3) != 0) ? tileSet.wallFront1 : tileSet.wallFront2
+                            setTileGroup(tile, forColumn: x, row: numberOfRows - y - 1)
+                        }
                     }
                     
                 case .floor:

@@ -11,13 +11,14 @@ class TileSet: SKTileSet {
     
     let wallFront1 = SKTileGroup(imageNamed: "WallFront1")
     let wallFront2 = SKTileGroup(imageNamed: "WallFront2")
+    let wallFrontShadow = SKTileGroup(imageNamed: "WallFrontShadow")
     let wallTop = SKTileGroup(imageNamed: "WallTop")
     let floor = SKTileGroup(imageNamed: "Floor")
     let floorShadow: SKTileGroup = SKTileGroup(imageNamed: "FloorShadow")
     let goal = SKTileGroup(imageNamed: "Goal")
     
     override init() {
-        super.init(tileGroups: [wallFront1, wallFront2, wallTop, floor, floorShadow, goal])
+        super.init(tileGroups: [wallFront1, wallFront2, wallFrontShadow, wallTop, floor, floorShadow, goal])
     }
     
     required init?(coder: NSCoder) {
