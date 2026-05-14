@@ -41,7 +41,8 @@ class TileMap: SKTileMapNode {
                     if tileBelow == .wall {
                         setTileGroup(tileSet.wallTop, forColumn: x, row: numberOfRows - y - 1)
                     } else {
-                        setTileGroup(tileSet.wallFront, forColumn: x, row: numberOfRows - y - 1)
+                        let tile = ((arc4random() & 3) != 0) ? tileSet.wallFront1 : tileSet.wallFront2
+                        setTileGroup(tile, forColumn: x, row: numberOfRows - y - 1)
                     }
                     
                 case .floor:
