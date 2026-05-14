@@ -16,4 +16,7 @@ class Scene: SKScene {
         let transition = SKTransition.fade(withDuration: 0.5)
         view?.presentScene(scene, transition: transition)
     }
+    
+    func handleKey(_ key: UIKey) {
+    }
 }

@@ -319,6 +319,23 @@ class GameScene: Scene {
         }
     }
     
+    override func handleKey(_ key: UIKey) {
+        switch key.keyCode {
+        case .keyboardLeftArrow:
+            pendingInput.append(.left)
+        case .keyboardUpArrow:
+            pendingInput.append(.up)
+        case .keyboardRightArrow:
+            pendingInput.append(.right)
+        case .keyboardDownArrow:
+            pendingInput.append(.down)
+        case .keyboardDeleteOrBackspace:
+            pendingInput.append(.undo)
+        default:
+            break
+        }
+    }
+
 }
 
 // sokoban tileset used for testing:
