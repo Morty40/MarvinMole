@@ -134,12 +134,22 @@ struct MapTests {
         #expect(testMap.legalMoves == [.pushLeft, .walkUp, .walkRight, .walkDown])
     }
 
-    @Test func completed() async throws {
+    @Test func isCompleted() async throws {
         let emptyMap = await Map.empty
         #expect(emptyMap.isCompleted == true)
 
         let testMap = await Map.mapFromXsb(string: testXsb)!
         #expect(testMap.isCompleted == false)
+    }
+
+    @Test func objectsOfType() async throws {
+        let emptyMap = await Map.empty
+        #expect(emptyMap.objectsOfType(.hero).isEmpty)
+        #expect(emptyMap.objectsOfType(.box).isEmpty)
+
+        let testMap = await Map.mapFromXsb(string: testXsb)!
+        #expect(testMap.objectsOfType(.hero).count == 1)
+        #expect(testMap.objectsOfType(.box).count == 6)
     }
 
     @Test func doNextMove() async throws {
