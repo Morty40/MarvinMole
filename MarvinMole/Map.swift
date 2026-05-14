@@ -267,25 +267,25 @@ class Map {
             
             switch move {
             case .walkLeft:
-                moveObject(from: heroPosition, to: (x-1, y))
+                moveObject(from: (x, y), to: (x-1, y))
             case .walkUp:
-                moveObject(from: heroPosition, to: (x, y-1))
+                moveObject(from: (x, y), to: (x, y-1))
             case .walkRight:
-                moveObject(from: heroPosition, to: (x+1, y))
+                moveObject(from: (x, y), to: (x+1, y))
             case .walkDown:
-                moveObject(from: heroPosition, to: (x, y+1))
+                moveObject(from: (x, y), to: (x, y+1))
             case .pushLeft:
                 moveObject(from: (x-1, y), to: (x-2, y))
-                moveObject(from: heroPosition, to: (x-1, y))
+                moveObject(from: (x, y), to: (x-1, y))
             case .pushUp:
                 moveObject(from: (x, y-1), to: (x, y-2))
-                moveObject(from: heroPosition, to: (x, y-1))
+                moveObject(from: (x, y), to: (x, y-1))
             case .pushRight:
                 moveObject(from: (x+1, y), to: (x+2, y))
-                moveObject(from: heroPosition, to: (x+1, y))
+                moveObject(from: (x, y), to: (x+1, y))
             case .pushDown:
                 moveObject(from: (x, y+1), to: (x, y+2))
-                moveObject(from: heroPosition, to: (x, y+1))
+                moveObject(from: (x, y), to: (x, y+1))
             }
             
             moves.append(move)
@@ -302,25 +302,25 @@ class Map {
             
             switch move {
             case .walkLeft:
-                moveObject(from: heroPosition, to: (x+1, y))
+                moveObject(from: (x, y), to: (x+1, y))
             case .walkUp:
-                moveObject(from: heroPosition, to: (x, y+1))
+                moveObject(from: (x, y), to: (x, y+1))
             case .walkRight:
-                moveObject(from: heroPosition, to: (x-1, y))
+                moveObject(from: (x, y), to: (x-1, y))
             case .walkDown:
-                moveObject(from: heroPosition, to: (x, y-1))
+                moveObject(from: (x, y), to: (x, y-1))
             case .pushLeft:
-                moveObject(from: (x+1, y), to: (x+2, y))
-                moveObject(from: heroPosition, to: (x+1, y))
+                moveObject(from: (x, y), to: (x+1, y))
+                moveObject(from: (x-1, y), to: (x, y))
             case .pushUp:
-                moveObject(from: (x, y+1), to: (x, y+2))
-                moveObject(from: heroPosition, to: (x, y+1))
+                moveObject(from: (x, y), to: (x, y+1))
+                moveObject(from: (x, y-1), to: (x, y))
             case .pushRight:
-                moveObject(from: (x-1, y), to: (x-2, y))
-                moveObject(from: heroPosition, to: (x-1, y))
+                moveObject(from: (x, y), to: (x-1, y))
+                moveObject(from: (x+1, y), to: (x, y))
             case .pushDown:
-                moveObject(from: (x, y-1), to: (x, y-2))
-                moveObject(from: heroPosition, to: (x, y-1))
+                moveObject(from: (x, y), to: (x, y-1))
+                moveObject(from: (x, y+1), to: (x, y))
             }
             
             return true

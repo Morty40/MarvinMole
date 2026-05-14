@@ -8,7 +8,7 @@
 import UIKit
 
 extension UISwipeGestureRecognizer {
-
+    
     convenience init(target: Any?,
                      action: Selector?,
                      direction: UISwipeGestureRecognizer.Direction) {

@@ -297,6 +297,12 @@ class GameScene: Scene {
                 }
             case .undo:
                 map.undoLastMove()
+                for (obj, box) in zip(map.objectsOfType(.box), boxes) {
+                    box.mapPosition = obj.position
+                }
+                if let heroPosition = map.heroPosition {
+                    hero.mapPosition = heroPosition
+                }
             }
             
             pendingInput.removeFirst()
