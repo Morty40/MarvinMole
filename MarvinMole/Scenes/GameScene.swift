@@ -32,9 +32,12 @@ class GameObjectNode: SKSpriteNode {
 
 class Box: GameObjectNode {
     
+    static let boxTexture = SKTexture(imageNamed: "Box")
+    static let boxOnGoalTexture = SKTexture(imageNamed: "BoxOnGoal")
+    
     override init() {
         super.init()
-        self.texture = SKTexture(imageNamed: "Box")
+        self.texture = Box.boxTexture
     }
     
     @MainActor required init?(coder aDecoder: NSCoder) {
@@ -60,7 +63,7 @@ private let smallXsb = """
   #  $ $ #
 ### # ## #   ######
 #   # ## #####  ..#
-# $  $          ..#
+# $  $         $..#
 ##### ### #@##  ..#
     #     #########
     #######
@@ -241,6 +244,7 @@ class GameScene: Scene {
 
         for (obj, box) in zip(map.objectsOfType(.box), boxes) {
             box.mapPosition = obj.position
+            box.texture = map.tileAt(x: obj.position.x, y: obj.position.y) == .goal ? Box.boxOnGoalTexture : Box.boxTexture
         }
 
     }
