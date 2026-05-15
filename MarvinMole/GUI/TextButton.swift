@@ -13,9 +13,9 @@ class TextButton: Button {
         let node = SKLabelNode()
         node.fontName = "Avenir-Black"
         node.fontColor = .white
-        node.position = .zero
+        node.position = CGPoint(x: 0, y: -10)
         node.horizontalAlignmentMode = .center
-        node.verticalAlignmentMode = .center
+        node.verticalAlignmentMode = .baseline
         node.zPosition = 2
         return node
     }()
@@ -25,6 +25,11 @@ class TextButton: Button {
     
         titleLabel.text = title
         addChild(titleLabel)
+    }
+    
+    var title: String {
+        get { titleLabel.text ?? "" }
+        set { titleLabel.text = newValue }
     }
     
     @MainActor required init?(coder aDecoder: NSCoder) {
