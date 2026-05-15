@@ -31,23 +31,32 @@ class Hero: GameObjectNode {
                    distance: CGFloat,
                    duration: TimeInterval = 0.3) -> SKAction {
         
-        var textures: [SKTexture]
         var dx, dy: CGFloat
+        var textures: [SKTexture]
         
         switch move {
-        case .walkLeft:  (textures, dx, dy) = (Hero.walkLeftTextures, -distance, 0)
-        case .walkUp:    (textures, dx, dy) = (Hero.walkUpTextures, 0, distance)
-        case .walkRight: (textures, dx, dy) = (Hero.walkRightTextures, distance, 0)
-        case .walkDown:  (textures, dx, dy) = (Hero.walkDownTextures, 0, -distance)
-        case .pushLeft:  (textures, dx, dy) = (Hero.pushLeftTextures, -distance, 0)
-        case .pushUp:    (textures, dx, dy) = (Hero.pushUpTextures, 0, distance)
-        case .pushRight: (textures, dx, dy) = (Hero.pushRightTextures, distance, 0)
-        case .pushDown:  (textures, dx, dy) = (Hero.pushDownTextures, 0, -distance)
+        case .walkLeft:
+            (dx, dy, textures) = (-distance, 0, Hero.walkLeftTextures)
+        case .walkUp:
+            (dx, dy, textures) = (0, distance, Hero.walkUpTextures)
+        case .walkRight:
+            (dx, dy, textures) = (distance, 0, Hero.walkRightTextures)
+        case .walkDown:
+            (dx, dy, textures) = (0, -distance, Hero.walkDownTextures)
+        case .pushLeft:
+            (dx, dy, textures) = (-distance, 0, Hero.pushLeftTextures)
+        case .pushUp:
+            (dx, dy, textures) = (0, distance, Hero.pushUpTextures)
+        case .pushRight:
+            (dx, dy, textures) = (distance, 0, Hero.pushRightTextures)
+        case .pushDown:
+            (dx, dy, textures) = (0, -distance, Hero.pushDownTextures)
         }
         
+        // create action that moves the object and animates the texture
         let action = SKAction.group([
-            SKAction.animate(with: textures, timePerFrame: duration / Double(textures.count)),
-            SKAction.moveBy(x: dx, y: dy, duration: duration)])
+            SKAction.moveBy(x: dx, y: dy, duration: duration),
+            SKAction.animate(with: textures, timePerFrame: duration / Double(textures.count))])
         action.timingMode = .linear
         return action
     }

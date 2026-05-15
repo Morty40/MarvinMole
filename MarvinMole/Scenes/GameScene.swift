@@ -30,29 +30,6 @@ class GameObjectNode: SKSpriteNode {
     }
 }
 
-class Box: GameObjectNode {
-    
-    static let boxTextures = [SKTexture(imageNamed: "Box1"),
-                              SKTexture(imageNamed: "Box2"),
-                              SKTexture(imageNamed: "Box3"),
-                              SKTexture(imageNamed: "Box4"),
-                              SKTexture(imageNamed: "Box5")]
-    static let boxOnGoalTexture = SKTexture(imageNamed: "BoxOnGoal")
-    
-    var boxTexture: SKTexture? = nil
-    
-    override init() {
-        super.init()
-        boxTexture = Box.boxTextures[Int(arc4random()) % Box.boxTextures.count]
-        self.texture = boxTexture
-    }
-    
-    @MainActor required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-}
-
 private let smallXsb = """
     #####
     #   #
@@ -283,36 +260,32 @@ class GameScene: Scene {
             case .left:
                 if let move = legalMoves.first(where: \.isLeft) {
                     map.doNextMove(move)
-                    let group = hero.actionFor(move: move, distance: 32)
                     isMoving = true
-                    hero.run(group) {
+                    hero.run(hero.actionFor(move: move, distance: 32)) {
                         self.isMoving = false
                     }
                 }
             case .up:
                 if let move = legalMoves.first(where: \.isUp) {
                     map.doNextMove(move)
-                    let group = hero.actionFor(move: move, distance: 32)
                     isMoving = true
-                    hero.run(group) {
+                    hero.run(hero.actionFor(move: move, distance: 32)) {
                         self.isMoving = false
                     }
                 }
             case .right:
                 if let move = legalMoves.first(where: \.isRight) {
                     map.doNextMove(move)
-                    let group = hero.actionFor(move: move, distance: 32)
                     isMoving = true
-                    hero.run(group) {
+                    hero.run(hero.actionFor(move: move, distance: 32)) {
                         self.isMoving = false
                     }
                 }
             case .down:
                 if let move = legalMoves.first(where: \.isDown) {
                     map.doNextMove(move)
-                    let group = hero.actionFor(move: move, distance: 32)
                     isMoving = true
-                    hero.run(group) {
+                    hero.run(hero.actionFor(move: move, distance: 32)) {
                         self.isMoving = false
                     }
                 }

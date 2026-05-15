@@ -93,6 +93,7 @@ class Map {
         }
     }
     
+    var name: String? = nil
     private var tiles: [[Tile]] = []
     private var objects: [Object] = []
     private var moves: [Move] = []
