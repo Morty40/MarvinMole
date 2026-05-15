@@ -217,21 +217,8 @@ class GameScene: Scene {
     }
     
     override func update(_ currentTime: TimeInterval) {
-        
         hudUpdate()
         processInput()
-        
-        // TODO: remove:
-        /*for box in boxContainer.children {
-            if let box = box as? Box {
-                if let object = map.objectsOfType(.box).first(where: { $0.id == box.id }) {
-                    box.setMapPosition(x: object.position.x,
-                                       y: object.position.y,
-                                       tileMap: tileMap)
-                }
-            }
-        }*/
-        
     }
     
     override func handleKey(_ key: UIKey) {
