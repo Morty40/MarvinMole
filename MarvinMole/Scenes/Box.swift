@@ -30,7 +30,7 @@ class Box: GameObjectNode {
     
     func actionFor(move: Map.Move,
                    distance: CGFloat,
-                   duration: TimeInterval = 0.2) -> SKAction? {
+                   duration: TimeInterval = 0.3) -> SKAction? {
         
         var dx, dy: CGFloat
         
@@ -48,7 +48,7 @@ class Box: GameObjectNode {
         }
         
         let action = SKAction.moveBy(x: dx, y: dy, duration: duration)
-        action.timingMode = .easeOut
+        action.timingMode = .linear
         return action
     }
 

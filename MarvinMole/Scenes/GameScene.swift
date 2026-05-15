@@ -38,7 +38,7 @@ private let smallXsb = """
   #  $ $ #
 ### # ## #   ######
 #   # ## #####  ..#
-# $  $         $..#
+# $  $          ..#
 ##### ### #@##  ..#
     #     #########
     #######
@@ -222,7 +222,7 @@ class GameScene: Scene {
         processInput()
         
         // TODO: remove:
-        for box in boxContainer.children {
+        /*for box in boxContainer.children {
             if let box = box as? Box {
                 if let object = map.objectsOfType(.box).first(where: { $0.id == box.id }) {
                     box.setMapPosition(x: object.position.x,
@@ -230,7 +230,7 @@ class GameScene: Scene {
                                        tileMap: tileMap)
                 }
             }
-        }
+        }*/
         
     }
     
@@ -251,6 +251,26 @@ class GameScene: Scene {
         }
     }
     
+    private func animateMovedObjects(movedObjects: [Map.Object], move: Map.Move) {
+        for obj in movedObjects {
+            if obj.type == .hero {
+                isMoving = true
+                hero.run(hero.actionFor(move: move, distance: 32)) {
+                    self.isMoving = false
+                }
+            }
+            if obj.type == .box {
+                for box in boxContainer.children {
+                    if let box = box as? Box, box.id == obj.id {
+                        if let action = box.actionFor(move: move, distance: 32) {
+                            box.run(action)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     private func processInput() {
         if !isMoving, let nextInput = pendingInput.first {
             
@@ -259,36 +279,28 @@ class GameScene: Scene {
             switch nextInput {
             case .left:
                 if let move = legalMoves.first(where: \.isLeft) {
-                    map.doNextMove(move)
-                    isMoving = true
-                    hero.run(hero.actionFor(move: move, distance: 32)) {
-                        self.isMoving = false
-                    }
+                    let movedObjects = map.doNextMove(move)
+                    animateMovedObjects(movedObjects: movedObjects, move: move)
                 }
+                
             case .up:
                 if let move = legalMoves.first(where: \.isUp) {
-                    map.doNextMove(move)
-                    isMoving = true
-                    hero.run(hero.actionFor(move: move, distance: 32)) {
-                        self.isMoving = false
-                    }
+                    let movedObjects = map.doNextMove(move)
+                    animateMovedObjects(movedObjects: movedObjects, move: move)
                 }
+                
             case .right:
                 if let move = legalMoves.first(where: \.isRight) {
-                    map.doNextMove(move)
-                    isMoving = true
-                    hero.run(hero.actionFor(move: move, distance: 32)) {
-                        self.isMoving = false
-                    }
+                    let movedObjects = map.doNextMove(move)
+                    animateMovedObjects(movedObjects: movedObjects, move: move)
                 }
+                
             case .down:
                 if let move = legalMoves.first(where: \.isDown) {
-                    map.doNextMove(move)
-                    isMoving = true
-                    hero.run(hero.actionFor(move: move, distance: 32)) {
-                        self.isMoving = false
-                    }
+                    let movedObjects = map.doNextMove(move)
+                    animateMovedObjects(movedObjects: movedObjects, move: move)
                 }
+                
             case .undo:
                 map.undoLastMove()
                 updateObjectPositions()
