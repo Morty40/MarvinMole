@@ -10,19 +10,19 @@ import SpriteKit
 class GameObjectNode: SKSpriteNode {
     var id: Int = 0
     
-    var mapPosition: (x: Int, y: Int) = (0, 0) {
-        didSet {
-            let w = parent?.frame.width ?? 0
-            let h = parent?.frame.height ?? 0
-            
-            position = CGPoint(x: 32*(CGFloat(mapPosition.x)+0.5) - w/2,
-                               y: h/2 - 32*(CGFloat(mapPosition.y)+0.5))
-        }
+    func setMapPosition(x: Int, y: Int, tileMap: TileMap) {
+        let w = tileMap.frame.width
+        let h = tileMap.frame.height
+        
+        position = CGPoint(x: 32*(CGFloat(x)+0.5) - w/2,
+                           y: h/2 - 32*(CGFloat(y)+0.5))
     }
     
     init() {
         let texture = SKTexture(imageNamed: "HeroWalkLeft")
         super.init(texture: texture, color: .red, size: CGSize(width: 32, height: 32))
+        anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -35,29 +35,21 @@ class Box: GameObjectNode {
     static let boxTextures = [SKTexture(imageNamed: "Box1"),
                               SKTexture(imageNamed: "Box2"),
                               SKTexture(imageNamed: "Box3"),
-                              SKTexture(imageNamed: "Box4")]
+                              SKTexture(imageNamed: "Box4"),
+                              SKTexture(imageNamed: "Box5")]
     static let boxOnGoalTexture = SKTexture(imageNamed: "BoxOnGoal")
     
     var boxTexture: SKTexture? = nil
     
     override init() {
         super.init()
-        boxTexture = Box.boxTextures[Int(arc4random()) % 4]
+        boxTexture = Box.boxTextures[Int(arc4random()) % Box.boxTextures.count]
         self.texture = boxTexture
     }
     
     @MainActor required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-}
-
-class Hero: GameObjectNode {
-    
-    static let walkLeftTextures = SKTexture(imageNamed: "HeroWalkLeft").split(columns: 8)
-    static let walkUpTextures = SKTexture(imageNamed: "HeroWalkUp").split(columns: 8)
-    static let walkRightTextures = SKTexture(imageNamed: "HeroWalkRight").split(columns: 8)
-    static let walkDownTextures = SKTexture(imageNamed: "HeroWalkDown").split(columns: 8)
     
 }
 
@@ -78,7 +70,6 @@ private let smallXsb = """
 class GameScene: Scene {
     
     private var map: Map = .empty
-    private var boxes: [Box] = []
     
     enum Input {
         case left, up, right, down, undo
@@ -94,7 +85,7 @@ class GameScene: Scene {
         return node
     }()
     
-    private lazy var levelLabel = {
+    private lazy var mapNameLabel = {
         let node = SKLabelNode()
         node.fontName = "Avenir-Black"
         node.position = CGPoint(x: frame.size.width * 0.86, y: frame.size.height * 0.73)
@@ -102,7 +93,6 @@ class GameScene: Scene {
         node.horizontalAlignmentMode = .center
         node.verticalAlignmentMode = .center
         node.zPosition = 2
-        node.text = "Easy 1"
         return node
     }()
     
@@ -128,19 +118,28 @@ class GameScene: Scene {
         return node
     }()
     
-    private lazy var tileMap = {
-        let node = TileMap()
-        node.position = CGPoint(x: frame.size.width * 0.43, y: frame.size.height * 0.5)
-        node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        node.zPosition = 2
-        return node
-    }()
-    
     private lazy var hero = {
         let node = Hero()
         node.position = .zero
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         node.zPosition = 3
+        return node
+    }()
+    
+    private lazy var boxContainer = {
+        let node = SKNode()
+        node.position = .zero
+        node.zPosition = 3
+        return node
+    }()
+    
+    private lazy var tileMap = {
+        let node = TileMap()
+        node.position = CGPoint(x: frame.size.width * 0.43, y: frame.size.height * 0.5)
+        node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        node.zPosition = 2
+        node.addChild(hero)
+        node.addChild(boxContainer)
         return node
     }()
     
@@ -172,14 +171,12 @@ class GameScene: Scene {
         anchorPoint = .zero
         
         addChild(backgroundImage)
-        addChild(levelLabel)
+        addChild(mapNameLabel)
         addChild(pushesLabel)
         addChild(movesLabel)
         addChild(tileMap)
         addChild(undoButton)
         addChild(quitButton)
-        
-        tileMap.addChild(hero)
     }
     
     override func didMove(to view: SKView) {
@@ -211,19 +208,13 @@ class GameScene: Scene {
         map = Map.mapFromXsb(string: smallXsb)!
         
         tileMap.draw(map: map)
-        
-        if let heroPosition = map.heroPosition {
-            hero.mapPosition = heroPosition
-        }
-        
+        boxContainer.removeAllChildren()
         for b in map.objectsOfType(.box) {
             let box = Box()
-            box.mapPosition = b.position
             box.id = b.id
-            boxes.append(box)
-            tileMap.addChild(box)
+            boxContainer.addChild(box)
         }
-        
+        updateObjectPositions()
     }
     
     @objc func onSwipeLeft() {
@@ -242,81 +233,28 @@ class GameScene: Scene {
         pendingInput.append(.down)
     }
     
-    override func update(_ currentTime: TimeInterval) {
+    private func hudUpdate() {
+        mapNameLabel.text = "Easy 1" // TODO: map.name
         pushesLabel.text = "\(map.numberOfPushes)"
         movesLabel.text = "\(map.numberOfMoves)"
-        
-        processInput()
-
-        for (obj, box) in zip(map.objectsOfType(.box), boxes) {
-            box.mapPosition = obj.position
-            box.texture = map.tileAt(x: obj.position.x, y: obj.position.y) == .goal ? Box.boxOnGoalTexture : box.boxTexture
-        }
-
     }
     
-    private func processInput() {
-        if !isMoving, let nextInput = pendingInput.first {
-            
-            let legalMoves = map.legalMoves
-            
-            switch nextInput {
-            case .left:
-                if let move = legalMoves.first(where: \.isLeft) {
-                    map.doNextMove(move)
-                    
-                    let group = SKAction.group([
-                        SKAction.animate(with: Hero.walkLeftTextures, timePerFrame: 0.05),
-                        SKAction.moveBy(x: -32, y: 0, duration: 0.4)])
-                    hero.run(group) {
-                        self.isMoving = false
-                    }
-                }
-            case .up:
-                if let move = legalMoves.first(where: \.isUp) {
-                    map.doNextMove(move)
-
-                    let group = SKAction.group([
-                        SKAction.animate(with: Hero.walkUpTextures, timePerFrame: 0.05),
-                        SKAction.moveBy(x: 0, y: 32, duration: 0.4)])
-                    hero.run(group) {
-                        self.isMoving = false
-                    }
-                }
-            case .right:
-                if let move = legalMoves.first(where: \.isRight) {
-                    map.doNextMove(move)
-                    
-                    let group = SKAction.group([
-                        SKAction.animate(with: Hero.walkRightTextures, timePerFrame: 0.05),
-                        SKAction.moveBy(x: 32, y: 0, duration: 0.4)])
-                    hero.run(group) {
-                        self.isMoving = false
-                    }
-                }
-            case .down:
-                if let move = legalMoves.first(where: \.isDown) {
-                    map.doNextMove(move)
-
-                    let group = SKAction.group([
-                        SKAction.animate(with: Hero.walkDownTextures, timePerFrame: 0.05),
-                        SKAction.moveBy(x: 0, y: -32, duration: 0.4)])
-                    hero.run(group) {
-                        self.isMoving = false
-                    }
-                }
-            case .undo:
-                map.undoLastMove()
-                for (obj, box) in zip(map.objectsOfType(.box), boxes) {
-                    box.mapPosition = obj.position
-                }
-                if let heroPosition = map.heroPosition {
-                    hero.mapPosition = heroPosition
+    override func update(_ currentTime: TimeInterval) {
+        
+        hudUpdate()
+        processInput()
+        
+        // TODO: remove:
+        for box in boxContainer.children {
+            if let box = box as? Box {
+                if let object = map.objectsOfType(.box).first(where: { $0.id == box.id }) {
+                    box.setMapPosition(x: object.position.x,
+                                       y: object.position.y,
+                                       tileMap: tileMap)
                 }
             }
-            
-            pendingInput.removeFirst()
         }
+        
     }
     
     override func handleKey(_ key: UIKey) {
@@ -335,8 +273,74 @@ class GameScene: Scene {
             break
         }
     }
+    
+    private func processInput() {
+        if !isMoving, let nextInput = pendingInput.first {
+            
+            let legalMoves = map.legalMoves
+            
+            switch nextInput {
+            case .left:
+                if let move = legalMoves.first(where: \.isLeft) {
+                    map.doNextMove(move)
+                    let group = hero.actionFor(move: move, distance: 32)
+                    isMoving = true
+                    hero.run(group) {
+                        self.isMoving = false
+                    }
+                }
+            case .up:
+                if let move = legalMoves.first(where: \.isUp) {
+                    map.doNextMove(move)
+                    let group = hero.actionFor(move: move, distance: 32)
+                    isMoving = true
+                    hero.run(group) {
+                        self.isMoving = false
+                    }
+                }
+            case .right:
+                if let move = legalMoves.first(where: \.isRight) {
+                    map.doNextMove(move)
+                    let group = hero.actionFor(move: move, distance: 32)
+                    isMoving = true
+                    hero.run(group) {
+                        self.isMoving = false
+                    }
+                }
+            case .down:
+                if let move = legalMoves.first(where: \.isDown) {
+                    map.doNextMove(move)
+                    let group = hero.actionFor(move: move, distance: 32)
+                    isMoving = true
+                    hero.run(group) {
+                        self.isMoving = false
+                    }
+                }
+            case .undo:
+                map.undoLastMove()
+                updateObjectPositions()
+            }
+            
+            pendingInput.removeFirst()
+        }
+    }
+    
+    private func updateObjectPositions() {
+        if let heroPosition = map.heroPosition {
+            hero.setMapPosition(x: heroPosition.x,
+                                y: heroPosition.y,
+                                tileMap: tileMap)
+        }
 
+        for box in boxContainer.children {
+            if let box = box as? Box {
+                if let object = map.objectsOfType(.box).first(where: { $0.id == box.id }) {
+                    box.setMapPosition(x: object.position.x,
+                                       y: object.position.y,
+                                       tileMap: tileMap)
+                }
+            }
+        }
+    }
+    
 }
-
-// sokoban tileset used for testing:
-// https://dani-maccari.itch.io/sokoban-tileset
