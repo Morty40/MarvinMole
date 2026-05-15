@@ -253,18 +253,16 @@ class Map {
         objects.filter({ $0.type == type })
     }
     
-    @discardableResult
     private func moveObject(from: (x: Int, y: Int),
-                            to: (x: Int, y: Int)) -> Object? {
+                            to: (x: Int, y: Int),
+                            movedObjects: inout [Object]) {
         
         if let object = objectAt(x: from.x, y: from.y) {
             removeObjectAt(x: from.x, y: from.y)
             let movedObject = Object(position: to, type: object.type, id: object.id)
             objects.append(movedObject)
-            return movedObject
+            movedObjects.append(movedObject)
         }
-        
-        return nil
     }
     
     @discardableResult
@@ -277,49 +275,25 @@ class Map {
             
             switch move {
             case .walkLeft:
-                if let movedObject = moveObject(from: (x, y), to: (x-1, y)) {
-                    movedObjects.append(movedObject)
-                }
+                moveObject(from: (x, y), to: (x-1, y), movedObjects: &movedObjects)
             case .walkUp:
-                if let movedObject = moveObject(from: (x, y), to: (x, y-1)) {
-                    movedObjects.append(movedObject)
-                }
+                moveObject(from: (x, y), to: (x, y-1), movedObjects: &movedObjects)
             case .walkRight:
-                if let movedObject = moveObject(from: (x, y), to: (x+1, y)) {
-                    movedObjects.append(movedObject)
-                }
+                moveObject(from: (x, y), to: (x+1, y), movedObjects: &movedObjects)
             case .walkDown:
-                if let movedObject = moveObject(from: (x, y), to: (x, y+1)) {
-                    movedObjects.append(movedObject)
-                }
+                moveObject(from: (x, y), to: (x, y+1), movedObjects: &movedObjects)
             case .pushLeft:
-                if let movedObject = moveObject(from: (x-1, y), to: (x-2, y)) {
-                    movedObjects.append(movedObject)
-                }
-                if let movedObject = moveObject(from: (x, y), to: (x-1, y)) {
-                    movedObjects.append(movedObject)
-                }
+                moveObject(from: (x-1, y), to: (x-2, y), movedObjects: &movedObjects)
+                moveObject(from: (x, y), to: (x-1, y), movedObjects: &movedObjects)
             case .pushUp:
-                if let movedObject = moveObject(from: (x, y-1), to: (x, y-2)) {
-                    movedObjects.append(movedObject)
-                }
-                if let movedObject = moveObject(from: (x, y), to: (x, y-1)) {
-                    movedObjects.append(movedObject)
-                }
+                moveObject(from: (x, y-1), to: (x, y-2), movedObjects: &movedObjects)
+                moveObject(from: (x, y), to: (x, y-1), movedObjects: &movedObjects)
             case .pushRight:
-                if let movedObject = moveObject(from: (x+1, y), to: (x+2, y)) {
-                    movedObjects.append(movedObject)
-                }
-                if let movedObject = moveObject(from: (x, y), to: (x+1, y)) {
-                    movedObjects.append(movedObject)
-                }
+                moveObject(from: (x+1, y), to: (x+2, y), movedObjects: &movedObjects)
+                moveObject(from: (x, y), to: (x+1, y), movedObjects: &movedObjects)
             case .pushDown:
-                if let movedObject = moveObject(from: (x, y+1), to: (x, y+2)) {
-                    movedObjects.append(movedObject)
-                }
-                if let movedObject = moveObject(from: (x, y), to: (x, y+1)) {
-                    movedObjects.append(movedObject)
-                }
+                moveObject(from: (x, y+1), to: (x, y+2), movedObjects: &movedObjects)
+                moveObject(from: (x, y), to: (x, y+1), movedObjects: &movedObjects)
             }
             
             moves.append(move)
@@ -329,37 +303,38 @@ class Map {
     }
     
     @discardableResult
-    func undoLastMove() -> Bool {
+    func undoLastMove() -> [Object] {
+        var movedObjects: [Object] = []
+
         if let move = moves.popLast(), let heroPosition = heroPosition {
             
             let (x, y) = heroPosition
             
             switch move {
             case .walkLeft:
-                moveObject(from: (x, y), to: (x+1, y))
+                moveObject(from: (x, y), to: (x+1, y), movedObjects: &movedObjects)
             case .walkUp:
-                moveObject(from: (x, y), to: (x, y+1))
+                moveObject(from: (x, y), to: (x, y+1), movedObjects: &movedObjects)
             case .walkRight:
-                moveObject(from: (x, y), to: (x-1, y))
+                moveObject(from: (x, y), to: (x-1, y), movedObjects: &movedObjects)
             case .walkDown:
-                moveObject(from: (x, y), to: (x, y-1))
+                moveObject(from: (x, y), to: (x, y-1), movedObjects: &movedObjects)
             case .pushLeft:
-                moveObject(from: (x, y), to: (x+1, y))
-                moveObject(from: (x-1, y), to: (x, y))
+                moveObject(from: (x, y), to: (x+1, y), movedObjects: &movedObjects)
+                moveObject(from: (x-1, y), to: (x, y), movedObjects: &movedObjects)
             case .pushUp:
-                moveObject(from: (x, y), to: (x, y+1))
-                moveObject(from: (x, y-1), to: (x, y))
+                moveObject(from: (x, y), to: (x, y+1), movedObjects: &movedObjects)
+                moveObject(from: (x, y-1), to: (x, y), movedObjects: &movedObjects)
             case .pushRight:
-                moveObject(from: (x, y), to: (x-1, y))
-                moveObject(from: (x+1, y), to: (x, y))
+                moveObject(from: (x, y), to: (x-1, y), movedObjects: &movedObjects)
+                moveObject(from: (x+1, y), to: (x, y), movedObjects: &movedObjects)
             case .pushDown:
-                moveObject(from: (x, y), to: (x, y-1))
-                moveObject(from: (x, y+1), to: (x, y))
+                moveObject(from: (x, y), to: (x, y-1), movedObjects: &movedObjects)
+                moveObject(from: (x, y+1), to: (x, y), movedObjects: &movedObjects)
             }
-            
-            return true
         }
-        return false
+
+        return movedObjects
     }
     
     var numberOfMoves: Int {
