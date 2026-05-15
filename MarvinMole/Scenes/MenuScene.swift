@@ -56,7 +56,7 @@ class MenuScene: Scene {
     }()
     
     @objc func onStart() {
-        transition(to: Scene.gameScene)
+        transition(to: Scene.mapIntroScene)
     }
 
     private lazy var mapCollectionButton = {
