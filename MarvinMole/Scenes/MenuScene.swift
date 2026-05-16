@@ -7,6 +7,20 @@
 
 import SpriteKit
 
+private let smallXsb = """
+    #####
+    #   #
+    #$  #
+  ###  $##
+  #  $ $ #
+### # ## #   ######
+#   # ## #####  ..#
+# $  $          ..#
+##### ### #@##  ..#
+    #     #########
+    #######
+"""
+
 class MenuScene: Scene {
     
     enum MapCollection: CaseIterable {
@@ -56,6 +70,7 @@ class MenuScene: Scene {
     }()
     
     @objc func onStart() {
+        Scene.gameScene.loadMapFromXsb(string: smallXsb)
         transition(to: Scene.mapIntroScene)
     }
 

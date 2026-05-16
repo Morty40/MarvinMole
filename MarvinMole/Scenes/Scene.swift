@@ -12,6 +12,7 @@ class Scene: SKScene {
     static let menuScene = MenuScene(size: CGSize(width: 1024, height: 768))
     static let mapIntroScene = MapIntroScene(size: CGSize(width: 1024, height: 768))
     static let gameScene = GameScene(size: CGSize(width: 1024, height: 768))
+    static let quitScene = QuitScene(size: CGSize(width: 1024, height: 768))
 
     func transition(to scene: SKScene) {
         let transition = SKTransition.fade(withDuration: 0.5)

@@ -30,20 +30,6 @@ class GameObjectNode: SKSpriteNode {
     }
 }
 
-private let smallXsb = """
-    #####
-    #   #
-    #$  #
-  ###  $##
-  #  $ $ #
-### # ## #   ######
-#   # ## #####  ..#
-# $  $          ..#
-##### ### #@##  ..#
-    #     #########
-    #######
-"""
-
 class GameScene: Scene {
     
     private var map: Map = .empty
@@ -139,7 +125,7 @@ class GameScene: Scene {
     }()
     
     @objc func onQuit() {
-        transition(to: Scene.menuScene)
+        transition(to: Scene.quitScene)
     }
     
     override func sceneDidLoad() {
@@ -180,9 +166,11 @@ class GameScene: Scene {
             UISwipeGestureRecognizer(target: self,
                                      action: #selector(onSwipeDown),
                                      direction: .down))
-        
+    }
+    
+    func loadMapFromXsb(string: String) {
         // load map
-        map = Map.mapFromXsb(string: smallXsb)!
+        map = Map.mapFromXsb(string: string)!
         
         tileMap.draw(map: map)
         boxContainer.removeAllChildren()
@@ -211,7 +199,7 @@ class GameScene: Scene {
     }
     
     private func hudUpdate() {
-        mapNameLabel.text = "Easy 1" // TODO: map.name
+        mapNameLabel.text = map.name ?? "?"
         pushesLabel.text = "\(map.numberOfPushes)"
         movesLabel.text = "\(map.numberOfMoves)"
     }
