@@ -11,8 +11,8 @@ class GameObjectNode: SKSpriteNode {
     var id: Int = 0
     
     func setMapPosition(x: Int, y: Int, tileMap: TileMap) {
-        let w = tileMap.frame.width
-        let h = tileMap.frame.height
+        let w = tileMap.frame.width / tileMap.xScale
+        let h = tileMap.frame.height / tileMap.yScale
         
         position = CGPoint(x: 32*(CGFloat(x)+0.5) - w/2,
                            y: h/2 - 32*(CGFloat(y)+0.5))
@@ -22,6 +22,7 @@ class GameObjectNode: SKSpriteNode {
         let texture = SKTexture(imageNamed: "HeroWalkLeft")
         super.init(texture: texture, color: .red, size: CGSize(width: 32, height: 32))
         anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        
         
     }
     
@@ -98,11 +99,15 @@ class GameScene: Scene {
     
     private lazy var tileMap = {
         let node = TileMap()
-        node.position = CGPoint(x: frame.size.width * 0.43, y: frame.size.height * 0.5)
+        node.position = CGPoint(x: frame.size.width * 0.43, y: frame.size.height * 0.53)
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         node.zPosition = 2
         node.addChild(hero)
         node.addChild(boxContainer)
+        
+        node.xScale = 2
+        node.yScale = 2
+        
         return node
     }()
     
@@ -179,6 +184,11 @@ class GameScene: Scene {
             boxContainer.addChild(box)
         }
         updateObjectPositions()
+
+        // scale small maps 2x
+        let scale = map.size.width < 10 && map.size.height < 10 ? 2.0 : 1.0
+        tileMap.xScale = scale
+        tileMap.yScale = scale
     }
     
     @objc func onSwipeLeft() {
