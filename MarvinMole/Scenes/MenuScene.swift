@@ -7,20 +7,6 @@
 
 import SpriteKit
 
-private let smallXsb = """
-    #####
-    #   #
-    #$  #
-  ###  $##
-  #  $ $ #
-### # ## #   ######
-#   # ## #####  ..#
-# $  $          ..#
-##### ### #@##  ..#
-    #     #########
-    #######
-"""
-
 class MenuScene: Scene {
     
     enum MapCollection: CaseIterable {
@@ -37,7 +23,7 @@ class MenuScene: Scene {
         }
     }
     private var mapCollection: MapCollection = .easy
-    private var mapNumber: Int = 0
+    private var mapNumber: Int = 1
     
     private lazy var backgroundImage = {
         let node = SKSpriteNode(imageNamed: "MenuBackground")
@@ -70,8 +56,16 @@ class MenuScene: Scene {
     }()
     
     @objc func onStart() {
-        Scene.gameScene.loadMapFromXsb(string: smallXsb)
-        transition(to: Scene.mapIntroScene)
+        let resource = String(format: "%@%02d", mapCollection.title, mapNumber)
+        
+        let filePath = Bundle.main.url(forResource: resource, withExtension: "xsb")
+        
+        if let data = try? Data(contentsOf: filePath!) {
+            let map = Map.mapFromXsb(data: data)
+            Scene.gameScene.load(map: map!)
+            transition(to: Scene.mapIntroScene)
+        }
+
     }
 
     private lazy var mapCollectionButton = {
@@ -89,15 +83,18 @@ class MenuScene: Scene {
     }
 
     private lazy var mapNumberButton = {
-        let node = TextButton(title: "\(mapNumber + 1)", target: self, action: #selector(onMapNumber))
+        let node = TextButton(title: "\(mapNumber)", target: self, action: #selector(onMapNumber))
         node.position = CGPoint(x: frame.size.width * 0.5, y: frame.size.height * 0.2)
         node.zPosition = 2
         return node
     }()
     
     @objc func onMapNumber() {
-        mapNumber = (mapNumber + 1) % 10
-        mapNumberButton.title = "\(mapNumber + 1)"
+        mapNumber += 1
+        if mapNumber > 3 {
+            mapNumber = 1
+        }
+        mapNumberButton.title = "\(mapNumber)"
     }
 
     override func sceneDidLoad() {

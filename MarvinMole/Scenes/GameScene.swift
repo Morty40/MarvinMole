@@ -168,9 +168,8 @@ class GameScene: Scene {
                                      direction: .down))
     }
     
-    func loadMapFromXsb(string: String) {
-        // load map
-        map = Map.mapFromXsb(string: string)!
+    func load(map: Map) {
+        self.map = map
         
         tileMap.draw(map: map)
         boxContainer.removeAllChildren()

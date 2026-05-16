@@ -17,7 +17,7 @@ class MapIntroScene: Scene {
         node.position = CGPoint(x: frame.size.width * 0.5, y: frame.size.height * 0.55)
         node.horizontalAlignmentMode = .center
         node.verticalAlignmentMode = .baseline
-        node.zPosition = 2
+        node.zPosition = 1
         node.text = "Easy 1"
         return node
     }()
@@ -30,8 +30,8 @@ class MapIntroScene: Scene {
         node.position = CGPoint(x: frame.size.width * 0.5, y: frame.size.height * 0.45)
         node.horizontalAlignmentMode = .center
         node.verticalAlignmentMode = .baseline
-        node.zPosition = 2
-        node.text = "The tunnel trouble begins"
+        node.zPosition = 1
+        node.text = "The trouble begins"
         return node
     }()
 
