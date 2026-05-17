@@ -18,7 +18,7 @@ class MapIntroScene: Scene {
         node.horizontalAlignmentMode = .center
         node.verticalAlignmentMode = .baseline
         node.zPosition = 1
-        node.text = "Title"
+        node.text = "<Title>"
         return node
     }()
     
@@ -36,7 +36,7 @@ class MapIntroScene: Scene {
         node.horizontalAlignmentMode = .center
         node.verticalAlignmentMode = .baseline
         node.zPosition = 1
-        node.text = "Subtitle"
+        node.text = "<Subtitle>"
         return node
     }()
     
@@ -45,6 +45,8 @@ class MapIntroScene: Scene {
         set { mapSubtitleLabel.text = newValue }
     }
     
+    /// This is called once after the scene has been initialized,
+    /// it's the recommended place to perform one-time setup
     override func sceneDidLoad() {
         super.sceneDidLoad()
         
@@ -55,6 +57,8 @@ class MapIntroScene: Scene {
         addChild(mapSubtitleLabel)
     }
     
+    /// The scene is about to be presented by a view
+    /// - Parameter view: The view that is presenting the scene
     override func didMove(to view: SKView) {
         
         // move on to game scene automatically
