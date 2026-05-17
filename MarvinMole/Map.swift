@@ -93,12 +93,13 @@ class Map {
         }
     }
     
-    var name: String? = nil
+    var title: String? = nil
     private var tiles: [[Tile]] = []
     private var objects: [Object] = []
     private var moves: [Move] = []
     
-    init(tiles: [[Tile]], objects: [Object]) {
+    init(title: String?, tiles: [[Tile]], objects: [Object]) {
+        self.title = title
         self.tiles = tiles
         self.objects = objects
         self.moves = []
@@ -337,10 +338,12 @@ class Map {
         return movedObjects
     }
     
+    /// Number of completed moves, walk and box push
     var numberOfMoves: Int {
         moves.count
     }
     
+    /// Number of completed moves that were box pushes
     var numberOfPushes: Int {
         moves.count(where: \.isPush)
     }
@@ -355,7 +358,16 @@ class Map {
     static func mapFromXsb(string: String) -> Map? {
         
         // split by newline into list of strings
-        let lines = string.split(whereSeparator: \.isNewline).map({ String($0) })
+        var lines = string.split(whereSeparator: \.isNewline).map({ String($0) })
+        
+        // parse map title
+        var title: String? = nil
+        if let line = lines.first(where: { $0.hasPrefix("Title:") }) {
+            title = String(line.split(separator: ":").last ?? "")
+        }
+        
+        // TODO: fix me
+        lines = lines.filter({ !$0.hasPrefix("Title:") })
         
         // parse wall tiles
         var tiles: [[Tile]] = lines.map({ $0.map({
@@ -374,10 +386,6 @@ class Map {
             }
         }
 
-        /*let objectTiles: [[ObjectType]] = lines.map({ $0.map({
-            ObjectType.typeFrom(xsb: String($0))
-        })})*/
-        
         // find the hero coordinate
         var heroX: Int? = nil
         var heroY: Int? = nil
@@ -417,10 +425,10 @@ class Map {
             })
         })
         
-        return Map(tiles: tiles, objects: objects)
+        return Map(title: title, tiles: tiles, objects: objects)
     }
     
     static var empty: Map {
-        Map(tiles: [], objects: [])
+        Map(title: nil, tiles: [], objects: [])
     }
 }

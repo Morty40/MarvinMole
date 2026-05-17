@@ -8,7 +8,7 @@
 import SpriteKit
 
 class MapIntroScene: Scene {
-            
+    
     private lazy var mapTitleLabel = {
         let node = SKLabelNode()
         node.fontName = "Avenir-Black"
@@ -18,11 +18,16 @@ class MapIntroScene: Scene {
         node.horizontalAlignmentMode = .center
         node.verticalAlignmentMode = .baseline
         node.zPosition = 1
-        node.text = "Easy 1"
+        node.text = "Title"
         return node
     }()
-
-    private lazy var mapDescriptionLabel = {
+    
+    var title: String? {
+        get { mapTitleLabel.text }
+        set { mapTitleLabel.text = newValue }
+    }
+    
+    private lazy var mapSubtitleLabel = {
         let node = SKLabelNode()
         node.fontName = "Avenir-Black"
         node.fontSize = 50
@@ -31,10 +36,15 @@ class MapIntroScene: Scene {
         node.horizontalAlignmentMode = .center
         node.verticalAlignmentMode = .baseline
         node.zPosition = 1
-        node.text = "The trouble begins"
+        node.text = "Subtitle"
         return node
     }()
-
+    
+    var subtitle: String? {
+        get { mapSubtitleLabel.text }
+        set { mapSubtitleLabel.text = newValue }
+    }
+    
     override func sceneDidLoad() {
         super.sceneDidLoad()
         
@@ -42,16 +52,16 @@ class MapIntroScene: Scene {
         anchorPoint = .zero
         
         addChild(mapTitleLabel)
-        addChild(mapDescriptionLabel)
+        addChild(mapSubtitleLabel)
     }
-
+    
     override func didMove(to view: SKView) {
+        
+        // move on to game scene automatically
         run(SKAction.wait(forDuration: 1.5), completion: {
             self.transition(to: Scene.gameScene)
         })
     }
     
-    override func update(_ currentTime: TimeInterval) {
-    }
 }
 

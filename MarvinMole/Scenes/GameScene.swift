@@ -48,18 +48,7 @@ class GameScene: Scene {
         node.zPosition = 1
         return node
     }()
-    
-    private lazy var mapNameLabel = {
-        let node = SKLabelNode()
-        node.fontName = "Avenir-Black"
-        node.position = CGPoint(x: frame.size.width * 0.86, y: frame.size.height * 0.73)
-        node.fontColor = .black
-        node.horizontalAlignmentMode = .center
-        node.verticalAlignmentMode = .center
-        node.zPosition = 2
-        return node
-    }()
-    
+        
     private lazy var pushesLabel = {
         let node = SKLabelNode()
         node.fontName = "Avenir-Black"
@@ -139,7 +128,6 @@ class GameScene: Scene {
         anchorPoint = .zero
         
         addChild(backgroundImage)
-        addChild(mapNameLabel)
         addChild(pushesLabel)
         addChild(movesLabel)
         addChild(tileMap)
@@ -208,7 +196,6 @@ class GameScene: Scene {
     }
     
     private func hudUpdate() {
-        mapNameLabel.text = map.name ?? "?"
         pushesLabel.text = "\(map.numberOfPushes)"
         movesLabel.text = "\(map.numberOfMoves)"
     }

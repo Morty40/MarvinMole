@@ -56,16 +56,21 @@ class MenuScene: Scene {
     }()
     
     @objc func onStart() {
+
+        // load Sokoban map from resource bundle
         let resource = String(format: "%@%02d", mapCollection.title, mapNumber)
-        
         let filePath = Bundle.main.url(forResource: resource, withExtension: "xsb")
-        
         if let data = try? Data(contentsOf: filePath!) {
+            
+            // prepare game scene
             let map = Map.mapFromXsb(data: data)
             Scene.gameScene.load(map: map!)
+            
+            // prepare and go to map transistion scene
+            Scene.mapIntroScene.title = String(format: "%@ %d", mapCollection.title, mapNumber)
+            Scene.mapIntroScene.subtitle = map?.title
             transition(to: Scene.mapIntroScene)
         }
-
     }
 
     private lazy var mapCollectionButton = {
