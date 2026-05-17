@@ -102,6 +102,8 @@ class MenuScene: Scene {
         mapNumberButton.title = "\(mapNumber)"
     }
 
+    /// This is called once after the scene has been initialized,
+    /// it's the recommended place to perform one-time setup
     override func sceneDidLoad() {
         super.sceneDidLoad()
         
@@ -112,12 +114,6 @@ class MenuScene: Scene {
         addChild(startButton)
         addChild(mapCollectionButton)
         addChild(mapNumberButton)
-    }
-
-    override func didMove(to view: SKView) {
-    }
-    
-    override func update(_ currentTime: TimeInterval) {
     }
 }
 

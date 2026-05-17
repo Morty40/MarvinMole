@@ -44,6 +44,8 @@ class QuitScene: Scene {
         transition(to: Scene.gameScene)
     }
 
+    /// This is called once after the scene has been initialized,
+    /// it's the recommended place to perform one-time setup
     override func sceneDidLoad() {
         super.sceneDidLoad()
         
@@ -53,12 +55,6 @@ class QuitScene: Scene {
         addChild(questionLabel)
         addChild(yesButton)
         addChild(noButton)
-    }
-
-    override func didMove(to view: SKView) {
-    }
-    
-    override func update(_ currentTime: TimeInterval) {
     }
 }
 
