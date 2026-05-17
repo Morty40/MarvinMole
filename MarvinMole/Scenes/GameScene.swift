@@ -22,8 +22,6 @@ class GameObjectNode: SKSpriteNode {
         let texture = SKTexture(imageNamed: "HeroWalkLeft")
         super.init(texture: texture, color: .red, size: CGSize(width: 32, height: 32))
         anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        
-        
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -108,7 +106,7 @@ class GameScene: Scene {
     }()
     
     @objc func onUndo() {
-        pendingInput.append(.undo)
+        register(input: .undo)
     }
     
     private lazy var quitButton = {
@@ -122,6 +120,8 @@ class GameScene: Scene {
         transition(to: Scene.quitScene)
     }
     
+    /// This is called once after the scene has been initialized,
+    /// it's the recommended place to perform one-time setup
     override func sceneDidLoad() {
         super.sceneDidLoad()
         
@@ -135,6 +135,8 @@ class GameScene: Scene {
         addChild(quitButton)
     }
     
+    /// The scene is about to be presented by a view
+    /// - Parameter view: The view that is presenting the scene
     override func didMove(to view: SKView) {
         
         // remove any old gesture recognizers
@@ -180,19 +182,19 @@ class GameScene: Scene {
     }
     
     @objc func onSwipeLeft() {
-        pendingInput.append(.left)
+        register(input: .left)
     }
     
     @objc func onSwipeUp() {
-        pendingInput.append(.up)
+        register(input: .up)
     }
     
     @objc func onSwipeRight() {
-        pendingInput.append(.right)
+        register(input: .right)
     }
     
     @objc func onSwipeDown() {
-        pendingInput.append(.down)
+        register(input: .down)
     }
     
     private func hudUpdate() {
@@ -205,18 +207,26 @@ class GameScene: Scene {
         processInput()
     }
     
+    /// Queue up input
+    /// - Parameter input: User input
+    private func register(input: Input) {
+        if pendingInput.count < 3 {
+            pendingInput.append(input)
+        }
+    }
+    
     override func handleKey(_ key: UIKey) {
         switch key.keyCode {
         case .keyboardLeftArrow:
-            pendingInput.append(.left)
+            register(input: .left)
         case .keyboardUpArrow:
-            pendingInput.append(.up)
+            register(input: .up)
         case .keyboardRightArrow:
-            pendingInput.append(.right)
+            register(input: .right)
         case .keyboardDownArrow:
-            pendingInput.append(.down)
+            register(input: .down)
         case .keyboardDeleteOrBackspace:
-            pendingInput.append(.undo)
+            register(input: .undo)
         default:
             break
         }
