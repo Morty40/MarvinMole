@@ -30,7 +30,7 @@ class Box: GameObjectNode {
     
     func actionFor(move: Map.Move,
                    distance: CGFloat,
-                   duration: TimeInterval = 0.3) -> SKAction? {
+                   duration: TimeInterval = 0.4) -> SKAction? {
         
         var dx, dy: CGFloat
         

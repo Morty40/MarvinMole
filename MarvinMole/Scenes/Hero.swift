@@ -20,7 +20,10 @@ class Hero: GameObjectNode {
     static let pushUpTextures = SKTexture(imageNamed: "HeroWalkUp").split(columns: 8)
     static let pushRightTextures = SKTexture(imageNamed: "HeroWalkRight").split(columns: 8)
     static let pushDownTextures = SKTexture(imageNamed: "HeroWalkDown").split(columns: 8)
-    
+
+    // idling
+    static let idleTextures = SKTexture(imageNamed: "HeroIdle").split(columns: 3)
+
     /// Animation action for a hero walk/push move
     /// - Parameters:
     ///   - move: Move type
@@ -29,7 +32,7 @@ class Hero: GameObjectNode {
     /// - Returns: Action
     func actionFor(move: Map.Move,
                    distance: CGFloat,
-                   duration: TimeInterval = 0.3) -> SKAction {
+                   duration: TimeInterval = 0.4) -> SKAction {
         
         var dx, dy: CGFloat
         var textures: [SKTexture]
@@ -59,5 +62,32 @@ class Hero: GameObjectNode {
             SKAction.animate(with: textures, timePerFrame: duration / Double(textures.count))])
         action.timingMode = .linear
         return action
+    }
+
+    var lastTime: TimeInterval = 0.0
+    var deltaTime: TimeInterval = 0.0
+    func update(_ currentTime: TimeInterval) {
+        if lastTime == 0.0 {
+            lastTime = currentTime
+        }
+        
+        deltaTime = currentTime - lastTime
+        lastTime = currentTime
+    }
+    
+    private var idleIndex: Int = 0
+    private var frameTime: TimeInterval = 0.0
+    
+    func idle() {
+        frameTime += deltaTime
+        if frameTime > 0.2 {
+            frameTime = 0.0
+            
+            let idleFrames = [0, 0, 1, 1, 0, 0, 1, 1,
+                              0, 0, 1, 1, 0, 0, 1, 1,
+                              2, 0, 1, 1, 0, 2, 1, 1]
+            texture = Hero.idleTextures[idleFrames[idleIndex]]
+            idleIndex = (idleIndex + 1) % idleFrames.count
+        }
     }
 }

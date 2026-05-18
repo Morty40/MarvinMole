@@ -205,6 +205,12 @@ class GameScene: Scene {
     override func update(_ currentTime: TimeInterval) {
         hudUpdate()
         processInput()
+        
+        hero.update(currentTime)
+        
+        if !isMoving && pendingInput.isEmpty {
+            hero.idle()            
+        }
     }
     
     /// Queue up input
@@ -286,7 +292,7 @@ class GameScene: Scene {
                 map.undoLastMove()
                 updateObjectPositions()
             }
-            
+
             pendingInput.removeFirst()
         }
     }
