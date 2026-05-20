@@ -91,10 +91,6 @@ class GameScene: Scene {
         node.zPosition = 2
         node.addChild(hero)
         node.addChild(boxContainer)
-        
-        node.xScale = 2
-        node.yScale = 2
-        
         return node
     }()
     
@@ -124,8 +120,6 @@ class GameScene: Scene {
     /// it's the recommended place to perform one-time setup
     override func sceneDidLoad() {
         super.sceneDidLoad()
-        
-        anchorPoint = .zero
         
         addChild(backgroundImage)
         addChild(pushesLabel)
@@ -249,7 +243,10 @@ class GameScene: Scene {
             if obj.type == .box {
                 for box in boxContainer.children {
                     if let box = box as? Box, box.id == obj.id {
-                        if let action = box.actionFor(move: move, distance: 32) {
+                        if let action = box.actionFor(move: move,
+                                                      toTile: map.tileAt(x: obj.position.x,
+                                                                         y: obj.position.y),
+                                                      distance: 32) {
                             box.run(action)
                         }
                     }
@@ -316,3 +313,6 @@ class GameScene: Scene {
     }
     
 }
+
+// TODO: Undo will move boxes back, but not update texture...
+// TODO: Hero is starting on wrong texture

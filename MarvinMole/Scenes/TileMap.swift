@@ -59,6 +59,7 @@ class TileMap: SKTileMapNode {
                     
                 case .goal:
                     setTileGroup(tileSet.goal, forColumn: x, row: numberOfRows - y - 1)
+                    
                 default:
                     break
                 }

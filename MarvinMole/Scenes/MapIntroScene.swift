@@ -50,9 +50,6 @@ class MapIntroScene: Scene {
     override func sceneDidLoad() {
         super.sceneDidLoad()
         
-        backgroundColor = .black
-        anchorPoint = .zero
-        
         addChild(mapTitleLabel)
         addChild(mapSubtitleLabel)
     }

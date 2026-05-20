@@ -107,8 +107,6 @@ class MenuScene: Scene {
     override func sceneDidLoad() {
         super.sceneDidLoad()
         
-        anchorPoint = .zero
-        
         addChild(backgroundImage)
         addChild(introText)
         addChild(startButton)

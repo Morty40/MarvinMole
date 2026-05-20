@@ -49,9 +49,6 @@ class QuitScene: Scene {
     override func sceneDidLoad() {
         super.sceneDidLoad()
         
-        backgroundColor = .black
-        anchorPoint = .zero
-        
         addChild(questionLabel)
         addChild(yesButton)
         addChild(noButton)

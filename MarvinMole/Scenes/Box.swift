@@ -29,11 +29,12 @@ class Box: GameObjectNode {
     }
     
     func actionFor(move: Map.Move,
+                   toTile: Map.Tile,
                    distance: CGFloat,
                    duration: TimeInterval = 0.4) -> SKAction? {
         
         var dx, dy: CGFloat
-        
+
         switch move {
         case .pushLeft:
             (dx, dy) = (-distance, 0)
@@ -47,10 +48,11 @@ class Box: GameObjectNode {
             return nil
         }
         
-        let action = SKAction.moveBy(x: dx, y: dy, duration: duration)
+        let action = SKAction.sequence([
+            SKAction.moveBy(x: dx, y: dy, duration: duration),
+            SKAction.setTexture(toTile == .floor ? boxTexture! : Box.boxOnGoalTexture)])
         action.timingMode = .linear
         return action
     }
-
     
 }
