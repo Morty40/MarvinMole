@@ -9,8 +9,11 @@ import SpriteKit
 
 class TileMap: SKTileMapNode {
     
-    override init() {
+    private var mask = [Map.Tile]()
+    
+    init(mask: [Map.Tile]) {
         super.init()
+        self.mask = mask
         tileSet = TileSet()
     }
 
@@ -37,6 +40,8 @@ class TileMap: SKTileMapNode {
                 let tileLeft = map.tileAt(x: x-1, y: y)
                 let tileBelowLeft = map.tileAt(x: x-1, y: y+1)
 
+                if !mask.contains(tile) { continue }
+                
                 switch tile {
                 case .wall:
                     if tileBelow == .wall {

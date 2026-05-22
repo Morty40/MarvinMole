@@ -22,6 +22,15 @@ class GameObjectNode: SKSpriteNode {
         let texture = SKTexture(imageNamed: "HeroWalkLeft")
         super.init(texture: texture, color: .red, size: CGSize(width: 32, height: 32))
         anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        
+        let shadowTexture = SKTexture(imageNamed: "ObjectShadow")
+        let shadow = SKSpriteNode(texture: shadowTexture, size: CGSize(width: 48, height: 16))
+        shadow.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        shadow.position = CGPoint(x: 0, y: -16)
+        shadow.zPosition = -1
+        shadow.alpha = 0.3
+        self.addChild(shadow)
+
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -51,7 +60,7 @@ class GameScene: Scene {
         let node = SKLabelNode()
         node.fontName = "Avenir-Black"
         node.position = CGPoint(x: frame.size.width * 0.86, y: frame.size.height * 0.62)
-        node.fontColor = .black
+        node.fontColor = .purple
         node.horizontalAlignmentMode = .center
         node.verticalAlignmentMode = .center
         node.zPosition = 2
@@ -62,7 +71,7 @@ class GameScene: Scene {
         let node = SKLabelNode()
         node.fontName = "Avenir-Black"
         node.position = CGPoint(x: frame.size.width * 0.86, y: frame.size.height * 0.50)
-        node.fontColor = .black
+        node.fontColor = .purple
         node.horizontalAlignmentMode = .center
         node.verticalAlignmentMode = .center
         node.zPosition = 2
@@ -74,6 +83,7 @@ class GameScene: Scene {
         node.position = .zero
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         node.zPosition = 3
+        
         return node
     }()
     
@@ -83,9 +93,9 @@ class GameScene: Scene {
         node.zPosition = 3
         return node
     }()
-    
-    private lazy var tileMap = {
-        let node = TileMap()
+        
+    private lazy var floorTileMap = {
+        let node = TileMap(mask: [.floor, .goal])
         node.position = CGPoint(x: frame.size.width * 0.43, y: frame.size.height * 0.53)
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         node.zPosition = 2
@@ -93,7 +103,15 @@ class GameScene: Scene {
         node.addChild(boxContainer)
         return node
     }()
-    
+
+    private lazy var wallTileMap = {
+        let node = TileMap(mask: [.wall])
+        node.position = CGPoint(x: frame.size.width * 0.43, y: frame.size.height * 0.53)
+        node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        node.zPosition = 10
+        return node
+    }()
+
     private lazy var undoButton = {
         let node = TextButton(title: "Undo", target: self, action: #selector(onUndo))
         node.position = CGPoint(x: frame.size.width * 0.8, y: frame.size.height * 0.1)
@@ -124,7 +142,8 @@ class GameScene: Scene {
         addChild(backgroundImage)
         addChild(pushesLabel)
         addChild(movesLabel)
-        addChild(tileMap)
+        addChild(floorTileMap)
+        addChild(wallTileMap)
         addChild(undoButton)
         addChild(quitButton)
     }
@@ -160,7 +179,9 @@ class GameScene: Scene {
     func load(map: Map) {
         self.map = map
         
-        tileMap.draw(map: map)
+        floorTileMap.draw(map: map)
+        wallTileMap.draw(map: map)
+        
         boxContainer.removeAllChildren()
         for b in map.objectsOfType(.box) {
             let box = Box()
@@ -171,8 +192,10 @@ class GameScene: Scene {
 
         // scale small maps 2x
         let scale = map.size.width < 10 && map.size.height < 10 ? 2.0 : 1.0
-        tileMap.xScale = scale
-        tileMap.yScale = scale
+        floorTileMap.xScale = scale
+        floorTileMap.yScale = scale
+        wallTileMap.xScale = scale
+        wallTileMap.yScale = scale
     }
     
     @objc func onSwipeLeft() {
@@ -298,7 +321,7 @@ class GameScene: Scene {
         if let heroPosition = map.heroPosition {
             hero.setMapPosition(x: heroPosition.x,
                                 y: heroPosition.y,
-                                tileMap: tileMap)
+                                tileMap: floorTileMap)
         }
 
         for box in boxContainer.children {
@@ -306,7 +329,7 @@ class GameScene: Scene {
                 if let object = map.objectsOfType(.box).first(where: { $0.id == box.id }) {
                     box.setMapPosition(x: object.position.x,
                                        y: object.position.y,
-                                       tileMap: tileMap)
+                                       tileMap: floorTileMap)
                 }
             }
         }
