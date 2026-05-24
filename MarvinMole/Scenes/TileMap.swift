@@ -33,7 +33,7 @@ class TileMap: SKTileMapNode {
                 let (c, r) = (x, numberOfRows - y - 1)
 
                 switch tile {
-                case .floor:
+                case .floor, .wall:
                     setTileGroup(tileSet.floors[Int(arc4random() & 3)], forColumn: c, row: r)
                     
                 case .goal:
@@ -63,22 +63,25 @@ class TileMap: SKTileMapNode {
                 case .floor, .goal:
                     if tileLeftUp == .wall, tileLeft != .wall, tileUp != .wall {
                         setTileGroup(tileSet.wallShadowLeftUp1, forColumn: c, row: r)
-                    }
-                    else if tileLeft == .wall, tileUp == .wall {
+                        
+                    } else if tileLeft == .wall, tileUp == .wall {
                         setTileGroup(tileSet.wallShadowLeftUp2, forColumn: c, row: r)
-                    }
-                    else if tileLeft == .wall, tileLeftUp == .wall {
+                        
+                    } else if tileLeft == .wall, tileLeftUp == .wall {
                         setTileGroup(tileSet.wallShadowLeft1, forColumn: c, row: r)
-                    }
-                    else if tileLeft == .wall, tileLeftUp != .wall {
+                        
+                    } else if tileLeft == .wall, tileLeftUp != .wall {
                         setTileGroup(tileSet.wallShadowLeft2, forColumn: c, row: r)
-                    }
-                    else if tileUp == .wall, tileLeftUp == .wall {
+                        
+                    } else if tileUp == .wall, tileLeftUp == .wall {
                         setTileGroup(tileSet.wallShadowUp1, forColumn: c, row: r)
-                    }
-                    else if tileUp == .wall, tileLeftUp != .wall {
+                        
+                    } else if tileUp == .wall, tileLeftUp != .wall {
                         setTileGroup(tileSet.wallShadowUp2, forColumn: c, row: r)
                     }
+
+                case .wall:
+                    setTileGroup(tileSet.wallShadowUnder, forColumn: c, row: r)
 
                 default:
                     break

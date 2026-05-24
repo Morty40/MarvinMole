@@ -26,7 +26,8 @@ class TileSet: SKTileSet {
     let wallShadowUp2 = SKTileGroup(imageNamed: "WallShadowUp2")
     let wallShadowLeftUp1 = SKTileGroup(imageNamed: "WallShadowLeftUp1")
     let wallShadowLeftUp2 = SKTileGroup(imageNamed: "WallShadowLeftUp2")
-    
+    let wallShadowUnder = SKTileGroup(imageNamed: "WallShadowUnder")
+
     override init() {
         let floorTextures = SKTexture(imageNamed: "Floor").split()
         floor = SKTileGroup(tileDefinition: SKTileDefinition(texture: floorTextures[0]))
@@ -36,6 +37,7 @@ class TileSet: SKTileSet {
         super.init(tileGroups: [wallShadowLeft1, wallShadowLeft2,
                                 wallShadowUp1, wallShadowUp2,
                                 wallShadowLeftUp1, wallShadowLeftUp2,
+                                wallShadowUnder,
                                 wallFront1, wallFront2,
                                 wallFrontShadow, wallTop, floor, goal] + floors)
     }
