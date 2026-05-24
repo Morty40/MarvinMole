@@ -23,11 +23,11 @@ class TileMap: SKTileMapNode {
         tileSet = TileSet()
     }
     
-    private func drawFloors(map: Map) {
+    private func drawFloors(map: Map, rect: (x: Int, y: Int, width: Int, height: Int)) {
         
         let tileSet = tileSet as! TileSet
-        for y in 0 ..< numberOfRows {
-            for x in 0 ..< numberOfColumns {
+        for y in rect.y ..< rect.y + rect.height {
+            for x in rect.x ..< rect.x + rect.width {
                 
                 let tile = map.tileAt(x: x, y: y)
                 let (c, r) = (x, numberOfRows - y - 1)
@@ -47,12 +47,12 @@ class TileMap: SKTileMapNode {
         
     }
     
-    private func drawShadows(map: Map) {
+    private func drawShadows(map: Map, rect: (x: Int, y: Int, width: Int, height: Int)) {
         
         let tileSet = tileSet as! TileSet
-        for y in 0 ..< numberOfRows {
-            for x in 0 ..< numberOfColumns {
-                
+        for y in rect.y ..< rect.y + rect.height {
+            for x in rect.x ..< rect.x + rect.width {
+
                 let tile = map.tileAt(x: x, y: y)
                 let tileLeft = map.tileAt(x: x-1, y: y)
                 let tileUp = map.tileAt(x: x, y: y-1)
@@ -88,12 +88,12 @@ class TileMap: SKTileMapNode {
         
     }
     
-    private func drawWalls(map: Map) {
+    private func drawWalls(map: Map, rect: (x: Int, y: Int, width: Int, height: Int)) {
         
         let tileSet = tileSet as! TileSet
-        for y in 0 ..< numberOfRows {
-            for x in 0 ..< numberOfColumns {
-                
+        for y in rect.y ..< rect.y + rect.height {
+            for x in rect.x ..< rect.x + rect.width {
+
                 let tile = map.tileAt(x: x, y: y)
                 let tileBelow = map.tileAt(x: x, y: y+1)
                 let (c, r) = (x, numberOfRows - y - 1)
@@ -115,30 +115,28 @@ class TileMap: SKTileMapNode {
         
     }
     
-    func draw(map: Map) {
-        
-        // clear
-        for column in 0 ..< numberOfColumns {
-            for row in 0 ..< numberOfRows {
-                setTileGroup(nil, forColumn: column, row: row)
-            }
-        }
-        
-        // set size
-        numberOfColumns = map.size.width
-        numberOfRows = map.size.height
+    func draw(map: Map, rect: (x: Int, y: Int, width: Int, height: Int)) {
         
         switch layer {
         case .floors:
-            drawFloors(map: map)
+            drawFloors(map: map, rect: rect)
         case .shadows:
-            drawShadows(map: map)
+            drawShadows(map: map, rect: rect)
         case .walls:
-            drawWalls(map: map)
+            drawWalls(map: map, rect: rect)
         }
         
     }
+
+    func clear() {
+        fill(with: nil)
+    }
     
+    var size: (width: Int, height: Int) {
+        get { (numberOfColumns, numberOfRows) }
+        set { (numberOfColumns, numberOfRows) = newValue }
+    }
+        
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
