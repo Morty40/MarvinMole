@@ -95,7 +95,7 @@ class GameScene: Scene {
     }()
         
     private lazy var floorTileMap = {
-        let node = TileMap(mask: [.floor, .goal])
+        let node = TileMap(layer: .floors)
         node.position = CGPoint(x: frame.size.width * 0.43, y: frame.size.height * 0.53)
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         node.zPosition = 2
@@ -104,8 +104,17 @@ class GameScene: Scene {
         return node
     }()
 
+    private lazy var shadowTileMap = {
+        let node = TileMap(layer: .shadows)
+        node.position = CGPoint(x: frame.size.width * 0.43, y: frame.size.height * 0.53)
+        node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        node.zPosition = 3
+        node.alpha = 0.2
+        return node
+    }()
+
     private lazy var wallTileMap = {
-        let node = TileMap(mask: [.wall])
+        let node = TileMap(layer: .walls)
         node.position = CGPoint(x: frame.size.width * 0.43, y: frame.size.height * 0.53)
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         node.zPosition = 10
@@ -143,6 +152,7 @@ class GameScene: Scene {
         addChild(pushesLabel)
         addChild(movesLabel)
         addChild(floorTileMap)
+        addChild(shadowTileMap)
         addChild(wallTileMap)
         addChild(undoButton)
         addChild(quitButton)
@@ -180,6 +190,7 @@ class GameScene: Scene {
         self.map = map
         
         floorTileMap.draw(map: map)
+        shadowTileMap.draw(map: map)
         wallTileMap.draw(map: map)
         
         boxContainer.removeAllChildren()
@@ -194,6 +205,8 @@ class GameScene: Scene {
         let scale = map.size.width < 10 && map.size.height < 10 ? 2.0 : 1.0
         floorTileMap.xScale = scale
         floorTileMap.yScale = scale
+        shadowTileMap.xScale = scale
+        shadowTileMap.yScale = scale
         wallTileMap.xScale = scale
         wallTileMap.yScale = scale
     }

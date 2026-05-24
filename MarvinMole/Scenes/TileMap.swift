@@ -9,16 +9,114 @@ import SpriteKit
 
 class TileMap: SKTileMapNode {
     
-    private var mask = [Map.Tile]()
+    enum Layer {
+        case floors
+        case shadows
+        case walls
+    }
     
-    init(mask: [Map.Tile]) {
+    private var layer: Layer
+    
+    init(layer: Layer) {
+        self.layer = layer
         super.init()
-        self.mask = mask
         tileSet = TileSet()
     }
+    
+    private func drawFloors(map: Map) {
+        
+        let tileSet = tileSet as! TileSet
+        for y in 0 ..< numberOfRows {
+            for x in 0 ..< numberOfColumns {
+                
+                let tile = map.tileAt(x: x, y: y)
+                let (c, r) = (x, numberOfRows - y - 1)
 
+                switch tile {
+                case .floor:
+                    setTileGroup(tileSet.floors[Int(arc4random() & 3)], forColumn: c, row: r)
+                    
+                case .goal:
+                    setTileGroup(tileSet.goal, forColumn: c, row: r)
+                    
+                default:
+                    break
+                }
+            }
+        }
+        
+    }
+    
+    private func drawShadows(map: Map) {
+        
+        let tileSet = tileSet as! TileSet
+        for y in 0 ..< numberOfRows {
+            for x in 0 ..< numberOfColumns {
+                
+                let tile = map.tileAt(x: x, y: y)
+                let tileLeft = map.tileAt(x: x-1, y: y)
+                let tileUp = map.tileAt(x: x, y: y-1)
+                let tileLeftUp = map.tileAt(x: x-1, y: y-1)
+                let (c, r) = (x, numberOfRows - y - 1)
+                
+                switch tile {
+                case .floor, .goal:
+                    if tileLeftUp == .wall, tileLeft != .wall, tileUp != .wall {
+                        setTileGroup(tileSet.wallShadowLeftUp1, forColumn: c, row: r)
+                    }
+                    else if tileLeft == .wall, tileUp == .wall {
+                        setTileGroup(tileSet.wallShadowLeftUp2, forColumn: c, row: r)
+                    }
+                    else if tileLeft == .wall, tileLeftUp == .wall {
+                        setTileGroup(tileSet.wallShadowLeft1, forColumn: c, row: r)
+                    }
+                    else if tileLeft == .wall, tileLeftUp != .wall {
+                        setTileGroup(tileSet.wallShadowLeft2, forColumn: c, row: r)
+                    }
+                    else if tileUp == .wall, tileLeftUp == .wall {
+                        setTileGroup(tileSet.wallShadowUp1, forColumn: c, row: r)
+                    }
+                    else if tileUp == .wall, tileLeftUp != .wall {
+                        setTileGroup(tileSet.wallShadowUp2, forColumn: c, row: r)
+                    }
+
+                default:
+                    break
+                }
+            }
+        }
+        
+    }
+    
+    private func drawWalls(map: Map) {
+        
+        let tileSet = tileSet as! TileSet
+        for y in 0 ..< numberOfRows {
+            for x in 0 ..< numberOfColumns {
+                
+                let tile = map.tileAt(x: x, y: y)
+                let tileBelow = map.tileAt(x: x, y: y+1)
+                let (c, r) = (x, numberOfRows - y - 1)
+
+                switch tile {
+                case .wall:
+                    if tileBelow == .wall {
+                        setTileGroup(tileSet.wallTop, forColumn: c, row: r)
+                    } else {
+                        let tile = ((arc4random() & 3) != 0) ? tileSet.wallFront1 : tileSet.wallFront2
+                        setTileGroup(tile, forColumn: c, row: r)
+                    }
+                    
+                default:
+                    break
+                }
+            }
+        }
+        
+    }
+    
     func draw(map: Map) {
-
+        
         // clear
         for column in 0 ..< numberOfColumns {
             for row in 0 ..< numberOfRows {
@@ -30,46 +128,15 @@ class TileMap: SKTileMapNode {
         numberOfColumns = map.size.width
         numberOfRows = map.size.height
         
-        // draw tiles
-        let tileSet = tileSet as! TileSet
-        for y in 0 ..< numberOfRows {
-            for x in 0 ..< numberOfColumns {
-                
-                let tile = map.tileAt(x: x, y: y)
-                let tileBelow = map.tileAt(x: x, y: y+1)
-                let tileLeft = map.tileAt(x: x-1, y: y)
-                let tileBelowLeft = map.tileAt(x: x-1, y: y+1)
-
-                if !mask.contains(tile) { continue }
-                
-                switch tile {
-                case .wall:
-                    if tileBelow == .wall {
-                        setTileGroup(tileSet.wallTop, forColumn: x, row: numberOfRows - y - 1)
-                    } else {
-                        if tileBelowLeft == .wall {
-                            setTileGroup(tileSet.wallFrontShadow, forColumn: x, row: numberOfRows - y - 1)
-                        } else {
-                            let tile = ((arc4random() & 3) != 0) ? tileSet.wallFront1 : tileSet.wallFront2
-                            setTileGroup(tile, forColumn: x, row: numberOfRows - y - 1)
-                        }
-                    }
-                    
-                case .floor:
-                    if tileLeft == .wall {
-                        setTileGroup(tileSet.floorShadow, forColumn: x, row: numberOfRows - y - 1)
-                    } else {
-                        setTileGroup(tileSet.floor, forColumn: x, row: numberOfRows - y - 1)
-                    }
-                    
-                case .goal:
-                    setTileGroup(tileSet.goal, forColumn: x, row: numberOfRows - y - 1)
-                    
-                default:
-                    break
-                }
-            }
+        switch layer {
+        case .floors:
+            drawFloors(map: map)
+        case .shadows:
+            drawShadows(map: map)
+        case .walls:
+            drawWalls(map: map)
         }
+        
     }
     
     required init?(coder aDecoder: NSCoder) {

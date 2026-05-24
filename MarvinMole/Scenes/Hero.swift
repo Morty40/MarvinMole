@@ -10,19 +10,19 @@ import SpriteKit
 class Hero: GameObjectNode {
     
     // walking
-    static let walkLeftTextures = SKTexture(imageNamed: "HeroWalkLeft").split(columns: 8)
-    static let walkUpTextures = SKTexture(imageNamed: "HeroWalkUp").split(columns: 8)
-    static let walkRightTextures = SKTexture(imageNamed: "HeroWalkRight").split(columns: 8)
-    static let walkDownTextures = SKTexture(imageNamed: "HeroWalkDown").split(columns: 8)
+    static let walkLeftTextures = SKTexture(imageNamed: "HeroWalkLeft").split()
+    static let walkUpTextures = SKTexture(imageNamed: "HeroWalkUp").split()
+    static let walkRightTextures = SKTexture(imageNamed: "HeroWalkRight").split()
+    static let walkDownTextures = SKTexture(imageNamed: "HeroWalkDown").split()
     
     // pushing
-    static let pushLeftTextures = SKTexture(imageNamed: "HeroWalkLeft").split(columns: 8)
-    static let pushUpTextures = SKTexture(imageNamed: "HeroWalkUp").split(columns: 8)
-    static let pushRightTextures = SKTexture(imageNamed: "HeroWalkRight").split(columns: 8)
-    static let pushDownTextures = SKTexture(imageNamed: "HeroWalkDown").split(columns: 8)
+    static let pushLeftTextures = SKTexture(imageNamed: "HeroWalkLeft").split()
+    static let pushUpTextures = SKTexture(imageNamed: "HeroWalkUp").split()
+    static let pushRightTextures = SKTexture(imageNamed: "HeroWalkRight").split()
+    static let pushDownTextures = SKTexture(imageNamed: "HeroWalkDown").split()
 
     // idling
-    static let idleTextures = SKTexture(imageNamed: "HeroIdle").split(columns: 3)
+    static let idleTextures = SKTexture(imageNamed: "HeroIdle").split()
 
     /// Animation action for a hero walk/push move
     /// - Parameters:

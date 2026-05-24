@@ -14,19 +14,27 @@ extension SKTexture {
     ///   - columns: Number of columns
     ///   - rows: Number of rows
     /// - Returns: Array of textures
-    func split(columns: Int = 1, rows: Int = 1) -> [SKTexture] {
+    func split(columns: Int = 0, rows: Int = 0) -> [SKTexture] {
         var textures: [SKTexture] = []
-        
-        for y in 0 ..< rows {
-            for x in 0 ..< columns {
-                let rect = CGRect(x: CGFloat(x) / CGFloat(columns),
-                                  y: CGFloat(y) / CGFloat(rows),
-                                  width: 1.0 / CGFloat(columns),
-                                  height: 1.0 / CGFloat(rows))
+
+        let s = size()
+        let minLength = min(s.width, s.height)
+        let maxLength = max(s.width, s.height)
+        let n = Int(maxLength / minLength)
+        let c = columns == 0 ? (s.width > s.height ? n : 1) : columns
+        let r = rows == 0 ? (s.width < s.height ? n : 1) : rows
+
+        for y in 0 ..< r {
+            for x in 0 ..< c {
+                let rect = CGRect(x: CGFloat(x) / CGFloat(c),
+                                  y: CGFloat(y) / CGFloat(r),
+                                  width: 1.0 / CGFloat(c),
+                                  height: 1.0 / CGFloat(r))
                 textures.append(SKTexture(rect: rect, in: self))
             }
         }
         
         return textures
     }
+    
 }
