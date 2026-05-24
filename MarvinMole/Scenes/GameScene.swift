@@ -59,10 +59,10 @@ class GameScene: Scene {
     private lazy var pushesLabel = {
         let node = SKLabelNode()
         node.fontName = "Avenir-Black"
-        node.position = CGPoint(x: frame.size.width * 0.86, y: frame.size.height * 0.62)
-        node.fontColor = .purple
+        node.position = CGPoint(x: frame.size.width * 0.85, y: frame.size.height * 0.62)
+        node.fontColor = .white
         node.horizontalAlignmentMode = .center
-        node.verticalAlignmentMode = .center
+        node.verticalAlignmentMode = .baseline
         node.zPosition = 2
         return node
     }()
@@ -70,10 +70,10 @@ class GameScene: Scene {
     private lazy var movesLabel = {
         let node = SKLabelNode()
         node.fontName = "Avenir-Black"
-        node.position = CGPoint(x: frame.size.width * 0.86, y: frame.size.height * 0.50)
-        node.fontColor = .purple
+        node.position = CGPoint(x: frame.size.width * 0.85, y: frame.size.height * 0.50)
+        node.fontColor = .white
         node.horizontalAlignmentMode = .center
-        node.verticalAlignmentMode = .center
+        node.verticalAlignmentMode = .baseline
         node.zPosition = 2
         return node
     }()
@@ -123,7 +123,7 @@ class GameScene: Scene {
 
     private lazy var undoButton = {
         let node = TextButton(title: "Undo", target: self, action: #selector(onUndo))
-        node.position = CGPoint(x: frame.size.width * 0.8, y: frame.size.height * 0.1)
+        node.position = CGPoint(x: frame.size.width * 0.15, y: frame.size.height * 0.1)
         node.zPosition = 2
         return node
     }()
@@ -133,8 +133,8 @@ class GameScene: Scene {
     }
     
     private lazy var quitButton = {
-        let node = TextButton(title: "Quit", target: self, action: #selector(onQuit))
-        node.position = CGPoint(x: frame.size.width * 0.2, y: frame.size.height * 0.1)
+        let node = IconButton(target: self, action: #selector(onQuit))
+        node.position = CGPoint(x: frame.size.width * 0.05, y: frame.size.height * 0.9)
         node.zPosition = 2
         return node
     }()
@@ -143,6 +143,34 @@ class GameScene: Scene {
         transition(to: Scene.quitScene)
     }
     
+    private lazy var leftButton = {
+        let node = IconButton(target: nil, action: nil)
+        node.position = CGPoint(x: frame.size.width * 0.78, y: frame.size.height * 0.1)
+        node.zPosition = 2
+        return node
+    }()
+
+    private lazy var upButton = {
+        let node = IconButton(target: nil, action: nil)
+        node.position = CGPoint(x: frame.size.width * 0.85, y: frame.size.height * 0.2)
+        node.zPosition = 2
+        return node
+    }()
+
+    private lazy var rightButton = {
+        let node = IconButton(target: nil, action: nil)
+        node.position = CGPoint(x: frame.size.width * 0.92, y: frame.size.height * 0.1)
+        node.zPosition = 2
+        return node
+    }()
+
+    private lazy var downButton = {
+        let node = IconButton(target: nil, action: nil)
+        node.position = CGPoint(x: frame.size.width * 0.85, y: frame.size.height * 0.1)
+        node.zPosition = 2
+        return node
+    }()
+
     /// This is called once after the scene has been initialized,
     /// it's the recommended place to perform one-time setup
     override func sceneDidLoad() {
@@ -156,6 +184,10 @@ class GameScene: Scene {
         addChild(wallTileMap)
         addChild(undoButton)
         addChild(quitButton)
+        addChild(leftButton)
+        addChild(upButton)
+        addChild(rightButton)
+        addChild(downButton)
     }
     
     /// The scene is about to be presented by a view
@@ -188,10 +220,21 @@ class GameScene: Scene {
     
     func load(map: Map) {
         self.map = map
-        
-        floorTileMap.draw(map: map)
-        shadowTileMap.draw(map: map)
-        wallTileMap.draw(map: map)
+
+        // clear tilemaps
+        floorTileMap.clear()
+        shadowTileMap.clear()
+        wallTileMap.clear()
+
+        // set size
+        floorTileMap.size = map.size
+        shadowTileMap.size = map.size
+        wallTileMap.size = map.size
+
+        // draw tilemaps
+        floorTileMap.draw(map: map, rect: (x: 0, y: 0, width: map.size.width, height: map.size.height))
+        shadowTileMap.draw(map: map, rect: (x: 0, y: 0, width: map.size.width, height: map.size.height))
+        wallTileMap.draw(map: map, rect: (x: 0, y: 0, width: map.size.width, height: map.size.height))
         
         boxContainer.removeAllChildren()
         for b in map.objectsOfType(.box) {
@@ -238,8 +281,22 @@ class GameScene: Scene {
         
         hero.update(currentTime)
         
-        if !isMoving && pendingInput.isEmpty {
-            hero.idle()            
+        if pendingInput.isEmpty, !isMoving {
+
+            // read on-screen joystick input
+            if leftButton.isPressed {
+                register(input: .left)
+            } else if upButton.isPressed {
+                register(input: .up)
+            } else if rightButton.isPressed {
+                register(input: .right)
+            } else if downButton.isPressed {
+                register(input: .down)
+            } else {
+
+                // standing still, and no new input => idle
+                hero.idle()
+            }
         }
     }
     
@@ -248,6 +305,7 @@ class GameScene: Scene {
     private func register(input: Input) {
         if pendingInput.count < 3 {
             pendingInput.append(input)
+            print("input: \(pendingInput)")
         }
     }
     
