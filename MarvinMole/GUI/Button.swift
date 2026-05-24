@@ -12,28 +12,40 @@ class Button: SKSpriteNode {
     private var target: Any? = nil
     private var action: Selector? = nil
     
-    private let texture1 = SKTexture(imageNamed: "ButtonNormal")
-    private let texture2 = SKTexture(imageNamed: "ButtonPressed")
+    private(set) var isPressed = false
     
     init(target: Any?, action: Selector?) {
-        super.init(texture: texture1,
+        super.init(texture: nil,
                    color: .clear,
-                   size: CGSize(width: 250, height: 100))
-
+                   size: .zero)
+        
         self.target = target
         self.action = action
-
+        
         self.isUserInteractionEnabled = true
         self.anchorPoint = CGPoint(x: 0.5, y: 0.5)
     }
     
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension Button {
+    
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        texture = texture2
+        super.touchesBegan(touches, with: event)
+        isPressed = true
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesMoved(touches, with: event)
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        texture = texture1
-        
+        super.touchesEnded(touches, with: event)
+        isPressed = false
+
         if let touch = touches.first {
             
             // translate touch event coordinate to node local coordinate
@@ -54,10 +66,8 @@ class Button: SKSpriteNode {
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        texture = texture1
+        super.touchesCancelled(touches, with: event)
+        isPressed = false
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
 }
