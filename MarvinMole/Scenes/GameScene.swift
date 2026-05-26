@@ -59,9 +59,10 @@ class GameScene: Scene {
     private lazy var pushesLabel = {
         let node = SKLabelNode()
         node.fontName = "Avenir-Black"
-        node.position = CGPoint(x: frame.size.width * 0.85, y: frame.size.height * 0.62)
+        node.fontSize = 35
+        node.position = CGPoint(x: frame.size.width * 0.70, y: frame.size.height * 0.02)
         node.fontColor = .white
-        node.horizontalAlignmentMode = .center
+        node.horizontalAlignmentMode = .right
         node.verticalAlignmentMode = .baseline
         node.zPosition = 2
         return node
@@ -70,9 +71,10 @@ class GameScene: Scene {
     private lazy var movesLabel = {
         let node = SKLabelNode()
         node.fontName = "Avenir-Black"
-        node.position = CGPoint(x: frame.size.width * 0.85, y: frame.size.height * 0.50)
+        node.fontSize = 35
+        node.position = CGPoint(x: frame.size.width * 0.48, y: frame.size.height * 0.02)
         node.fontColor = .white
-        node.horizontalAlignmentMode = .center
+        node.horizontalAlignmentMode = .right
         node.verticalAlignmentMode = .baseline
         node.zPosition = 2
         return node
@@ -96,7 +98,7 @@ class GameScene: Scene {
         
     private lazy var floorTileMap = {
         let node = TileMap(layer: .floors)
-        node.position = CGPoint(x: frame.size.width * 0.43, y: frame.size.height * 0.53)
+        node.position = CGPoint(x: frame.size.width * 0.46, y: frame.size.height * 0.50)
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         node.zPosition = 2
         node.addChild(hero)
@@ -106,7 +108,7 @@ class GameScene: Scene {
 
     private lazy var shadowTileMap = {
         let node = TileMap(layer: .shadows)
-        node.position = CGPoint(x: frame.size.width * 0.43, y: frame.size.height * 0.53)
+        node.position = CGPoint(x: frame.size.width * 0.46, y: frame.size.height * 0.50)
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         node.zPosition = 3
         node.alpha = 0.2
@@ -115,26 +117,15 @@ class GameScene: Scene {
 
     private lazy var wallTileMap = {
         let node = TileMap(layer: .walls)
-        node.position = CGPoint(x: frame.size.width * 0.43, y: frame.size.height * 0.53)
+        node.position = CGPoint(x: frame.size.width * 0.46, y: frame.size.height * 0.50)
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         node.zPosition = 10
         return node
     }()
 
-    private lazy var undoButton = {
-        let node = TextButton(title: "Undo", target: self, action: #selector(onUndo))
-        node.position = CGPoint(x: frame.size.width * 0.15, y: frame.size.height * 0.1)
-        node.zPosition = 2
-        return node
-    }()
-    
-    @objc func onUndo() {
-        register(input: .undo)
-    }
-    
     private lazy var quitButton = {
-        let node = IconButton(target: self, action: #selector(onQuit))
-        node.position = CGPoint(x: frame.size.width * 0.05, y: frame.size.height * 0.9)
+        let node = IconButton(imageName: "CloseIcon", target: self, action: #selector(onQuit))
+        node.position = CGPoint(x: frame.size.width * 0.05, y: frame.size.height * 0.95)
         node.zPosition = 2
         return node
     }()
@@ -142,31 +133,42 @@ class GameScene: Scene {
     @objc func onQuit() {
         transition(to: Scene.quitScene)
     }
+
+    private lazy var undoButton = {
+        let node = IconButton(imageName: "UndoIcon", target: self, action: #selector(onUndo))
+        node.position = CGPoint(x: frame.size.width * 0.05, y: frame.size.height * 0.05)
+        node.zPosition = 2
+        return node
+    }()
     
+    @objc func onUndo() {
+        register(input: .undo)
+    }
+        
     private lazy var leftButton = {
-        let node = IconButton(target: nil, action: nil)
-        node.position = CGPoint(x: frame.size.width * 0.78, y: frame.size.height * 0.1)
+        let node = IconButton(imageName: "ArrowLeftIcon", target: nil, action: nil)
+        node.position = CGPoint(x: frame.size.width * 0.81, y: frame.size.height * 0.05)
         node.zPosition = 2
         return node
     }()
 
     private lazy var upButton = {
-        let node = IconButton(target: nil, action: nil)
-        node.position = CGPoint(x: frame.size.width * 0.85, y: frame.size.height * 0.2)
+        let node = IconButton(imageName: "ArrowUpIcon", target: nil, action: nil)
+        node.position = CGPoint(x: frame.size.width * 0.88, y: frame.size.height * 0.15)
         node.zPosition = 2
         return node
     }()
 
     private lazy var rightButton = {
-        let node = IconButton(target: nil, action: nil)
-        node.position = CGPoint(x: frame.size.width * 0.92, y: frame.size.height * 0.1)
+        let node = IconButton(imageName: "ArrowRightIcon", target: nil, action: nil)
+        node.position = CGPoint(x: frame.size.width * 0.95, y: frame.size.height * 0.05)
         node.zPosition = 2
         return node
     }()
 
     private lazy var downButton = {
-        let node = IconButton(target: nil, action: nil)
-        node.position = CGPoint(x: frame.size.width * 0.85, y: frame.size.height * 0.1)
+        let node = IconButton(imageName: "ArrowDownIcon", target: nil, action: nil)
+        node.position = CGPoint(x: frame.size.width * 0.88, y: frame.size.height * 0.05)
         node.zPosition = 2
         return node
     }()
@@ -182,8 +184,8 @@ class GameScene: Scene {
         addChild(floorTileMap)
         addChild(shadowTileMap)
         addChild(wallTileMap)
-        addChild(undoButton)
         addChild(quitButton)
+        addChild(undoButton)
         addChild(leftButton)
         addChild(upButton)
         addChild(rightButton)

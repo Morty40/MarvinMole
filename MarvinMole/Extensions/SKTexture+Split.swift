@@ -9,7 +9,8 @@ import SpriteKit
 
 extension SKTexture {
     
-    /// Split a texture (e.g. sprite sheet) into multiple textures, by columns x rows
+    /// Split a texture (e.g. sprite sheet) into multiple textures, by columns and rows.
+    /// When columns and rows are zero, attempt to calculate the number of splits.
     /// - Parameters:
     ///   - columns: Number of columns
     ///   - rows: Number of rows
