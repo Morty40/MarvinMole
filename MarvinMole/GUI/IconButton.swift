@@ -9,14 +9,24 @@ import SpriteKit
 
 class IconButton: Button {
         
-    private let texture1 = SKTexture(imageNamed: "ButtonNormal")
-    private let texture2 = SKTexture(imageNamed: "ButtonPressed")
+    private let texture1 = SKTexture(imageNamed: "IconButtonNormal")
+    private let texture2 = SKTexture(imageNamed: "IconButtonPressed")
 
-    override init(target: Any?, action: Selector?) {
+    private lazy var iconSprite = {
+        let node = SKSpriteNode()
+        node.zPosition = 1
+        return node
+    }()
+
+    init(imageName: String, target: Any?, action: Selector?) {
         super.init(target: target, action: action)
     
         texture = texture1
-        size = CGSize(width: 60, height: 60)
+        size = texture1.size()
+    
+        iconSprite.texture = SKTexture(imageNamed: imageName)
+        iconSprite.size = iconSprite.texture!.size()
+        addChild(iconSprite)
     }
         
     @MainActor required init?(coder aDecoder: NSCoder) {

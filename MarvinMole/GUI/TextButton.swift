@@ -19,7 +19,7 @@ class TextButton: Button {
         node.position = CGPoint(x: 0, y: -10)
         node.horizontalAlignmentMode = .center
         node.verticalAlignmentMode = .baseline
-        node.zPosition = 2
+        node.zPosition = 1
         return node
     }()
 
