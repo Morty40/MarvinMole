@@ -35,7 +35,7 @@ class MenuScene: Scene {
     
     private lazy var introText = {
         let node = SKLabelNode()
-        node.fontName = "Avenir-Black"
+        node.fontName = "Rubik-Bold"
         node.fontSize = 30
         node.fontColor = .black
         node.position = CGPoint(x: frame.size.width * 0.09, y: frame.size.height * 0.78)
@@ -112,6 +112,15 @@ class MenuScene: Scene {
         addChild(startButton)
         addChild(mapCollectionButton)
         addChild(mapNumberButton)
+
+        // TODO: remove
+        for name in UIFont.familyNames {
+            print(name)
+            if let nameString = name as? String {
+                print(UIFont.fontNames(forFamilyName: nameString))
+            }
+        }
+        
     }
 }
 

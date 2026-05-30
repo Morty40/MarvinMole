@@ -11,7 +11,7 @@ class QuitScene: Scene {
             
     private lazy var questionLabel = {
         let node = SKLabelNode()
-        node.fontName = "Avenir-Black"
+        node.fontName = "Rubik-Bold"
         node.fontSize = 40
         node.fontColor = .white
         node.position = CGPoint(x: frame.size.width * 0.5, y: frame.size.height * 0.55)

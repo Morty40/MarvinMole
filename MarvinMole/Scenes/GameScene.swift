@@ -58,7 +58,7 @@ class GameScene: Scene {
         
     private lazy var pushesLabel = {
         let node = SKLabelNode()
-        node.fontName = "Avenir-Black"
+        node.fontName = "Rubik-Bold"
         node.fontSize = 35
         node.position = CGPoint(x: frame.size.width * 0.70, y: frame.size.height * 0.02)
         node.fontColor = .white
@@ -70,7 +70,7 @@ class GameScene: Scene {
     
     private lazy var movesLabel = {
         let node = SKLabelNode()
-        node.fontName = "Avenir-Black"
+        node.fontName = "Rubik-Bold"
         node.fontSize = 35
         node.position = CGPoint(x: frame.size.width * 0.48, y: frame.size.height * 0.02)
         node.fontColor = .white

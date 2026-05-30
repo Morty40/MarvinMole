@@ -21,9 +21,23 @@
 		BDE6FC492FA63893002D27FE /* UnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		BDBC50FE2FCB367300866FAB /* Exceptions for "MarvinMole" folder in "MarvinMole" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Fonts/OFL.txt,
+				Info.plist,
+			);
+			target = BDE6FC072FA496E3002D27FE /* MarvinMole */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		BDE6FC0A2FA496E3002D27FE /* MarvinMole */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BDBC50FE2FCB367300866FAB /* Exceptions for "MarvinMole" folder in "MarvinMole" target */,
+			);
 			path = MarvinMole;
 			sourceTree = "<group>";
 		};
@@ -330,6 +344,7 @@
 				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = DMV6HHFTVS;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MarvinMole/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Tunnel Trouble";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.puzzle-games";
@@ -366,6 +381,7 @@
 				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = DMV6HHFTVS;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MarvinMole/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Tunnel Trouble";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.puzzle-games";

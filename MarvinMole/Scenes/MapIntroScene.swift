@@ -11,7 +11,7 @@ class MapIntroScene: Scene {
     
     private lazy var mapTitleLabel = {
         let node = SKLabelNode()
-        node.fontName = "Avenir-Black"
+        node.fontName = "Rubik-Bold"
         node.fontSize = 60
         node.fontColor = .white
         node.position = CGPoint(x: frame.size.width * 0.5, y: frame.size.height * 0.55)
@@ -29,7 +29,7 @@ class MapIntroScene: Scene {
     
     private lazy var mapSubtitleLabel = {
         let node = SKLabelNode()
-        node.fontName = "Avenir-Black"
+        node.fontName = "Rubik-Bold"
         node.fontSize = 50
         node.fontColor = .white
         node.position = CGPoint(x: frame.size.width * 0.5, y: frame.size.height * 0.45)

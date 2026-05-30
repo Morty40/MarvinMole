@@ -14,7 +14,7 @@ class TextButton: Button {
 
     private lazy var titleLabel = {
         let node = SKLabelNode()
-        node.fontName = "Avenir-Black"
+        node.fontName = "Rubik-Bold"
         node.fontColor = .white
         node.position = CGPoint(x: 0, y: -10)
         node.horizontalAlignmentMode = .center
