@@ -12,16 +12,33 @@ class MenuScene: Scene {
     enum MapCollection: CaseIterable {
         case easy
         case medium
-        case hard
+        case sokoban
         
         var title: String {
             switch self {
             case .easy: return "Easy"
             case .medium: return "Medium"
-            case .hard: return "Hard"
+            case .sokoban: return "Sokoban"
+            }
+        }
+        
+        var count: Int {
+            switch self {
+            case .easy: return 3
+            case .medium: return 3
+            case .sokoban: return 50
+            }
+        }
+        
+        var fileName: String {
+            switch self {
+            case .easy: return "Easy%02d"
+            case .medium: return "Medium%02d"
+            case .sokoban: return "Sokoban%02d"
             }
         }
     }
+    
     private var mapCollection: MapCollection = .easy
     private var mapNumber: Int = 1
     
@@ -58,7 +75,7 @@ class MenuScene: Scene {
     @objc func onStart() {
 
         // load Sokoban map from resource bundle
-        let resource = String(format: "%@%02d", mapCollection.title, mapNumber)
+        let resource = String(format: mapCollection.fileName, mapNumber)
         let filePath = Bundle.main.url(forResource: resource, withExtension: "xsb")
         if let data = try? Data(contentsOf: filePath!) {
             
@@ -85,6 +102,8 @@ class MenuScene: Scene {
         index = (index + 1) % MapCollection.allCases.count
         mapCollection = MapCollection.allCases[index]
         mapCollectionButton.title = mapCollection.title
+        mapNumber = 1
+        mapNumberButton.title = "\(mapNumber)"
     }
 
     private lazy var mapNumberButton = {
@@ -96,7 +115,7 @@ class MenuScene: Scene {
     
     @objc func onMapNumber() {
         mapNumber += 1
-        if mapNumber > 3 {
+        if mapNumber > mapCollection.count {
             mapNumber = 1
         }
         mapNumberButton.title = "\(mapNumber)"
