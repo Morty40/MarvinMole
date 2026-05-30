@@ -35,14 +35,14 @@ struct MapTests {
     @Test func count() async throws {
         let emptyMap = await Map.empty
         #expect(emptyMap.count(of: .wall) == 0)
-        #expect(emptyMap.count(of: .goal) == 0)
+        #expect(emptyMap.count(of: .floorGoal) == 0)
         #expect(emptyMap.count(of: .floor) == 0)
         #expect(emptyMap.count(of: .hero) == 0)
         #expect(emptyMap.count(of: .box) == 0)
 
         let testMap = await Map.mapFromXsb(string: testXsb)!
         #expect(testMap.count(of: .wall) == 70)
-        #expect(testMap.count(of: .goal) == 6)
+        #expect(testMap.count(of: .floorGoal) == 6)
         #expect(testMap.count(of: .floor) == 50)
         #expect(testMap.count(of: .hero) == 1)
         #expect(testMap.count(of: .box) == 6)
@@ -50,13 +50,13 @@ struct MapTests {
 
     @Test func tileAt() async throws {
         let emptyMap = await Map.empty
-        #expect(emptyMap.tileAt(x: 0, y: 0) == .void)
-        #expect(emptyMap.tileAt(x: 1, y: 1) == .void)
+        #expect(emptyMap.tileAt(x: 0, y: 0).isVoid)
+        #expect(emptyMap.tileAt(x: 1, y: 1).isVoid)
 
         let testMap = await Map.mapFromXsb(string: testXsb)!
-        #expect(testMap.tileAt(x: 0, y: 0) == .void)
-        #expect(testMap.tileAt(x: 4, y: 0) == .wall)
-        #expect(testMap.tileAt(x: 17, y: 6) == .goal)
+        #expect(testMap.tileAt(x: 0, y: 0).isVoid)
+        #expect(testMap.tileAt(x: 4, y: 0).isWall)
+        #expect(testMap.tileAt(x: 17, y: 6) == .floorGoal)
         #expect(testMap.tileAt(x: 5, y: 1) == .floor)
     }
 

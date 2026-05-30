@@ -14,8 +14,8 @@ class Map {
     enum Tile {
         case void
         case wall
-        case goal
         case floor
+        case floorGoal
         
         /// Convert symbol to tile, using .xsb notation
         /// - Parameter symbol: map symbol
@@ -24,18 +24,27 @@ class Map {
             switch symbol {
             case "#":
                 return .wall
-            case ".", "*", "+":
-                return .goal
             case " ", "-", "_", "@", "$":
                 return .floor
+            case ".", "*", "+":
+                return .floorGoal
             default:
                 return .void
             }
         }
         
-        var isCollidable: Bool {
-            [.wall].contains(self)
+        var isVoid: Bool {
+            self == .void
         }
+
+        var isWall: Bool {
+            self == .wall
+        }
+
+        var isFloor: Bool {
+            [.floor, .floorGoal].contains(self)
+        }
+
     }
     
     /// Movable object types
@@ -187,45 +196,45 @@ class Map {
         if let (x, y) = heroPosition {
             
             // left
-            if !tileAt(x: x-1, y: y).isCollidable &&
+            if !tileAt(x: x-1, y: y).isWall &&
                 !isObjectAt(x: x-1, y: y) {
                 moves.append(.walkLeft)
-            } else if !tileAt(x: x-1, y: y).isCollidable &&
+            } else if !tileAt(x: x-1, y: y).isWall &&
                         objectAt(x: x-1, y: y)?.type == .box &&
-                        !tileAt(x: x-2, y: y).isCollidable &&
+                        !tileAt(x: x-2, y: y).isWall &&
                         !isObjectAt(x: x-2, y: y) {
                 moves.append(.pushLeft)
             }
             
             // up
-            if !tileAt(x: x, y: y-1).isCollidable &&
+            if !tileAt(x: x, y: y-1).isWall &&
                 !isObjectAt(x: x, y: y-1) {
                 moves.append(.walkUp)
-            } else if !tileAt(x: x, y: y-1).isCollidable &&
+            } else if !tileAt(x: x, y: y-1).isWall &&
                         objectAt(x: x, y: y-1)?.type == .box &&
-                        !tileAt(x: x, y: y-2).isCollidable &&
+                        !tileAt(x: x, y: y-2).isWall &&
                         !isObjectAt(x: x, y: y-2) {
                 moves.append(.pushUp)
             }
             
             // right
-            if !tileAt(x: x+1, y: y).isCollidable &&
+            if !tileAt(x: x+1, y: y).isWall &&
                 !isObjectAt(x: x+1, y: y) {
                 moves.append(.walkRight)
-            } else if !tileAt(x: x+1, y: y).isCollidable &&
+            } else if !tileAt(x: x+1, y: y).isWall &&
                         objectAt(x: x+1, y: y)?.type == .box &&
-                        !tileAt(x: x+2, y: y).isCollidable &&
+                        !tileAt(x: x+2, y: y).isWall &&
                         !isObjectAt(x: x+2, y: y) {
                 moves.append(.pushRight)
             }
             
             // down
-            if !tileAt(x: x, y: y+1).isCollidable &&
+            if !tileAt(x: x, y: y+1).isWall &&
                 !isObjectAt(x: x, y: y+1) {
                 moves.append(.walkDown)
-            } else if !tileAt(x: x, y: y+1).isCollidable &&
+            } else if !tileAt(x: x, y: y+1).isWall &&
                         objectAt(x: x, y: y+1)?.type == .box &&
-                        !tileAt(x: x, y: y+2).isCollidable &&
+                        !tileAt(x: x, y: y+2).isWall &&
                         !isObjectAt(x: x, y: y+2) {
                 moves.append(.pushDown)
             }
@@ -237,7 +246,7 @@ class Map {
     /// Check if all goals have a box on top
     var isCompleted: Bool {
         for (y, row) in tiles.enumerated() {
-            for (x, tile) in row.enumerated() where tile == .goal {
+            for (x, tile) in row.enumerated() where tile == .floorGoal {
                 
                 if objectAt(x: x, y: y)?.type != .box {
                     // no box on top of this goal, the map is not completed
@@ -371,7 +380,7 @@ class Map {
         
         // parse wall tiles
         var tiles: [[Tile]] = lines.map({ $0.map({
-            Tile.tileFrom(symbol: String($0)) == .wall ? .wall : .void
+            Tile.tileFrom(symbol: String($0)).isWall ? .wall : .void
         })})
         
         // parse object tiles
@@ -397,7 +406,7 @@ class Map {
         func fillFloors(_ tiles: inout [[Tile]], x: Int, y: Int) {
             if y >= 0, y < tiles.count {
                 if x >= 0, x < tiles[y].count {
-                    if tiles[y][x] == .void {
+                    if tiles[y][x].isVoid {
                         tiles[y][x] = .floor
                         fillFloors(&tiles, x: x - 1, y: y)
                         fillFloors(&tiles, x: x + 1, y: y)

@@ -10,8 +10,6 @@ import SpriteKit
 class TileSet: SKTileSet {
     
     let wallFront1 = SKTileGroup(imageNamed: "WallFront1")
-    let wallFront2 = SKTileGroup(imageNamed: "WallFront2")
-    let wallFrontShadow = SKTileGroup(imageNamed: "WallFrontShadow")
     let wallTop = SKTileGroup(imageNamed: "WallTop")
     
     var floor: SKTileGroup
@@ -28,6 +26,10 @@ class TileSet: SKTileSet {
     let wallShadowLeftUp2 = SKTileGroup(imageNamed: "WallShadowLeftUp2")
     let wallShadowUnder = SKTileGroup(imageNamed: "WallShadowUnder")
 
+    let outerWallTextures = SKTexture(imageNamed: "OuterWalls").split(columns: 3, rows: 7).map { SKTileGroup(tileDefinition: SKTileDefinition(texture: $0)) }
+
+    let innerWallTextures = SKTexture(imageNamed: "InnerWalls").split(columns: 3, rows: 5).map { SKTileGroup(tileDefinition: SKTileDefinition(texture: $0)) }
+
     override init() {
         let floorTextures = SKTexture(imageNamed: "Floor").split()
         floor = SKTileGroup(tileDefinition: SKTileDefinition(texture: floorTextures[0]))
@@ -38,8 +40,8 @@ class TileSet: SKTileSet {
                                 wallShadowUp1, wallShadowUp2,
                                 wallShadowLeftUp1, wallShadowLeftUp2,
                                 wallShadowUnder,
-                                wallFront1, wallFront2,
-                                wallFrontShadow, wallTop, floor, goal] + floors)
+                                wallFront1,
+                                wallTop, floor, goal] + floors + outerWallTextures + innerWallTextures)
     }
     
     required init?(coder: NSCoder) {

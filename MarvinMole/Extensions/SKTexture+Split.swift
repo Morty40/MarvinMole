@@ -28,7 +28,7 @@ extension SKTexture {
         for y in 0 ..< r {
             for x in 0 ..< c {
                 let rect = CGRect(x: CGFloat(x) / CGFloat(c),
-                                  y: CGFloat(y) / CGFloat(r),
+                                  y: CGFloat(r-y-1) / CGFloat(r),
                                   width: 1.0 / CGFloat(c),
                                   height: 1.0 / CGFloat(r))
                 textures.append(SKTexture(rect: rect, in: self))

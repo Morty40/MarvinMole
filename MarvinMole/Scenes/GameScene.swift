@@ -307,7 +307,6 @@ class GameScene: Scene {
     private func register(input: Input) {
         if pendingInput.count < 3 {
             pendingInput.append(input)
-            print("input: \(pendingInput)")
         }
     }
     
@@ -323,6 +322,14 @@ class GameScene: Scene {
             register(input: .down)
         case .keyboardDeleteOrBackspace:
             register(input: .undo)
+#if DEBUG
+        case .keyboardF:
+            floorTileMap.isHidden.toggle()
+        case .keyboardS:
+            shadowTileMap.isHidden.toggle()
+        case .keyboardW:
+            wallTileMap.isHidden.toggle()
+#endif
         default:
             break
         }

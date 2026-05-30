@@ -34,9 +34,10 @@ class TileMap: SKTileMapNode {
 
                 switch tile {
                 case .floor, .wall:
-                    setTileGroup(tileSet.floors[Int(arc4random() & 3)], forColumn: c, row: r)
+                    let n = tileSet.floors.count
+                    setTileGroup(tileSet.floors[Int(arc4random()) % n], forColumn: c, row: r)
                     
-                case .goal:
+                case .floorGoal:
                     setTileGroup(tileSet.goal, forColumn: c, row: r)
                     
                 default:
@@ -60,23 +61,23 @@ class TileMap: SKTileMapNode {
                 let (c, r) = (x, numberOfRows - y - 1)
                 
                 switch tile {
-                case .floor, .goal:
-                    if tileLeftUp == .wall, tileLeft != .wall, tileUp != .wall {
+                case .floor, .floorGoal:
+                    if tileLeftUp.isWall, tileLeft != .wall, tileUp != .wall {
                         setTileGroup(tileSet.wallShadowLeftUp1, forColumn: c, row: r)
                         
-                    } else if tileLeft == .wall, tileUp == .wall {
+                    } else if tileLeft.isWall, tileLeftUp != .wall, tileUp.isWall {
                         setTileGroup(tileSet.wallShadowLeftUp2, forColumn: c, row: r)
                         
-                    } else if tileLeft == .wall, tileLeftUp == .wall {
+                    } else if tileLeft.isWall, tileLeftUp.isWall {
                         setTileGroup(tileSet.wallShadowLeft1, forColumn: c, row: r)
                         
-                    } else if tileLeft == .wall, tileLeftUp != .wall {
+                    } else if tileLeft.isWall, tileLeftUp != .wall {
                         setTileGroup(tileSet.wallShadowLeft2, forColumn: c, row: r)
                         
-                    } else if tileUp == .wall, tileLeftUp == .wall {
+                    } else if tileUp.isWall, tileLeftUp.isWall {
                         setTileGroup(tileSet.wallShadowUp1, forColumn: c, row: r)
                         
-                    } else if tileUp == .wall, tileLeftUp != .wall {
+                    } else if tileUp.isWall, tileLeftUp != .wall {
                         setTileGroup(tileSet.wallShadowUp2, forColumn: c, row: r)
                     }
 
@@ -98,16 +99,132 @@ class TileMap: SKTileMapNode {
             for x in rect.x ..< rect.x + rect.width {
 
                 let tile = map.tileAt(x: x, y: y)
-                let tileBelow = map.tileAt(x: x, y: y+1)
+                
+                let tileLeft = map.tileAt(x: x-1, y: y)
+                let tileUp = map.tileAt(x: x, y: y-1)
+                let tileRight = map.tileAt(x: x+1, y: y)
+                let tileDown = map.tileAt(x: x, y: y+1)
+                
+                let tileLeftUp = map.tileAt(x: x-1, y: y-1)
+                let tileUpRight = map.tileAt(x: x+1, y: y-1)
+                let tileRightDown = map.tileAt(x: x+1, y: y+1)
+                let tileDownLeft = map.tileAt(x: x-1, y: y+1)
+
+                let adjacentTiles = [tileLeft, tileUp, tileRight, tileDown, tileLeftUp, tileUpRight, tileRightDown, tileDownLeft]
+                let isOuterWall = adjacentTiles.contains(where: { $0.isVoid })
+                
                 let (c, r) = (x, numberOfRows - y - 1)
 
                 switch tile {
                 case .wall:
-                    if tileBelow == .wall {
-                        setTileGroup(tileSet.wallTop, forColumn: c, row: r)
+                
+                    if isOuterWall {
+                        var index = 4
+                        
+                        if tileLeft.isVoid, tileLeftUp.isVoid, tileUp.isVoid {
+                            index = 0
+                            
+                        } else if tileLeft.isWall, tileUp.isVoid, tileRight.isWall, tileDown.isFloor {
+                            index = 1
+
+                        } else if tileUp.isVoid, tileUpRight.isVoid, tileRight.isVoid {
+                            index = 2
+
+                        } else if tileLeft.isVoid, tileUp.isWall, tileDown.isWall {
+                            index = 3
+
+                        } else if tileUp.isWall, tileRight.isVoid, tileDown.isWall {
+                            index = 5
+
+                        } else if tileLeft.isVoid, tileDownLeft.isVoid, tileDown.isVoid {
+                            index = 6
+
+                        } else if tileLeft.isWall, tileUp.isFloor, tileRight.isWall, tileDown.isVoid {
+                            index = 7
+
+                        } else if tileRight.isVoid, tileRightDown.isVoid, tileDown.isVoid {
+                            index = 8
+
+                        } else if tileLeft.isFloor, tileLeftUp.isFloor, tileUp.isFloor, tileRight.isWall, tileRightDown.isVoid, tileDown.isWall {
+                            index = 9
+
+                        } else if tileLeft.isWall, tileUp.isFloor, tileRight.isWall, tileDown.isVoid {
+                            index = 10
+
+                        } else if tileLeft.isWall, tileUp.isFloor, tileUpRight.isFloor, tileRight.isFloor, tileDown.isWall {
+                            index = 11
+
+                        } else if tileLeft.isFloor, tileUp.isWall, tileUpRight.isVoid, tileRight.isWall, tileDown.isFloor, tileDownLeft.isFloor {
+                            index = 12
+                            
+                        } else if tileLeft.isWall, tileLeftUp.isVoid, tileUp.isWall, tileRight.isFloor, tileRightDown.isFloor, tileDown.isFloor {
+                            index = 14
+
+                        } else if tileRight.isWall, tileRightDown.isVoid, tileDown.isWall {
+                            index = 15
+
+                        } else if tileLeft.isWall, tileUp.isWall, tileRight.isWall, tileDown.isVoid {
+                            index = 16
+
+                        } else if tileLeft.isWall, tileDown.isWall, tileDownLeft.isVoid {
+                            index = 17
+                            
+                        } else if tileUp.isWall, tileUpRight.isVoid, tileRight.isWall {
+                            index = 18
+                            
+                        } else if tileUp.isVoid, tileDown.isWall {
+                            index = 19
+
+                        } else if tileLeft.isWall, tileLeftUp.isVoid, tileUp.isWall {
+                            index = 20
+                        }
+                        
+                        setTileGroup(tileSet.outerWallTextures[index], forColumn: c, row: r)
+                        
                     } else {
-                        let tile = ((arc4random() & 3) != 0) ? tileSet.wallFront1 : tileSet.wallFront2
-                        setTileGroup(tile, forColumn: c, row: r)
+                        var index = 3
+                        
+                        if tileLeft.isFloor, tileLeftUp.isFloor, tileUp.isFloor, tileRight.isWall, tileDown.isWall {
+                            index = 0
+
+                        } else if tileLeft.isWall, tileUp.isFloor, tileRight.isWall, tileDown.isFloor {
+                            index = 1
+                            
+                        } else if tileLeft.isWall, tileUp.isFloor, tileUpRight.isFloor, tileRight.isFloor, tileDown.isWall {
+                            index = 2
+                            
+                        } else if tileLeft.isWall, tileUp.isWall, tileRight.isWall, tileDown.isWall {
+                            index = 3
+
+                        } else if tileLeft.isWall, tileUp.isFloor, tileRight.isWall, tileDown.isWall {
+                            index = 4
+
+                        } else if tileLeft.isFloor, tileUp.isFloor, tileRight.isFloor, tileDown.isFloor {
+                            index = 5
+
+                        } else if tileLeft.isFloor, tileUp.isWall, tileRight.isWall, tileDown.isFloor, tileDownLeft.isFloor {
+                            index = 6
+
+                        } else if tileLeft.isWall, tileUp.isWall, tileRight.isWall, tileRightDown.isFloor, tileDown.isFloor, tileDownLeft.isFloor {
+                            index = 7
+
+                        } else if tileLeft.isWall, tileUp.isWall, tileRight.isFloor, tileRightDown.isFloor, tileDown.isFloor {
+                            index = 8
+
+                        } else if tileLeft.isFloor, tileUp.isFloor, tileRight.isFloor, tileDown.isWall {
+                            index = 9
+
+                        } else if tileLeft.isFloor, tileLeftUp.isFloor, tileUp.isFloor, tileRight.isWall, tileDown.isFloor {
+                            index = 10
+                            
+                        } else if tileLeft.isWall, tileUp.isFloor, tileRight.isFloor, tileDown.isFloor {
+                            index = 11
+
+                        } else if tileLeft.isFloor, tileUp.isWall, tileRight.isFloor, tileDown.isFloor {
+                            index = 12
+                        }
+
+                        setTileGroup(tileSet.innerWallTextures[index], forColumn: c, row: r)
                     }
                     
                 default:
