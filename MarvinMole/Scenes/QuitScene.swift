@@ -17,7 +17,6 @@ class QuitScene: Scene {
         node.position = CGPoint(x: frame.size.width * 0.5, y: frame.size.height * 0.55)
         node.horizontalAlignmentMode = .center
         node.verticalAlignmentMode = .baseline
-        node.zPosition = 1
         node.text = "Are you sure you want to quit?"
         return node
     }()
@@ -25,7 +24,6 @@ class QuitScene: Scene {
     private lazy var yesButton = {
         let node = TextButton(title: "Yes", target: self, action: #selector(onYes))
         node.position = CGPoint(x: frame.size.width * 0.35, y: frame.size.height * 0.40)
-        node.zPosition = 1
         return node
     }()
     
@@ -36,7 +34,6 @@ class QuitScene: Scene {
     private lazy var noButton = {
         let node = TextButton(title: "No", target: self, action: #selector(onNo))
         node.position = CGPoint(x: frame.size.width * 0.65, y: frame.size.height * 0.40)
-        node.zPosition = 1
         return node
     }()
     
