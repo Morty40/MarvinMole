@@ -80,7 +80,6 @@ class GameScene: Scene {
         node.position = CGPoint(x: frame.size.width * 0.46, y: frame.size.height * 0.50)
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         node.zPosition = 3
-        node.alpha = 0.2
         return node
     }()
 

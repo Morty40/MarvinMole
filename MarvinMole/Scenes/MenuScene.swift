@@ -18,7 +18,7 @@ class MenuScene: Scene {
             switch self {
             case .easy: return "Easy"
             case .medium: return "Medium"
-            case .sokoban: return "Sokoban"
+            case .sokoban: return "Classic"
             }
         }
         

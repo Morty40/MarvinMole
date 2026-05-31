@@ -55,34 +55,51 @@ class TileMap: SKTileMapNode {
             for x in rect.x ..< rect.x + rect.width {
 
                 let tile = map.tileAt(x: x, y: y)
+
                 let tileLeft = map.tileAt(x: x-1, y: y)
-                let tileUp = map.tileAt(x: x, y: y-1)
                 let tileLeftUp = map.tileAt(x: x-1, y: y-1)
+                let tileUp = map.tileAt(x: x, y: y-1)
+
                 let (c, r) = (x, numberOfRows - y - 1)
                 
                 switch tile {
                 case .floor, .floorGoal:
-                    if tileLeftUp.isWall, tileLeft != .wall, tileUp != .wall {
-                        setTileGroup(tileSet.wallShadowLeftUp1, forColumn: c, row: r)
+                    if tileLeft.isWall, tileLeftUp.isWall, tileUp.isWall {
+                        setTileGroup(tileSet.shadows[0], forColumn: c, row: r)
                         
-                    } else if tileLeft.isWall, tileLeftUp != .wall, tileUp.isWall {
-                        setTileGroup(tileSet.wallShadowLeftUp2, forColumn: c, row: r)
+                    } else if tileLeft.isFloor, tileLeftUp.isWall, tileUp.isWall {
+                        setTileGroup(tileSet.shadows[1], forColumn: c, row: r)
                         
-                    } else if tileLeft.isWall, tileLeftUp.isWall {
-                        setTileGroup(tileSet.wallShadowLeft1, forColumn: c, row: r)
+                    } /*else if tileLeft.isWall, tileLeftUp.isWall {
+                        setTileGroup(tileSet.shadows[0], forColumn: c, row: r)
                         
                     } else if tileLeft.isWall, tileLeftUp != .wall {
-                        setTileGroup(tileSet.wallShadowLeft2, forColumn: c, row: r)
+                        setTileGroup(tileSet.shadows[0], forColumn: c, row: r)
                         
                     } else if tileUp.isWall, tileLeftUp.isWall {
-                        setTileGroup(tileSet.wallShadowUp1, forColumn: c, row: r)
+                        setTileGroup(tileSet.shadows[0], forColumn: c, row: r)
                         
                     } else if tileUp.isWall, tileLeftUp != .wall {
-                        setTileGroup(tileSet.wallShadowUp2, forColumn: c, row: r)
-                    }
-
+                        setTileGroup(tileSet.shadows[0], forColumn: c, row: r)
+                    }*/
+break
+                    
                 case .wall:
-                    setTileGroup(tileSet.wallShadowUnder, forColumn: c, row: r)
+                    if tileLeft.isCastingShadow, tileLeftUp.isCastingShadow, tileUp.isCastingShadow {
+                        setTileGroup(tileSet.wallShadows[0], forColumn: c, row: r)
+                        
+                    } else if tileLeft.isCastingShadow, tileLeftUp.isFloor, tileUp.isCastingShadow {
+                        setTileGroup(tileSet.wallShadows[1], forColumn: c, row: r)
+
+                    } else if tileLeft.isFloor, tileLeftUp.isFloor, tileUp.isFloor {
+                        setTileGroup(tileSet.wallShadows[2], forColumn: c, row: r)
+
+                    } else if tileLeft.isCastingShadow, tileUp.isFloor {
+                        setTileGroup(tileSet.wallShadows[3], forColumn: c, row: r)
+
+                    } else if tileLeft.isFloor, tileUp.isCastingShadow {
+                        setTileGroup(tileSet.wallShadows[4], forColumn: c, row: r)
+                    }
 
                 default:
                     break
@@ -101,13 +118,12 @@ class TileMap: SKTileMapNode {
                 let tile = map.tileAt(x: x, y: y)
                 
                 let tileLeft = map.tileAt(x: x-1, y: y)
-                let tileUp = map.tileAt(x: x, y: y-1)
-                let tileRight = map.tileAt(x: x+1, y: y)
-                let tileDown = map.tileAt(x: x, y: y+1)
-                
                 let tileLeftUp = map.tileAt(x: x-1, y: y-1)
+                let tileUp = map.tileAt(x: x, y: y-1)
                 let tileUpRight = map.tileAt(x: x+1, y: y-1)
+                let tileRight = map.tileAt(x: x+1, y: y)
                 let tileRightDown = map.tileAt(x: x+1, y: y+1)
+                let tileDown = map.tileAt(x: x, y: y+1)
                 let tileDownLeft = map.tileAt(x: x-1, y: y+1)
 
                 let adjacentTiles = [tileLeft, tileUp, tileRight, tileDown, tileLeftUp, tileUpRight, tileRightDown, tileDownLeft]
@@ -179,7 +195,7 @@ class TileMap: SKTileMapNode {
                             index = 20
                         }
                         
-                        setTileGroup(tileSet.outerWallTextures[index], forColumn: c, row: r)
+                        setTileGroup(tileSet.outerWalls[index], forColumn: c, row: r)
                         
                     } else {
                         var index = 3
@@ -224,7 +240,7 @@ class TileMap: SKTileMapNode {
                             index = 12
                         }
 
-                        setTileGroup(tileSet.innerWallTextures[index], forColumn: c, row: r)
+                        setTileGroup(tileSet.innerWalls[index], forColumn: c, row: r)
                     }
                     
                 default:

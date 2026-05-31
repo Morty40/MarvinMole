@@ -45,6 +45,9 @@ class Map {
             [.floor, .floorGoal].contains(self)
         }
 
+        var isCastingShadow: Bool {
+            [.wall, .void].contains(self)
+        }
     }
     
     /// Movable object types
