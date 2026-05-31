@@ -133,12 +133,13 @@ class MenuScene: Scene {
         addChild(mapNumberButton)
 
         // TODO: remove
+        /*
         for name in UIFont.familyNames {
             print(name)
             if let nameString = name as? String {
                 print(UIFont.fontNames(forFamilyName: nameString))
             }
-        }
+        }*/
         
     }
 }

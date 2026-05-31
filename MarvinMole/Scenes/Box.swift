@@ -7,7 +7,8 @@
 
 import SpriteKit
 
-class Box: GameObjectNode {
+/// Box object
+class Box: Object {
     
     static let boxTextures = [SKTexture(imageNamed: "Box1"),
                               SKTexture(imageNamed: "Box2"),
@@ -34,7 +35,7 @@ class Box: GameObjectNode {
                    duration: TimeInterval = 0.4) -> SKAction? {
         
         var dx, dy: CGFloat
-
+        
         switch move {
         case .pushLeft:
             (dx, dy) = (-distance, 0)

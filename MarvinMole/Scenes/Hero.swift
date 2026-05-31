@@ -7,7 +7,8 @@
 
 import SpriteKit
 
-class Hero: GameObjectNode {
+/// Hero object
+class Hero: Object {
     
     // walking
     static let walkLeftTextures = SKTexture(imageNamed: "HeroWalkLeft").split()
