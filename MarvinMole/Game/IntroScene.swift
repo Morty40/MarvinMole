@@ -1,5 +1,5 @@
 //
-//  MapIntroScene.swift
+//  IntroScene.swift
 //  MarvinMole
 //
 //  (c) Morten Perriard 2026
@@ -7,7 +7,7 @@
 
 import SpriteKit
 
-class MapIntroScene: Scene {
+class IntroScene: Scene {
     
     private lazy var mapTitleLabel = {
         let node = SKLabelNode()
@@ -17,7 +17,6 @@ class MapIntroScene: Scene {
         node.position = CGPoint(x: frame.size.width * 0.5, y: frame.size.height * 0.55)
         node.horizontalAlignmentMode = .center
         node.verticalAlignmentMode = .baseline
-        node.zPosition = 1
         node.text = "<Title>"
         return node
     }()
@@ -35,7 +34,6 @@ class MapIntroScene: Scene {
         node.position = CGPoint(x: frame.size.width * 0.5, y: frame.size.height * 0.45)
         node.horizontalAlignmentMode = .center
         node.verticalAlignmentMode = .baseline
-        node.zPosition = 1
         node.text = "<Subtitle>"
         return node
     }()

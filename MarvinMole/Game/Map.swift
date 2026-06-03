@@ -279,7 +279,7 @@ class Map {
     }
     
     @discardableResult
-    func doNextMove(_ move: Move) -> [Object] {
+    func makeMove(_ move: Move) -> [Object] {
         var movedObjects: [Object] = []
         
         if legalMoves.contains(move), let heroPosition = heroPosition {
@@ -316,7 +316,7 @@ class Map {
     }
     
     @discardableResult
-    func undoLastMove() -> [Object] {
+    func undoMove() -> [Object] {
         var movedObjects: [Object] = []
 
         if let move = moves.popLast(), let heroPosition = heroPosition {

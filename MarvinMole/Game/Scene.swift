@@ -10,7 +10,8 @@ import SpriteKit
 class Scene: SKScene {
     
     static let menuScene = MenuScene()
-    static let mapIntroScene = MapIntroScene()
+    static let demoScene = DemoScene()
+    static let introScene = IntroScene()
     static let gameScene = GameScene()
     static let quitScene = QuitScene()
 
@@ -31,5 +32,9 @@ class Scene: SKScene {
     }
     
     func handleKey(_ key: UIKey) {
+    }
+    
+    var center: CGPoint {
+        CGPoint(x: frame.size.width * 0.5, y: frame.size.height * 0.5)
     }
 }

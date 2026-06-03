@@ -15,16 +15,20 @@ class GameScene: Scene {
         case left, up, right, down, undo
     }
     private var pendingInput: [Input] = []
-    private var isMoving: Bool = false
     
     private lazy var backgroundImage = {
         let node = SKSpriteNode(imageNamed: "GameBackground")
-        node.position = CGPoint(x: frame.size.width / 2, y: frame.size.height / 2)
-        node.size = CGSize(width: size.width, height: size.height)
-        node.zPosition = 1
+        node.position = center
+        node.size = size
         return node
     }()
         
+    private lazy var mapView = {
+        let node = MapView()
+        node.position = CGPoint(x: frame.size.width * 0.5, y: frame.size.height * 0.5)
+        return node
+    }()
+    
     private lazy var pushesLabel = {
         let node = SKLabelNode()
         node.fontName = "Rubik-Bold"
@@ -49,48 +53,6 @@ class GameScene: Scene {
         return node
     }()
     
-    private lazy var hero = {
-        let node = Hero()
-        node.position = .zero
-        node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        node.zPosition = 3
-        
-        return node
-    }()
-    
-    private lazy var boxContainer = {
-        let node = SKNode()
-        node.position = .zero
-        node.zPosition = 3
-        return node
-    }()
-        
-    private lazy var floorTileMap = {
-        let node = TileMap(layer: .floors)
-        node.position = CGPoint(x: frame.size.width * 0.46, y: frame.size.height * 0.50)
-        node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        node.zPosition = 2
-        node.addChild(hero)
-        node.addChild(boxContainer)
-        return node
-    }()
-
-    private lazy var shadowTileMap = {
-        let node = TileMap(layer: .shadows)
-        node.position = CGPoint(x: frame.size.width * 0.46, y: frame.size.height * 0.50)
-        node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        node.zPosition = 3
-        return node
-    }()
-
-    private lazy var wallTileMap = {
-        let node = TileMap(layer: .walls)
-        node.position = CGPoint(x: frame.size.width * 0.46, y: frame.size.height * 0.50)
-        node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        node.zPosition = 10
-        return node
-    }()
-
     private lazy var quitButton = {
         let node = IconButton(imageName: "CloseIcon", target: self, action: #selector(onQuit))
         node.position = CGPoint(x: frame.size.width * 0.05, y: frame.size.height * 0.95)
@@ -147,11 +109,9 @@ class GameScene: Scene {
         super.sceneDidLoad()
         
         addChild(backgroundImage)
+        addChild(mapView)
         addChild(pushesLabel)
         addChild(movesLabel)
-        addChild(floorTileMap)
-        addChild(shadowTileMap)
-        addChild(wallTileMap)
         addChild(quitButton)
         addChild(undoButton)
         addChild(leftButton)
@@ -190,40 +150,9 @@ class GameScene: Scene {
     
     func load(map: Map) {
         self.map = map
-
-        // clear tilemaps
-        floorTileMap.clear()
-        shadowTileMap.clear()
-        wallTileMap.clear()
-
-        // set size
-        floorTileMap.size = map.size
-        shadowTileMap.size = map.size
-        wallTileMap.size = map.size
-
-        // draw tilemaps
-        floorTileMap.draw(map: map, rect: (x: 0, y: 0, width: map.size.width, height: map.size.height))
-        shadowTileMap.draw(map: map, rect: (x: 0, y: 0, width: map.size.width, height: map.size.height))
-        wallTileMap.draw(map: map, rect: (x: 0, y: 0, width: map.size.width, height: map.size.height))
-        
-        boxContainer.removeAllChildren()
-        for b in map.objectsOfType(.box) {
-            let box = Box()
-            box.id = b.id
-            boxContainer.addChild(box)
-        }
-        updateObjectPositions()
-
-        // scale small maps 2x
-        let scale = map.size.width < 10 && map.size.height < 10 ? 2.0 : 1.0
-        floorTileMap.xScale = scale
-        floorTileMap.yScale = scale
-        shadowTileMap.xScale = scale
-        shadowTileMap.yScale = scale
-        wallTileMap.xScale = scale
-        wallTileMap.yScale = scale
+        mapView.update(with: map)
     }
-    
+
     @objc func onSwipeLeft() {
         register(input: .left)
     }
@@ -246,12 +175,13 @@ class GameScene: Scene {
     }
     
     override func update(_ currentTime: TimeInterval) {
+        super.update(currentTime)
+        
         hudUpdate()
-        processInput()
         
-        hero.update(currentTime)
+        mapView.hero.update(currentTime)
         
-        if pendingInput.isEmpty, !isMoving {
+        if pendingInput.isEmpty, !mapView.hasActions() {
 
             // read on-screen joystick input
             if leftButton.isPressed {
@@ -265,9 +195,11 @@ class GameScene: Scene {
             } else {
 
                 // standing still, and no new input => idle
-                hero.idle()
+                mapView.hero.idle()
             }
         }
+        processInput()
+        
     }
     
     /// Queue up input
@@ -290,99 +222,60 @@ class GameScene: Scene {
             register(input: .down)
         case .keyboardDeleteOrBackspace:
             register(input: .undo)
+        case .keyboardEscape:
+            onQuit()
 #if DEBUG
         case .keyboardF:
-            floorTileMap.isHidden.toggle()
+            mapView.floorTileMap.isHidden.toggle()
         case .keyboardS:
-            shadowTileMap.isHidden.toggle()
+            mapView.shadowTileMap.isHidden.toggle()
         case .keyboardW:
-            wallTileMap.isHidden.toggle()
+            mapView.wallTileMap.isHidden.toggle()
 #endif
         default:
             break
         }
     }
     
-    private func animateMovedObjects(movedObjects: [Map.Object], move: Map.Move) {
-        for obj in movedObjects {
-            if obj.type == .hero {
-                isMoving = true
-                hero.run(hero.actionFor(move: move, distance: 32)) {
-                    self.isMoving = false
-                }
-            }
-            if obj.type == .box {
-                for box in boxContainer.children {
-                    if let box = box as? Box, box.id == obj.id {
-                        if let action = box.actionFor(move: move,
-                                                      toTile: map.tileAt(x: obj.position.x,
-                                                                         y: obj.position.y),
-                                                      distance: 32) {
-                            box.run(action)
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
     private func processInput() {
-        if !isMoving, let nextInput = pendingInput.first {
+        if !mapView.hasActions(), let nextInput = pendingInput.first {
             
             let legalMoves = map.legalMoves
             
             switch nextInput {
             case .left:
                 if let move = legalMoves.first(where: \.isLeft) {
-                    let movedObjects = map.doNextMove(move)
-                    animateMovedObjects(movedObjects: movedObjects, move: move)
+                    let movedObjects = map.makeMove(move)
+                    mapView.animateMovedObjects(movedObjects: movedObjects, move: move, map: map)
                 }
                 
             case .up:
                 if let move = legalMoves.first(where: \.isUp) {
-                    let movedObjects = map.doNextMove(move)
-                    animateMovedObjects(movedObjects: movedObjects, move: move)
+                    let movedObjects = map.makeMove(move)
+                    mapView.animateMovedObjects(movedObjects: movedObjects, move: move, map: map)
                 }
                 
             case .right:
                 if let move = legalMoves.first(where: \.isRight) {
-                    let movedObjects = map.doNextMove(move)
-                    animateMovedObjects(movedObjects: movedObjects, move: move)
+                    let movedObjects = map.makeMove(move)
+                    mapView.animateMovedObjects(movedObjects: movedObjects, move: move, map: map)
                 }
                 
             case .down:
                 if let move = legalMoves.first(where: \.isDown) {
-                    let movedObjects = map.doNextMove(move)
-                    animateMovedObjects(movedObjects: movedObjects, move: move)
+                    let movedObjects = map.makeMove(move)
+                    mapView.animateMovedObjects(movedObjects: movedObjects, move: move, map: map)
                 }
                 
             case .undo:
-                map.undoLastMove()
-                updateObjectPositions()
+                map.undoMove()
+                mapView.updateObjectPositions(map)
             }
 
             pendingInput.removeFirst()
         }
     }
-    
-    private func updateObjectPositions() {
-        if let heroPosition = map.heroPosition {
-            hero.setMapPosition(x: heroPosition.x,
-                                y: heroPosition.y,
-                                tileMap: floorTileMap)
-        }
-
-        for box in boxContainer.children {
-            if let box = box as? Box {
-                if let object = map.objectsOfType(.box).first(where: { $0.id == box.id }) {
-                    box.setMapPosition(x: object.position.x,
-                                       y: object.position.y,
-                                       tileMap: floorTileMap)
-                }
-            }
-        }
-    }
-    
+        
 }
 
 // TODO: Undo will move boxes back, but not update texture...

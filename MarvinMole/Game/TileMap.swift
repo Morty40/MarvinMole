@@ -23,11 +23,11 @@ class TileMap: SKTileMapNode {
         tileSet = TileSet()
     }
     
-    private func drawFloors(map: Map, rect: (x: Int, y: Int, width: Int, height: Int)) {
+    private func drawFloors(map: Map) {
         
         let tileSet = tileSet as! TileSet
-        for y in rect.y ..< rect.y + rect.height {
-            for x in rect.x ..< rect.x + rect.width {
+        for y in 0 ..< map.size.height {
+            for x in 0 ..< map.size.width {
                 
                 let tile = map.tileAt(x: x, y: y)
                 let (c, r) = (x, numberOfRows - y - 1)
@@ -48,11 +48,11 @@ class TileMap: SKTileMapNode {
         
     }
     
-    private func drawShadows(map: Map, rect: (x: Int, y: Int, width: Int, height: Int)) {
+    private func drawShadows(map: Map) {
         
         let tileSet = tileSet as! TileSet
-        for y in rect.y ..< rect.y + rect.height {
-            for x in rect.x ..< rect.x + rect.width {
+        for y in 0 ..< map.size.height {
+            for x in 0 ..< map.size.width {
 
                 let tile = map.tileAt(x: x, y: y)
 
@@ -109,11 +109,11 @@ break
         
     }
     
-    private func drawWalls(map: Map, rect: (x: Int, y: Int, width: Int, height: Int)) {
+    private func drawWalls(map: Map) {
         
         let tileSet = tileSet as! TileSet
-        for y in rect.y ..< rect.y + rect.height {
-            for x in rect.x ..< rect.x + rect.width {
+        for y in 0 ..< map.size.height {
+            for x in 0 ..< map.size.width {
 
                 let tile = map.tileAt(x: x, y: y)
                 
@@ -251,15 +251,15 @@ break
         
     }
     
-    func draw(map: Map, rect: (x: Int, y: Int, width: Int, height: Int)) {
+    func draw(map: Map) {
         
         switch layer {
         case .floors:
-            drawFloors(map: map, rect: rect)
+            drawFloors(map: map)
         case .shadows:
-            drawShadows(map: map, rect: rect)
+            drawShadows(map: map)
         case .walls:
-            drawWalls(map: map, rect: rect)
+            drawWalls(map: map)
         }
         
     }

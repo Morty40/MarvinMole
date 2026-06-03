@@ -44,9 +44,8 @@ class MenuScene: Scene {
     
     private lazy var backgroundImage = {
         let node = SKSpriteNode(imageNamed: "MenuBackground")
-        node.position = CGPoint(x: frame.size.width / 2, y: frame.size.height / 2)
-        node.size = CGSize(width: size.width, height: size.height)
-        node.zPosition = 1
+        node.position = center
+        node.size = size
         return node
     }()
     
@@ -84,9 +83,9 @@ class MenuScene: Scene {
             Scene.gameScene.load(map: map!)
             
             // prepare and go to map transistion scene
-            Scene.mapIntroScene.title = String(format: "%@ %d", mapCollection.title, mapNumber)
-            Scene.mapIntroScene.subtitle = map?.title
-            transition(to: Scene.mapIntroScene)
+            Scene.introScene.title = String(format: "%@ %d", mapCollection.title, mapNumber)
+            Scene.introScene.subtitle = map?.title
+            transition(to: Scene.introScene)
         }
     }
 
@@ -142,5 +141,28 @@ class MenuScene: Scene {
         }*/
         
     }
+    
+    override func handleKey(_ key: UIKey) {
+        switch key.keyCode {
+        case .keyboardD:
+            
+            // load Sokoban map from resource bundle
+            let resource = String(format: "Easy%02d", 1)
+            let filePath = Bundle.main.url(forResource: resource, withExtension: "xsb")
+            if let data = try? Data(contentsOf: filePath!) {
+                
+                // prepare game scene
+                let map = Map.mapFromXsb(data: data)
+                Scene.demoScene.load(map: map!)
+                
+                transition(to: Scene.demoScene)
+            }
+            
+        default:
+            break
+        }
+    }
+
 }
 
+// TODO: auto start demo mode after some idle time

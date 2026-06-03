@@ -105,31 +105,31 @@ struct MapTests {
         #expect(testMap.heroPosition! == (x: 11, y: 8))
         #expect(testMap.legalMoves == [.walkUp])
         
-        await testMap.doNextMove(.walkUp)
+        await testMap.makeMove(.walkUp)
         #expect(testMap.heroPosition! == (x: 11, y: 7))
         #expect(testMap.legalMoves == [.walkLeft, .walkRight, .walkDown])
 
-        await testMap.doNextMove(.walkLeft)
+        await testMap.makeMove(.walkLeft)
         #expect(testMap.heroPosition! == (x: 10, y: 7))
         #expect(testMap.legalMoves == [.walkLeft, .walkRight])
 
-        await testMap.doNextMove(.walkLeft)
+        await testMap.makeMove(.walkLeft)
         #expect(testMap.heroPosition! == (x: 9, y: 7))
         #expect(testMap.legalMoves == [.walkLeft, .walkRight, .walkDown])
 
-        await testMap.doNextMove(.walkLeft)
+        await testMap.makeMove(.walkLeft)
         #expect(testMap.heroPosition! == (x: 8, y: 7))
         #expect(testMap.legalMoves == [.walkLeft, .walkUp, .walkRight])
 
-        await testMap.doNextMove(.walkLeft)
+        await testMap.makeMove(.walkLeft)
         #expect(testMap.heroPosition! == (x: 7, y: 7))
         #expect(testMap.legalMoves == [.walkLeft, .walkRight])
 
-        await testMap.doNextMove(.walkLeft)
+        await testMap.makeMove(.walkLeft)
         #expect(testMap.heroPosition! == (x: 6, y: 7))
         #expect(testMap.legalMoves == [.pushLeft, .walkRight])
 
-        await testMap.doNextMove(.pushLeft)
+        await testMap.makeMove(.pushLeft)
         #expect(testMap.heroPosition! == (x: 5, y: 7))
         #expect(testMap.legalMoves == [.pushLeft, .walkUp, .walkRight, .walkDown])
     }
@@ -157,20 +157,20 @@ struct MapTests {
         // four way walk
         var testMap = await Map.mapFromXsb(string: testXsb)!
         #expect(testMap.heroPosition! == (x: 11, y: 8))
-        await testMap.doNextMove(.walkUp)
+        await testMap.makeMove(.walkUp)
         #expect(testMap.heroPosition! == (x: 11, y: 7))
-        await testMap.doNextMove(.walkLeft)
+        await testMap.makeMove(.walkLeft)
         #expect(testMap.heroPosition! == (x: 10, y: 7))
-        await testMap.doNextMove(.walkRight)
+        await testMap.makeMove(.walkRight)
         #expect(testMap.heroPosition! == (x: 11, y: 7))
-        await testMap.doNextMove(.walkDown)
+        await testMap.makeMove(.walkDown)
         #expect(testMap.heroPosition! == (x: 11, y: 8))
         
         // push left
         testMap = await Map.mapFromXsb(string: testXsb)!
         await testMap.removeObjectAt(x: 11, y: 8)
         await testMap.putObjectAt(x: 6, y: 7, type: .hero)
-        await testMap.doNextMove(.pushLeft)
+        await testMap.makeMove(.pushLeft)
         await #expect(testMap.objectAt(x: 4, y: 7)?.type == .box)
         await #expect(testMap.objectAt(x: 5, y: 7)?.type == .hero)
         await #expect(testMap.isObjectAt(x: 6, y: 7) == false)
@@ -179,7 +179,7 @@ struct MapTests {
         testMap = await Map.mapFromXsb(string: testXsb)!
         await testMap.removeObjectAt(x: 11, y: 8)
         await testMap.putObjectAt(x: 5, y: 8, type: .hero)
-        await testMap.doNextMove(.pushUp)
+        await testMap.makeMove(.pushUp)
         await #expect(testMap.objectAt(x: 5, y: 6)?.type == .box)
         await #expect(testMap.objectAt(x: 5, y: 7)?.type == .hero)
         await #expect(testMap.isObjectAt(x: 5, y: 8) == false)
@@ -188,7 +188,7 @@ struct MapTests {
         testMap = await Map.mapFromXsb(string: testXsb)!
         await testMap.removeObjectAt(x: 11, y: 8)
         await testMap.putObjectAt(x: 4, y: 7, type: .hero)
-        await testMap.doNextMove(.pushRight)
+        await testMap.makeMove(.pushRight)
         await #expect(testMap.objectAt(x: 6, y: 7)?.type == .box)
         await #expect(testMap.objectAt(x: 5, y: 7)?.type == .hero)
         await #expect(testMap.isObjectAt(x: 4, y: 7) == false)
@@ -197,7 +197,7 @@ struct MapTests {
         testMap = await Map.mapFromXsb(string: testXsb)!
         await testMap.removeObjectAt(x: 11, y: 8)
         await testMap.putObjectAt(x: 5, y: 6, type: .hero)
-        await testMap.doNextMove(.pushDown)
+        await testMap.makeMove(.pushDown)
         await #expect(testMap.objectAt(x: 5, y: 8)?.type == .box)
         await #expect(testMap.objectAt(x: 5, y: 7)?.type == .hero)
         await #expect(testMap.isObjectAt(x: 5, y: 6) == false)
