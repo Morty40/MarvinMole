@@ -10,7 +10,7 @@ import SpriteKit
 class DemoScene: Scene {
     
     private var map: Map = .empty
-    private var pendingMoves: [Map.Move] = [.walkRight, .walkDown, .pushRight, .walkDown, .walkRight, .pushUp]
+    private var moves: [Map.Move] = []
     
     private lazy var backgroundImage = {
         let node = SKSpriteNode(imageNamed: "GameBackground")
@@ -34,8 +34,9 @@ class DemoScene: Scene {
         addChild(mapView)
     }
     
-    func load(map: Map) {
+    func load(map: Map, moves: [Map.Move]) {
         self.map = map
+        self.moves = moves
         mapView.update(with: map)
     }
     
@@ -51,10 +52,10 @@ class DemoScene: Scene {
         
         if !mapView.hasActions() {
             
-            if let move = pendingMoves.first {
+            if let move = moves.first {
                 let movedObjects = map.makeMove(move)
                 mapView.animateMovedObjects(movedObjects: movedObjects, move: move, map: map)
-                pendingMoves.removeFirst()
+                moves.removeFirst()
                 
             } else {
                 mapView.hero.idle()

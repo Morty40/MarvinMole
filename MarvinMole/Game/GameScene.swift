@@ -25,7 +25,7 @@ class GameScene: Scene {
         
     private lazy var mapView = {
         let node = MapView()
-        node.position = CGPoint(x: frame.size.width * 0.5, y: frame.size.height * 0.5)
+        node.position = center
         return node
     }()
     
@@ -37,7 +37,6 @@ class GameScene: Scene {
         node.fontColor = .white
         node.horizontalAlignmentMode = .right
         node.verticalAlignmentMode = .baseline
-        node.zPosition = 2
         return node
     }()
     
@@ -49,14 +48,12 @@ class GameScene: Scene {
         node.fontColor = .white
         node.horizontalAlignmentMode = .right
         node.verticalAlignmentMode = .baseline
-        node.zPosition = 2
         return node
     }()
     
     private lazy var quitButton = {
         let node = IconButton(imageName: "CloseIcon", target: self, action: #selector(onQuit))
         node.position = CGPoint(x: frame.size.width * 0.05, y: frame.size.height * 0.95)
-        node.zPosition = 2
         return node
     }()
     
@@ -67,7 +64,6 @@ class GameScene: Scene {
     private lazy var undoButton = {
         let node = IconButton(imageName: "UndoIcon", target: self, action: #selector(onUndo))
         node.position = CGPoint(x: frame.size.width * 0.05, y: frame.size.height * 0.05)
-        node.zPosition = 2
         return node
     }()
     
@@ -78,28 +74,24 @@ class GameScene: Scene {
     private lazy var leftButton = {
         let node = IconButton(imageName: "ArrowLeftIcon", target: nil, action: nil)
         node.position = CGPoint(x: frame.size.width * 0.81, y: frame.size.height * 0.05)
-        node.zPosition = 2
         return node
     }()
 
     private lazy var upButton = {
         let node = IconButton(imageName: "ArrowUpIcon", target: nil, action: nil)
         node.position = CGPoint(x: frame.size.width * 0.88, y: frame.size.height * 0.15)
-        node.zPosition = 2
         return node
     }()
 
     private lazy var rightButton = {
         let node = IconButton(imageName: "ArrowRightIcon", target: nil, action: nil)
         node.position = CGPoint(x: frame.size.width * 0.95, y: frame.size.height * 0.05)
-        node.zPosition = 2
         return node
     }()
 
     private lazy var downButton = {
         let node = IconButton(imageName: "ArrowDownIcon", target: nil, action: nil)
         node.position = CGPoint(x: frame.size.width * 0.88, y: frame.size.height * 0.05)
-        node.zPosition = 2
         return node
     }()
 

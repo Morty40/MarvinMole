@@ -20,7 +20,7 @@ class GameViewController: UIViewController {
             view.showsFPS = true
             view.showsNodeCount = true
 #endif
-            view.ignoresSiblingOrder = true
+            view.ignoresSiblingOrder = false
             view.presentScene(scene)
 
             scene.transition(to: Scene.menuScene)

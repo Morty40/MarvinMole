@@ -58,7 +58,6 @@ class MenuScene: Scene {
         node.preferredMaxLayoutWidth = 380
         node.horizontalAlignmentMode = .left
         node.verticalAlignmentMode = .top
-        node.zPosition = 2
         node.text = "Oh dear! Marvin Mole's home is flooded and his food is all over the place.\n\nHelp him push his food back in the cupboards."
         node.numberOfLines = 0
         return node
@@ -67,7 +66,6 @@ class MenuScene: Scene {
     private lazy var startButton = {
         let node = TextButton(title: "Start", target: self, action: #selector(onStart))
         node.position = CGPoint(x: frame.size.width * 0.25, y: frame.size.height * 0.35)
-        node.zPosition = 2
         return node
     }()
     
@@ -92,7 +90,6 @@ class MenuScene: Scene {
     private lazy var mapCollectionButton = {
         let node = TextButton(title: mapCollection.title, target: self, action: #selector(onMapCollection))
         node.position = CGPoint(x: frame.size.width * 0.25, y: frame.size.height * 0.2)
-        node.zPosition = 2
         return node
     }()
     
@@ -108,7 +105,6 @@ class MenuScene: Scene {
     private lazy var mapNumberButton = {
         let node = TextButton(title: "\(mapNumber)", target: self, action: #selector(onMapNumber))
         node.position = CGPoint(x: frame.size.width * 0.5, y: frame.size.height * 0.2)
-        node.zPosition = 2
         return node
     }()
     
@@ -147,13 +143,22 @@ class MenuScene: Scene {
         case .keyboardD:
             
             // load Sokoban map from resource bundle
-            let resource = String(format: "Easy%02d", 1)
+            let resource = String(format: "Sokoban%02d", 1)
             let filePath = Bundle.main.url(forResource: resource, withExtension: "xsb")
             if let data = try? Data(contentsOf: filePath!) {
                 
-                // prepare game scene
                 let map = Map.mapFromXsb(data: data)
-                Scene.demoScene.load(map: map!)
+                
+                let moves = """
+                ullluuuLUllDlldddrRRRRRRRRRRdrUllllllluuululldDDuu
+                lldddrRRRRRRRRRRRRlllllllluuulLulDDDuulldddrRRRRRR
+                RRRRRllllllluuulluuurDDuullDDDDDuulldddrRRRRRRRRRR
+                uRRlDllllllluuuLLulDDDuulldddrRRRRRRRRRRdRRlUlllll
+                lllllllulldRRRRRRRRRRRRRuRDldR
+                """
+                
+                Scene.demoScene.load(map: map!,
+                                     moves: Map.movesFrom(lurd: moves))
                 
                 transition(to: Scene.demoScene)
             }

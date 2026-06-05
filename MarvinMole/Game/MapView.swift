@@ -8,30 +8,11 @@
 import SpriteKit
 
 class MapView: SKNode {
-    
-    lazy var hero = {
-        let node = Hero()
-        node.position = .zero
-        node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        node.zPosition = 3
         
-        return node
-    }()
-    
-    lazy var boxContainer = {
-        let node = SKNode()
-        node.position = .zero
-        node.zPosition = 3
-        return node
-    }()
-    
     lazy var floorTileMap = {
         let node = TileMap(layer: .floors)
         node.position = CGPoint(x: frame.size.width * 0.46, y: frame.size.height * 0.50)
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        node.zPosition = 2
-        node.addChild(hero)
-        node.addChild(boxContainer)
         return node
     }()
     
@@ -39,15 +20,26 @@ class MapView: SKNode {
         let node = TileMap(layer: .shadows)
         node.position = CGPoint(x: frame.size.width * 0.46, y: frame.size.height * 0.50)
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        node.zPosition = 3
         return node
     }()
     
+    lazy var hero = {
+        let node = Hero()
+        node.position = .zero
+        node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        return node
+    }()
+    
+    lazy var boxContainer = {
+        let node = SKNode()
+        node.position = .zero
+        return node
+    }()
+
     lazy var wallTileMap = {
         let node = TileMap(layer: .walls)
         node.position = CGPoint(x: frame.size.width * 0.46, y: frame.size.height * 0.50)
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        node.zPosition = 10
         return node
     }()
     
@@ -56,6 +48,8 @@ class MapView: SKNode {
         
         addChild(floorTileMap)
         addChild(shadowTileMap)
+        addChild(hero)
+        addChild(boxContainer)
         addChild(wallTileMap)
     }
     
@@ -109,7 +103,6 @@ class MapView: SKNode {
                 }
             }
         }
-        
     }
 
     override func hasActions() -> Bool {

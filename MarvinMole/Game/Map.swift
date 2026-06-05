@@ -74,7 +74,7 @@ class Map {
     }
     
     /// Move types, using Sokoban solution LURD notation
-    enum Move: String {
+    enum Move: String, CaseIterable {
         case walkLeft  = "l"
         case walkUp    = "u"
         case walkRight = "r"
@@ -103,6 +103,12 @@ class Map {
         var isPush: Bool {
             [.pushLeft, .pushRight, .pushUp, .pushDown].contains(self)
         }
+    }
+    
+    static func movesFrom(lurd: String) -> [Move] {
+        let valid = Move.allCases.map(\.rawValue)
+        let lurd = lurd.filter { valid.contains(String($0)) }
+        return lurd.map { Move(rawValue: String($0))! }
     }
     
     var title: String? = nil
