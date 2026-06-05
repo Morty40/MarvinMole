@@ -218,11 +218,11 @@ class GameScene: Scene {
             onQuit()
 #if DEBUG
         case .keyboardF:
-            mapView.floorTileMap.isHidden.toggle()
+            mapView.toggleVisibility(layer: .floors)
         case .keyboardS:
-            mapView.shadowTileMap.isHidden.toggle()
+            mapView.toggleVisibility(layer: .shadows)
         case .keyboardW:
-            mapView.wallTileMap.isHidden.toggle()
+            mapView.toggleVisibility(layer: .walls)
 #endif
         default:
             break

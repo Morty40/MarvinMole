@@ -9,34 +9,34 @@ import SpriteKit
 
 class MapView: SKNode {
         
-    lazy var floorTileMap = {
+    private lazy var floorTileMap = {
         let node = TileMap(layer: .floors)
         node.position = CGPoint(x: frame.size.width * 0.46, y: frame.size.height * 0.50)
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         return node
     }()
     
-    lazy var shadowTileMap = {
+    private lazy var shadowTileMap = {
         let node = TileMap(layer: .shadows)
         node.position = CGPoint(x: frame.size.width * 0.46, y: frame.size.height * 0.50)
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         return node
     }()
     
-    lazy var hero = {
+    lazy var hero = { // TODO: private
         let node = Hero()
         node.position = .zero
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         return node
     }()
     
-    lazy var boxContainer = {
+    private lazy var boxContainer = {
         let node = SKNode()
         node.position = .zero
         return node
     }()
 
-    lazy var wallTileMap = {
+    private lazy var wallTileMap = {
         let node = TileMap(layer: .walls)
         node.position = CGPoint(x: frame.size.width * 0.46, y: frame.size.height * 0.50)
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
@@ -129,4 +129,15 @@ class MapView: SKNode {
         }
     }
 
+    func toggleVisibility(layer: TileMap.Layer) {
+        switch layer {
+        case .floors:
+            floorTileMap.isHidden.toggle()
+        case .shadows:
+            shadowTileMap.isHidden.toggle()
+        case .walls:
+            wallTileMap.isHidden.toggle()
+        }
+    }
+    
 }
