@@ -29,6 +29,31 @@ class GameScene: Scene {
         return node
     }()
     
+    private lazy var nextButton = {
+        let node = TextButton(title: "Next >>", target: self, action: #selector(onNext))
+        node.position = CGPoint(x: frame.size.width * 0.86, y: frame.size.height * 0.92)
+        return node
+    }()
+    
+    @objc private func onNext() {
+        
+        // advance to next
+        MapManager.shared.incrementMapNumber()
+        
+        // load Sokoban map from resource bundle
+        let resource = String(format: MapManager.shared.currentMapCollection.fileName, MapManager.shared.currentMapNumber)
+        if let map = Map.mapFromBundle(resource: resource) {
+            
+            // prepare game scene
+            Scene.gameScene.load(map: map)
+            
+            // prepare and go to map transistion scene
+            Scene.introScene.subtitle = map.title
+            transition(to: Scene.introScene)
+        }
+        // TODO: duplicate from MenuScene
+    }
+
     private lazy var pushesLabel = {
         let node = SKLabelNode()
         node.fontName = "Rubik-Bold"
@@ -102,6 +127,7 @@ class GameScene: Scene {
         
         addChild(backgroundImage)
         addChild(mapView)
+        addChild(nextButton)
         addChild(pushesLabel)
         addChild(movesLabel)
         addChild(quitButton)
@@ -138,6 +164,8 @@ class GameScene: Scene {
             UISwipeGestureRecognizer(target: self,
                                      action: #selector(onSwipeDown),
                                      direction: .down))
+        
+        nextButton.isHidden = !map.isCompleted
     }
     
     func load(map: Map) {
@@ -170,10 +198,12 @@ class GameScene: Scene {
         super.update(currentTime)
         
         hudUpdate()
-        
+
         mapView.hero.update(currentTime)
         
         if pendingInput.isEmpty, !mapView.hasActions() {
+
+            nextButton.isHidden = !map.isCompleted
 
             // read on-screen joystick input
             if leftButton.isPressed {
@@ -191,7 +221,6 @@ class GameScene: Scene {
             }
         }
         processInput()
-        
     }
     
     /// Queue up input

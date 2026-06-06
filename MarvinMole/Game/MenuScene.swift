@@ -7,7 +7,12 @@
 
 import SpriteKit
 
-class MenuScene: Scene {
+class MapManager {
+    static let shared = MapManager()
+
+    private init() {}
+    
+    var currentMapNumber: Int = 1
     
     enum MapCollection: CaseIterable {
         case easy
@@ -38,10 +43,19 @@ class MenuScene: Scene {
             }
         }
     }
+
+    var currentMapCollection: MapCollection = .easy
     
-    private var mapCollection: MapCollection = .easy
-    private var mapNumber: Int = 1
-    
+    func incrementMapNumber() {
+        currentMapNumber += 1
+        if currentMapNumber > currentMapCollection.count {
+            currentMapNumber = 1
+        }
+    }
+}
+
+class MenuScene: Scene {
+        
     private lazy var backgroundImage = {
         let node = SKSpriteNode(imageNamed: "MenuBackground")
         node.position = center
@@ -72,48 +86,42 @@ class MenuScene: Scene {
     @objc func onStart() {
 
         // load Sokoban map from resource bundle
-        let resource = String(format: mapCollection.fileName, mapNumber)
-        let filePath = Bundle.main.url(forResource: resource, withExtension: "xsb")
-        if let data = try? Data(contentsOf: filePath!) {
+        let resource = String(format: MapManager.shared.currentMapCollection.fileName, MapManager.shared.currentMapNumber)
+        if let map = Map.mapFromBundle(resource: resource) {
             
             // prepare game scene
-            let map = Map.mapFromXsb(data: data)
-            Scene.gameScene.load(map: map!)
+            Scene.gameScene.load(map: map)
             
             // prepare and go to map transistion scene
-            Scene.introScene.title = String(format: "%@ %d", mapCollection.title, mapNumber)
-            Scene.introScene.subtitle = map?.title
+            Scene.introScene.subtitle = map.title
             transition(to: Scene.introScene)
         }
     }
 
     private lazy var mapCollectionButton = {
-        let node = TextButton(title: mapCollection.title, target: self, action: #selector(onMapCollection))
+        let node = TextButton(title: MapManager.shared.currentMapCollection.title, target: self, action: #selector(onMapCollection))
         node.position = CGPoint(x: frame.size.width * 0.25, y: frame.size.height * 0.2)
         return node
     }()
     
     @objc func onMapCollection() {
-        var index = MapCollection.allCases.firstIndex(of: mapCollection)!
-        index = (index + 1) % MapCollection.allCases.count
-        mapCollection = MapCollection.allCases[index]
-        mapCollectionButton.title = mapCollection.title
-        mapNumber = 1
-        mapNumberButton.title = "\(mapNumber)"
+        var index = MapManager.MapCollection.allCases.firstIndex(of: MapManager.shared.currentMapCollection)!
+        index = (index + 1) % MapManager.MapCollection.allCases.count
+        MapManager.shared.currentMapCollection = MapManager.MapCollection.allCases[index]
+        mapCollectionButton.title = MapManager.shared.currentMapCollection.title
+        MapManager.shared.currentMapNumber = 1
+        mapNumberButton.title = "\(MapManager.shared.currentMapNumber)"
     }
 
     private lazy var mapNumberButton = {
-        let node = TextButton(title: "\(mapNumber)", target: self, action: #selector(onMapNumber))
+        let node = TextButton(title: "\(MapManager.shared.currentMapNumber)", target: self, action: #selector(onMapNumber))
         node.position = CGPoint(x: frame.size.width * 0.5, y: frame.size.height * 0.2)
         return node
     }()
     
     @objc func onMapNumber() {
-        mapNumber += 1
-        if mapNumber > mapCollection.count {
-            mapNumber = 1
-        }
-        mapNumberButton.title = "\(mapNumber)"
+        MapManager.shared.incrementMapNumber()
+        mapNumberButton.title = "\(MapManager.shared.currentMapNumber)"
     }
 
     /// This is called once after the scene has been initialized,
@@ -144,10 +152,7 @@ class MenuScene: Scene {
             
             // load Sokoban map from resource bundle
             let resource = String(format: "Sokoban%02d", 1)
-            let filePath = Bundle.main.url(forResource: resource, withExtension: "xsb")
-            if let data = try? Data(contentsOf: filePath!) {
-                
-                let map = Map.mapFromXsb(data: data)
+            if let map = Map.mapFromBundle(resource: resource) {
                 
                 let moves = """
                 ullluuuLUllDlldddrRRRRRRRRRRdrUllllllluuululldDDuu
@@ -157,7 +162,7 @@ class MenuScene: Scene {
                 lllllllulldRRRRRRRRRRRRRuRDldR
                 """
                 
-                Scene.demoScene.load(map: map!,
+                Scene.demoScene.load(map: map,
                                      moves: Map.movesFrom(lurd: moves))
                 
                 transition(to: Scene.demoScene)

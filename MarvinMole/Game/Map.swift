@@ -373,6 +373,14 @@ class Map {
         return nil
     }
     
+    static func mapFromBundle(resource: String) -> Map? {
+        if let url = Bundle.main.url(forResource: resource, withExtension: "xsb"),
+           let data = try? Data(contentsOf: url) {
+            return mapFromXsb(data: data)
+        }
+        return nil
+    }
+        
     static func mapFromXsb(string: String) -> Map? {
         
         // split by newline into list of strings

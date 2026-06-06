@@ -20,12 +20,7 @@ class IntroScene: Scene {
         node.text = "<Title>"
         return node
     }()
-    
-    var title: String? {
-        get { mapTitleLabel.text }
-        set { mapTitleLabel.text = newValue }
-    }
-    
+        
     private lazy var mapSubtitleLabel = {
         let node = SKLabelNode()
         node.fontName = "Rubik-Bold"
@@ -56,6 +51,8 @@ class IntroScene: Scene {
     /// - Parameter view: The view that is presenting the scene
     override func didMove(to view: SKView) {
         
+        mapTitleLabel.text = String(format: "%@ %d", MapManager.shared.currentMapCollection.title, MapManager.shared.currentMapNumber)
+
         // move on to game scene automatically
         run(SKAction.wait(forDuration: 1.5), completion: {
             self.transition(to: Scene.gameScene)
