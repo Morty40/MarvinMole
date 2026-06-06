@@ -223,6 +223,16 @@ class GameScene: Scene {
             mapView.toggleVisibility(layer: .shadows)
         case .keyboardW:
             mapView.toggleVisibility(layer: .walls)
+        case .keyboardO:
+            let node = mapView.hero
+            if let scene = node.scene {
+                let globalPosition = node.parent!.convert(node.position, to: scene)
+                let ft = FloatingText(text: "Oh dear!")
+                ft.position = globalPosition
+                ft.position.y += 20 * mapView.yScale
+                addChild(ft)
+                ft.runAnimation()
+            }
 #endif
         default:
             break
@@ -231,8 +241,9 @@ class GameScene: Scene {
     
     private func processInput() {
         if !mapView.hasActions(), let nextInput = pendingInput.first {
-            
-            let legalMoves = map.legalMoves
+
+            // no more legal moves once map is completed
+            let legalMoves = map.isCompleted ? [] : map.legalMoves
             
             switch nextInput {
             case .left:
@@ -260,8 +271,11 @@ class GameScene: Scene {
                 }
                 
             case .undo:
-                map.undoMove()
-                mapView.updateObjectPositions(map)
+                // no more undo once map is completed
+                if !map.isCompleted {
+                    map.undoMove()
+                    mapView.updateObjectPositions(map)
+                }
             }
 
             pendingInput.removeFirst()

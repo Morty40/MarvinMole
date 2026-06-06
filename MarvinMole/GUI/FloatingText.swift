@@ -9,56 +9,61 @@ import SpriteKit
 
 class FloatingText: SKLabelNode {
         
-    private var bgLabel: SKLabelNode!
+    private var label: SKLabelNode!
     
-    override init() {
+    init(text: String) {
         super.init()
         
-        bgLabel = SKLabelNode()
-        bgLabel.fontColor = UIColor(white: 0.0, alpha: 0.5)
-        bgLabel.position = .zero
-        bgLabel.zPosition = -0.1 // relative to parent
-        addChild(bgLabel)
+        fontName = "Rubik-Bold"
+        fontSize = 20
+        horizontalAlignmentMode = .center
+        verticalAlignmentMode = .center
+
+        let attributes1: [NSAttributedString.Key: Any] = [
+            .strokeColor: UIColor.black,
+            .strokeWidth: -10.0,
+            .foregroundColor: UIColor.black,
+            .font: UIFont(name: fontName!, size: fontSize)!
+        ]
+        attributedText = NSAttributedString(string: text,
+                                            attributes: attributes1)
+        
+        let attributes2: [NSAttributedString.Key: Any] = [
+            .strokeColor: UIColor.black,
+            .strokeWidth: 0.0,
+            .foregroundColor: UIColor.systemCyan,
+            .font: UIFont(name: fontName!, size: fontSize)!
+        ]
+
+        label = SKLabelNode()
+        label.horizontalAlignmentMode = horizontalAlignmentMode
+        label.verticalAlignmentMode = verticalAlignmentMode
+        label.fontName = fontName
+        label.fontSize = fontSize
+        label.position = .zero
+        label.attributedText = NSAttributedString(string: text,
+                                                  attributes: attributes2)
+        addChild(label)
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    func runAnimation() {
+        let moveUp = SKAction.moveBy(x: 0, y: 10, duration: 1.0)
+        
+        let wait = SKAction.wait(forDuration: 0.7)
+        let fadeOut = SKAction.fadeOut(withDuration: 0.3)
+        let fadeOutSequence = SKAction.sequence([wait, fadeOut])
+        
+        let group = SKAction.group([moveUp, fadeOutSequence])
+        
+        let removeSelf = SKAction.removeFromParent()
+        
+        let sequence = SKAction.sequence([group, removeSelf])
 
-    override var verticalAlignmentMode: SKLabelVerticalAlignmentMode {
-        didSet {
-            self.verticalAlignmentMode = .center
-            bgLabel.verticalAlignmentMode = .center
-        }
-    }
-    
-    override var horizontalAlignmentMode: SKLabelHorizontalAlignmentMode {
-        didSet { (children as! [SKLabelNode]).forEach { $0.horizontalAlignmentMode = horizontalAlignmentMode } }
-    }
-    
-    override var numberOfLines: Int {
-        didSet { (children as! [SKLabelNode]).forEach { $0.numberOfLines = numberOfLines } }
-    }
-    
-    override var lineBreakMode: NSLineBreakMode {
-        didSet { (children as! [SKLabelNode]).forEach { $0.lineBreakMode = lineBreakMode } }
-    }
-
-    override var preferredMaxLayoutWidth: CGFloat {
-        didSet { (children as! [SKLabelNode]).forEach { $0.preferredMaxLayoutWidth = preferredMaxLayoutWidth } }
-    }
-    
-    override var fontName: String? {
-        didSet { (children as! [SKLabelNode]).forEach { $0.fontName = fontName } }
-    }
-    
-    override var fontSize: CGFloat {
-        didSet { (children as! [SKLabelNode]).forEach { $0.fontSize = fontSize } }
-    }
-
-    
-    override var text: String? {
-        didSet { (children as! [SKLabelNode]).forEach { $0.text = text } }
+        run(sequence)
     }
 
 }
