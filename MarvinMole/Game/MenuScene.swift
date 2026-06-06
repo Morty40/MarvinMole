@@ -17,13 +17,13 @@ class MapManager {
     enum MapCollection: CaseIterable {
         case easy
         case medium
-        case sokoban
+        case classic
         
         var title: String {
             switch self {
             case .easy: return "Easy"
             case .medium: return "Medium"
-            case .sokoban: return "Classic"
+            case .classic: return "Classic"
             }
         }
         
@@ -31,7 +31,7 @@ class MapManager {
             switch self {
             case .easy: return 3
             case .medium: return 3
-            case .sokoban: return 50
+            case .classic: return 50
             }
         }
         
@@ -39,12 +39,16 @@ class MapManager {
             switch self {
             case .easy: return "Easy%02d"
             case .medium: return "Medium%02d"
-            case .sokoban: return "Sokoban%02d"
+            case .classic: return "Classic%02d"
             }
         }
     }
 
     var currentMapCollection: MapCollection = .easy
+    
+    var currentMapResourceName: String {
+        String(format: currentMapCollection.fileName, currentMapNumber)
+    }
     
     func incrementMapNumber() {
         currentMapNumber += 1
@@ -85,9 +89,8 @@ class MenuScene: Scene {
     
     @objc func onStart() {
 
-        // load Sokoban map from resource bundle
-        let resource = String(format: MapManager.shared.currentMapCollection.fileName, MapManager.shared.currentMapNumber)
-        if let map = Map.mapFromBundle(resource: resource) {
+        // load map from resource bundle
+        if let map = Map.mapFromBundle(resource: MapManager.shared.currentMapResourceName) {
             
             // prepare game scene
             Scene.gameScene.load(map: map)
@@ -150,8 +153,8 @@ class MenuScene: Scene {
         switch key.keyCode {
         case .keyboardD:
             
-            // load Sokoban map from resource bundle
-            let resource = String(format: "Sokoban%02d", 1)
+            // load map from resource bundle
+            let resource = String(format: "Classic%02d", 1)
             if let map = Map.mapFromBundle(resource: resource) {
                 
                 let moves = """

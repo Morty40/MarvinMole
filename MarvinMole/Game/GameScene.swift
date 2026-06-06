@@ -40,9 +40,8 @@ class GameScene: Scene {
         // advance to next
         MapManager.shared.incrementMapNumber()
         
-        // load Sokoban map from resource bundle
-        let resource = String(format: MapManager.shared.currentMapCollection.fileName, MapManager.shared.currentMapNumber)
-        if let map = Map.mapFromBundle(resource: resource) {
+        // load map from resource bundle
+        if let map = Map.mapFromBundle(resource: MapManager.shared.currentMapResourceName) {
             
             // prepare game scene
             Scene.gameScene.load(map: map)

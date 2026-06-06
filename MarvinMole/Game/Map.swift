@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// Sokoban map representation
+/// Map representation
 class Map {
     
     /// Static tile types
@@ -73,7 +73,7 @@ class Map {
         var id: Int
     }
     
-    /// Move types, using Sokoban solution LURD notation
+    /// Move types, using LURD notation
     enum Move: String, CaseIterable {
         case walkLeft  = "l"
         case walkUp    = "u"
