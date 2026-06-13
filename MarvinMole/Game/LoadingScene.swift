@@ -51,9 +51,11 @@ class LoadingScene: Scene {
         // move on to game scene automatically
         run(SKAction.wait(forDuration: 1.5), completion: {
             
+            Scene.floodScene.load(map: self.map!)
+
             // prepare game scene, and transition
             Scene.gameScene.load(map: self.map!)
-            self.transition(to: Scene.gameScene)
+            self.transition(to: Scene.floodScene)
         })
     }
     

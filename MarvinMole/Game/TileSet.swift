@@ -9,9 +9,12 @@ import SpriteKit
 
 class TileSet: SKTileSet {
     
-    let floors = SKTexture(imageNamed: "Floor").split().map {
+    let floor = SKTexture(imageNamed: "Floor").split().map {
         SKTileGroup(tileDefinition: SKTileDefinition(texture: $0)) }
-    
+
+    let water = SKTexture(imageNamed: "Water").split().map {
+        SKTileGroup(tileDefinition: SKTileDefinition(texture: $0)) }
+
     let goal = SKTileGroup(imageNamed: "Goal")
     
     let wallShadows = SKTexture(imageNamed: "WallShadows").split().map {
@@ -27,7 +30,7 @@ class TileSet: SKTileSet {
         SKTileGroup(tileDefinition: SKTileDefinition(texture: $0)) }
     
     override init() {
-        super.init(tileGroups: floors + [goal] + wallShadows + shadows + outerWalls + innerWalls)
+        super.init(tileGroups: floor + water + [goal] + wallShadows + shadows + outerWalls + innerWalls)
     }
     
     required init?(coder: NSCoder) {

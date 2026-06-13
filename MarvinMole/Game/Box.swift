@@ -19,9 +19,9 @@ class Box: Object {
     
     var boxTexture: SKTexture? = nil
     
-    override init() {
-        super.init()
-        boxTexture = Box.boxTextures[Int(arc4random()) % Box.boxTextures.count]
+    override init(id: Int) {
+        super.init(id: id)
+        boxTexture = Box.boxTextures[id % Box.boxTextures.count]
         self.texture = boxTexture
     }
     

@@ -35,8 +35,8 @@ class MenuScene: Scene {
         node.fontName = "Rubik-Bold"
         node.fontSize = 30
         node.fontColor = .white
-        node.position = CGPoint(x: frame.size.width * 0.01, y: frame.size.height * 0.90)
-        node.horizontalAlignmentMode = .left
+        node.position = CGPoint(x: frame.size.width * 0.5, y: frame.size.height * 0.01)
+        node.horizontalAlignmentMode = .center
         node.verticalAlignmentMode = .baseline
         node.numberOfLines = 1
         return node
@@ -44,7 +44,7 @@ class MenuScene: Scene {
 
     private lazy var startButton = {
         let node = TextButton(title: "Start", target: self, action: #selector(onStart))
-        node.position = CGPoint(x: frame.size.width * 0.25, y: frame.size.height * 0.35)
+        node.position = CGPoint(x: frame.size.width * 0.22, y: frame.size.height * 0.35)
         return node
     }()
     
@@ -58,7 +58,7 @@ class MenuScene: Scene {
 
     private lazy var mapCollectionButton = {
         let node = TextButton(title: MapManager.shared.selectedMap.collection.title, target: self, action: #selector(onMapCollection))
-        node.position = CGPoint(x: frame.size.width * 0.25, y: frame.size.height * 0.2)
+        node.position = CGPoint(x: frame.size.width * 0.22, y: frame.size.height * 0.2)
         return node
     }()
     
@@ -103,8 +103,7 @@ class MenuScene: Scene {
     override func didMove(to view: SKView) {
         MapManager.shared.load()
         refreshSelectedMap()
-        
-        solvedMapsText.text = "Solved: \(MapManager.shared.totalNumberOfSolvedMaps) / \(MapManager.shared.totalNumberOfMaps)"
+        refreshSolvedMapsText()
     }
     
     private func refreshSelectedMap() {
@@ -112,11 +111,26 @@ class MenuScene: Scene {
         mapCollectionButton.title = MapManager.shared.selectedMap.collection.title
 
         // map number
-        if let solution = MapManager.shared.mapSolutionFor(resourceName: MapManager.shared.selectedMap.resourceName) {
+        if let _ = MapManager.shared.mapSolutionFor(resourceName: MapManager.shared.selectedMap.resourceName) {
             mapNumberButton.title = "\(MapManager.shared.selectedMap.number) (solved)"
 
         } else {
             mapNumberButton.title = "\(MapManager.shared.selectedMap.number)"
+        }
+    }
+    
+    private func refreshSolvedMapsText() {
+        let totalNumberOfMaps = MapManager.shared.totalNumberOfMaps
+        let totalNumberOfSolvedMaps = MapManager.shared.totalNumberOfSolvedMaps
+        if totalNumberOfSolvedMaps <= 0 {
+            solvedMapsText.text = ""
+
+        } else if totalNumberOfSolvedMaps >= totalNumberOfMaps {
+            solvedMapsText.text = "You solved all the maps! Marvin is happy!"
+
+        } else {
+            solvedMapsText.text = "You solved \(totalNumberOfSolvedMaps) of \(totalNumberOfMaps) maps. Good job!"
+
         }
     }
     

@@ -12,6 +12,7 @@ class TileMap: SKTileMapNode {
     enum Layer {
         case floors
         case shadows
+        case water
         case walls
     }
     
@@ -34,8 +35,8 @@ class TileMap: SKTileMapNode {
 
                 switch tile {
                 case .floor, .wall:
-                    let n = tileSet.floors.count
-                    setTileGroup(tileSet.floors[Int(arc4random()) % n], forColumn: c, row: r)
+                    let n = tileSet.floor.count
+                    setTileGroup(tileSet.floor[Int(arc4random()) % n], forColumn: c, row: r)
                     
                 case .floorGoal:
                     setTileGroup(tileSet.goal, forColumn: c, row: r)
@@ -47,7 +48,7 @@ class TileMap: SKTileMapNode {
         }
         
     }
-    
+
     private func drawShadows(map: Map) {
         
         let tileSet = tileSet as! TileSet
@@ -109,6 +110,44 @@ break
         
     }
     
+    private func drawWater(map: Map, flooding: Double) {
+        
+        let tileSet = tileSet as! TileSet
+        
+        let cX = map.size.width / 2
+        let cY = map.size.height / 2
+        let distC = sqrt(Double(cX*cX) + Double(cY*cY))
+        
+        for y in 0 ..< map.size.height {
+            for x in 0 ..< map.size.width {
+                
+                let tile = map.tileAt(x: x, y: y)
+                let (c, r) = (x, numberOfRows - y - 1)
+
+                switch tile {
+                case .floor, .floorGoal, .wall:
+                    
+                    let dX = cX-x
+                    let dY = cY-y
+                    let d = sqrt(Double(dX*dX) + Double(dY*dY))
+                    let normalizedDistance = d/distC
+                    let isWater = normalizedDistance < flooding
+
+                    if isWater {
+                        let n = tileSet.floor.count
+                        setTileGroup(tileSet.water[(c+r) % n], forColumn: c, row: r)
+                    } else {
+                        setTileGroup(nil, forColumn: c, row: r)
+                    }
+                    
+                default:
+                    break
+                }
+            }
+        }
+        
+    }
+
     private func drawWalls(map: Map) {
         
         let tileSet = tileSet as! TileSet
@@ -251,11 +290,13 @@ break
         
     }
     
-    func draw(map: Map) {
+    func draw(map: Map, flooding: Double = 0.0) {
         
         switch layer {
         case .floors:
             drawFloors(map: map)
+        case .water:
+            drawWater(map: map, flooding: flooding)
         case .shadows:
             drawShadows(map: map)
         case .walls:

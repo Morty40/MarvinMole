@@ -9,10 +9,11 @@ import SpriteKit
 
 class Scene: SKScene {
     
-    static let menuScene = MenuScene()
     static let demoScene = DemoScene()
-    static let loadingScene = LoadingScene()
+    static let floodScene = FloodScene()
     static let gameScene = GameScene()
+    static let loadingScene = LoadingScene()
+    static let menuScene = MenuScene()
     static let quitScene = QuitScene()
 
     override init() {
@@ -26,9 +27,14 @@ class Scene: SKScene {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func transition(to scene: SKScene) {
-        let transition = SKTransition.fade(withDuration: 0.5)
-        view?.presentScene(scene, transition: transition)
+    func transition(to scene: SKScene, animated: Bool = true) {
+        if animated {
+            let transition = SKTransition.fade(withDuration: 0.3)
+            //let transition = SKTransition.crossFade(withDuration: 0.1)
+            view?.presentScene(scene, transition: transition)
+        } else {
+            view?.presentScene(scene)
+        }
     }
     
     func handleKey(_ key: UIKey) {

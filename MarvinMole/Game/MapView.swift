@@ -9,14 +9,14 @@ import SpriteKit
 
 class MapView: SKNode {
         
-    private lazy var floorTileMap = {
+    lazy var floorTileMap = {
         let node = TileMap(layer: .floors)
-        node.position = CGPoint(x: frame.size.width * 0.46, y: frame.size.height * 0.50)
+        node.position = CGPoint(x: frame.size.width * 0.46, y: frame.size.height * 0.50) // TODO ?
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         return node
     }()
-    
-    private lazy var shadowTileMap = {
+
+    lazy var shadowTileMap = {
         let node = TileMap(layer: .shadows)
         node.position = CGPoint(x: frame.size.width * 0.46, y: frame.size.height * 0.50)
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
@@ -24,19 +24,26 @@ class MapView: SKNode {
     }()
     
     lazy var hero = { // TODO: private
-        let node = Hero()
+        let node = Hero(id: 0) // TODO: id is important?
         node.position = .zero
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         return node
     }()
     
-    private lazy var boxContainer = {
+    lazy var boxContainer = {
         let node = SKNode()
         node.position = .zero
         return node
     }()
 
-    private lazy var wallTileMap = {
+    lazy var waterTileMap = {
+        let node = TileMap(layer: .water)
+        node.position = CGPoint(x: frame.size.width * 0.46, y: frame.size.height * 0.50)
+        node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        return node
+    }()
+
+    lazy var wallTileMap = {
         let node = TileMap(layer: .walls)
         node.position = CGPoint(x: frame.size.width * 0.46, y: frame.size.height * 0.50)
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
@@ -50,6 +57,7 @@ class MapView: SKNode {
         addChild(shadowTileMap)
         addChild(hero)
         addChild(boxContainer)
+        addChild(waterTileMap)
         addChild(wallTileMap)
     }
     
@@ -61,22 +69,24 @@ class MapView: SKNode {
         // clear tilemaps
         floorTileMap.clear()
         shadowTileMap.clear()
+        waterTileMap.clear()
         wallTileMap.clear()
         
         // set size
         floorTileMap.size = map.size
         shadowTileMap.size = map.size
+        waterTileMap.size = map.size
         wallTileMap.size = map.size
         
         // draw tilemaps
         floorTileMap.draw(map: map)
         shadowTileMap.draw(map: map)
+        waterTileMap.draw(map: map)
         wallTileMap.draw(map: map)
         
         boxContainer.removeAllChildren()
         for b in map.objectsOfType(.box) {
-            let box = Box()
-            box.id = b.id
+            let box = Box(id: b.id)
             boxContainer.addChild(box)
         }
         updateObjectPositions(map)
@@ -137,6 +147,8 @@ class MapView: SKNode {
             floorTileMap.isHidden.toggle()
         case .shadows:
             shadowTileMap.isHidden.toggle()
+        case .water:
+            waterTileMap.isHidden.toggle()
         case .walls:
             wallTileMap.isHidden.toggle()
         }

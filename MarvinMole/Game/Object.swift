@@ -20,16 +20,17 @@ class Object: SKSpriteNode {
                            y: h/2 - 32*(CGFloat(y)+0.5))
     }
     
-    init() {
-        let texture = SKTexture(imageNamed: "HeroWalkLeft")
-        super.init(texture: texture, color: .red, size: CGSize(width: 32, height: 32))
+    init(id: Int) {
+        self.id = id
+        
+        super.init(texture: nil, color: .clear, size: CGSize(width: 32, height: 32))
         anchorPoint = CGPoint(x: 0.5, y: 0.5)
         
         let shadowTexture = SKTexture(imageNamed: "ObjectShadow")
         let shadow = SKSpriteNode(texture: shadowTexture, size: CGSize(width: 48, height: 16))
         shadow.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         shadow.position = CGPoint(x: 0, y: -16)
-        shadow.zPosition = -1
+        shadow.zPosition = 0
         shadow.alpha = 0.3
         self.addChild(shadow)
     }
