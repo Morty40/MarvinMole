@@ -11,7 +11,7 @@ class Scene: SKScene {
     
     static let menuScene = MenuScene()
     static let demoScene = DemoScene()
-    static let introScene = IntroScene()
+    static let loadingScene = LoadingScene()
     static let gameScene = GameScene()
     static let quitScene = QuitScene()
 

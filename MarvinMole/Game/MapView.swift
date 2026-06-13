@@ -81,8 +81,10 @@ class MapView: SKNode {
         }
         updateObjectPositions(map)
         
-        // scale small maps 2x
-        let scale = map.size.width <= 12 && map.size.height <= 9 ? 2.0 : 1.0
+        // map scale
+        let scaleWidth = Double(1024 - 250) / Double(map.size.width * 32)
+        let scaleHeight = Double(768 - 250) / Double(map.size.height * 32)
+        let scale = min(3.0, CGFloat(min(scaleWidth, scaleHeight)))
         xScale = scale
         yScale = scale
     }

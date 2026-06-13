@@ -37,20 +37,19 @@ class GameScene: Scene {
     
     @objc private func onNext() {
         
+        
+        // register solution, TODO: fix me
+        var solution = MapManager.MapSolution(resourceName: MapManager.shared.selectedMap.resourceName,
+                                              moves: "TODO")
+        MapManager.shared.register(solution: solution)
+        
         // advance to next
         MapManager.shared.incrementMapNumber()
-        
-        // load map from resource bundle
-        if let map = Map.mapFromBundle(resource: MapManager.shared.currentMapResourceName) {
-            
-            // prepare game scene
-            Scene.gameScene.load(map: map)
-            
-            // prepare and go to map transistion scene
-            Scene.introScene.subtitle = map.title
-            transition(to: Scene.introScene)
-        }
-        // TODO: duplicate from MenuScene
+        MapManager.shared.save()
+
+        // load current map and transition
+        Scene.loadingScene.loadCurrentMap()
+        transition(to: Scene.loadingScene)
     }
 
     private lazy var pushesLabel = {

@@ -7,57 +7,6 @@
 
 import SpriteKit
 
-class MapManager {
-    static let shared = MapManager()
-
-    private init() {}
-    
-    var currentMapNumber: Int = 1
-    
-    enum MapCollection: CaseIterable {
-        case easy
-        case medium
-        case classic
-        
-        var title: String {
-            switch self {
-            case .easy: return "Easy"
-            case .medium: return "Medium"
-            case .classic: return "Classic"
-            }
-        }
-        
-        var count: Int {
-            switch self {
-            case .easy: return 3
-            case .medium: return 3
-            case .classic: return 50
-            }
-        }
-        
-        var fileName: String {
-            switch self {
-            case .easy: return "Easy%02d"
-            case .medium: return "Medium%02d"
-            case .classic: return "Classic%02d"
-            }
-        }
-    }
-
-    var currentMapCollection: MapCollection = .easy
-    
-    var currentMapResourceName: String {
-        String(format: currentMapCollection.fileName, currentMapNumber)
-    }
-    
-    func incrementMapNumber() {
-        currentMapNumber += 1
-        if currentMapNumber > currentMapCollection.count {
-            currentMapNumber = 1
-        }
-    }
-}
-
 class MenuScene: Scene {
         
     private lazy var backgroundImage = {
@@ -67,7 +16,7 @@ class MenuScene: Scene {
         return node
     }()
     
-    private lazy var introText = {
+    private lazy var storyText = {
         let node = SKLabelNode()
         node.fontName = "Rubik-Bold"
         node.fontSize = 30
@@ -81,6 +30,18 @@ class MenuScene: Scene {
         return node
     }()
 
+    private lazy var solvedMapsText = {
+        let node = SKLabelNode()
+        node.fontName = "Rubik-Bold"
+        node.fontSize = 30
+        node.fontColor = .white
+        node.position = CGPoint(x: frame.size.width * 0.01, y: frame.size.height * 0.90)
+        node.horizontalAlignmentMode = .left
+        node.verticalAlignmentMode = .baseline
+        node.numberOfLines = 1
+        return node
+    }()
+
     private lazy var startButton = {
         let node = TextButton(title: "Start", target: self, action: #selector(onStart))
         node.position = CGPoint(x: frame.size.width * 0.25, y: frame.size.height * 0.35)
@@ -88,43 +49,38 @@ class MenuScene: Scene {
     }()
     
     @objc func onStart() {
+        MapManager.shared.save()
 
-        // load map from resource bundle
-        if let map = Map.mapFromBundle(resource: MapManager.shared.currentMapResourceName) {
-            
-            // prepare game scene
-            Scene.gameScene.load(map: map)
-            
-            // prepare and go to map transistion scene
-            Scene.introScene.subtitle = map.title
-            transition(to: Scene.introScene)
-        }
+        // load current map and transition
+        Scene.loadingScene.loadCurrentMap()
+        transition(to: Scene.loadingScene)
     }
 
     private lazy var mapCollectionButton = {
-        let node = TextButton(title: MapManager.shared.currentMapCollection.title, target: self, action: #selector(onMapCollection))
+        let node = TextButton(title: MapManager.shared.selectedMap.collection.title, target: self, action: #selector(onMapCollection))
         node.position = CGPoint(x: frame.size.width * 0.25, y: frame.size.height * 0.2)
         return node
     }()
     
     @objc func onMapCollection() {
-        var index = MapManager.MapCollection.allCases.firstIndex(of: MapManager.shared.currentMapCollection)!
+        var index = MapManager.MapCollection.allCases.firstIndex(of: MapManager.shared.selectedMap.collection)!
         index = (index + 1) % MapManager.MapCollection.allCases.count
-        MapManager.shared.currentMapCollection = MapManager.MapCollection.allCases[index]
-        mapCollectionButton.title = MapManager.shared.currentMapCollection.title
-        MapManager.shared.currentMapNumber = 1
-        mapNumberButton.title = "\(MapManager.shared.currentMapNumber)"
+        MapManager.shared.selectedMap.collection = MapManager.MapCollection.allCases[index]
+        MapManager.shared.selectedMap.number = 1
+        
+        refreshSelectedMap()
     }
 
     private lazy var mapNumberButton = {
-        let node = TextButton(title: "\(MapManager.shared.currentMapNumber)", target: self, action: #selector(onMapNumber))
+        let node = TextButton(title: "\(MapManager.shared.selectedMap.number)", target: self, action: #selector(onMapNumber))
         node.position = CGPoint(x: frame.size.width * 0.5, y: frame.size.height * 0.2)
         return node
     }()
     
     @objc func onMapNumber() {
         MapManager.shared.incrementMapNumber()
-        mapNumberButton.title = "\(MapManager.shared.currentMapNumber)"
+
+        refreshSelectedMap()
     }
 
     /// This is called once after the scene has been initialized,
@@ -133,20 +89,35 @@ class MenuScene: Scene {
         super.sceneDidLoad()
         
         addChild(backgroundImage)
-        addChild(introText)
+        addChild(storyText)
+        addChild(solvedMapsText)
         addChild(startButton)
         addChild(mapCollectionButton)
         addChild(mapNumberButton)
-
-        // TODO: remove
-        /*
-        for name in UIFont.familyNames {
-            print(name)
-            if let nameString = name as? String {
-                print(UIFont.fontNames(forFamilyName: nameString))
-            }
-        }*/
         
+        refreshSelectedMap()
+    }
+    
+    /// The scene is about to be presented by a view
+    /// - Parameter view: The view that is presenting the scene
+    override func didMove(to view: SKView) {
+        MapManager.shared.load()
+        refreshSelectedMap()
+        
+        solvedMapsText.text = "Solved: \(MapManager.shared.totalNumberOfSolvedMaps) / \(MapManager.shared.totalNumberOfMaps)"
+    }
+    
+    private func refreshSelectedMap() {
+        // map collection
+        mapCollectionButton.title = MapManager.shared.selectedMap.collection.title
+
+        // map number
+        if let solution = MapManager.shared.mapSolutionFor(resourceName: MapManager.shared.selectedMap.resourceName) {
+            mapNumberButton.title = "\(MapManager.shared.selectedMap.number) (solved)"
+
+        } else {
+            mapNumberButton.title = "\(MapManager.shared.selectedMap.number)"
+        }
     }
     
     override func handleKey(_ key: UIKey) {
@@ -179,3 +150,4 @@ class MenuScene: Scene {
 }
 
 // TODO: auto start demo mode after some idle time
+// TODO: update UI according to selected map
