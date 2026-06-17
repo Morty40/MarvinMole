@@ -39,8 +39,12 @@ class FloodScene: Scene {
         var floodingActions: [SKAction] = []
         
         let steps = map.size.width + map.size.height
-        
+
         floodingActions.append(SKAction.wait(forDuration: 1.0))
+
+        floodingActions.append(SKAction.run {
+            self.mapView.waterTileMap.alpha = 0.5
+        })
 
         for i in 0 ... steps {
             let flooding = Double(i) / Double(steps)
@@ -51,18 +55,20 @@ class FloodScene: Scene {
         }
 
         floodingActions.append(SKAction.run {
+            self.mapView.waterTileMap.run(SKAction.fadeAlpha(to: 1.0, duration: 1.0))
+        })
+        floodingActions.append(SKAction.wait(forDuration: 1.0))
+
+        floodingActions.append(SKAction.run {
             self.mapView.boxContainer.isHidden = false
         })
         
         floodingActions.append(SKAction.wait(forDuration: 2.0))
 
-        for i in 0 ... steps*2 {
-            let flooding = 1.0 - (Double(i) / Double(steps*2))
-            floodingActions.append(SKAction.run {
-                self.mapView.waterTileMap.draw(map: self.map, flooding: flooding)
-            })
-            floodingActions.append(SKAction.wait(forDuration: 0.02))
-        }
+        floodingActions.append(SKAction.run {
+            self.mapView.waterTileMap.run(SKAction.fadeAlpha(to: 0.0, duration: 3.0))
+        })
+        floodingActions.append(SKAction.wait(forDuration: 3.0))
 
         floodingActions.append(SKAction.wait(forDuration: 1.0))
 

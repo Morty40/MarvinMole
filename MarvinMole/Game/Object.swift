@@ -20,6 +20,7 @@ class Object: SKSpriteNode {
                            y: h/2 - 32*(CGFloat(y)+0.5))
     }
     
+    // TODO: Object: SKNode, add two child sprite nodes
     init(id: Int) {
         self.id = id
         

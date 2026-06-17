@@ -36,7 +36,7 @@ class TileMap: SKTileMapNode {
                 switch tile {
                 case .floor, .wall:
                     let n = tileSet.floor.count
-                    setTileGroup(tileSet.floor[Int(arc4random()) % n], forColumn: c, row: r)
+                    setTileGroup(tileSet.floor[(c+r) % n], forColumn: c, row: r)
                     
                 case .floorGoal:
                     setTileGroup(tileSet.goal, forColumn: c, row: r)
@@ -135,7 +135,7 @@ break
 
                     if isWater {
                         let n = tileSet.floor.count
-                        setTileGroup(tileSet.water[(c+r) % n], forColumn: c, row: r)
+                        setTileGroup(tileSet.animatedWater, forColumn: c, row: r)
                     } else {
                         setTileGroup(nil, forColumn: c, row: r)
                     }

@@ -14,6 +14,10 @@ class TileSet: SKTileSet {
 
     let water = SKTexture(imageNamed: "Water").split().map {
         SKTileGroup(tileDefinition: SKTileDefinition(texture: $0)) }
+    
+    let animatedWater = SKTileGroup(tileDefinition: SKTileDefinition(textures: SKTexture(imageNamed: "Water").split(),
+                                                                     size: CGSize(width: 32, height: 32),
+                                                                     timePerFrame: 0.2))
 
     let goal = SKTileGroup(imageNamed: "Goal")
     
@@ -30,7 +34,7 @@ class TileSet: SKTileSet {
         SKTileGroup(tileDefinition: SKTileDefinition(texture: $0)) }
     
     override init() {
-        super.init(tileGroups: floor + water + [goal] + wallShadows + shadows + outerWalls + innerWalls)
+        super.init(tileGroups: floor + water + [goal, animatedWater] + wallShadows + shadows + outerWalls + innerWalls)
     }
     
     required init?(coder: NSCoder) {
