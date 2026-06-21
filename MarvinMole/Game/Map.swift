@@ -111,10 +111,14 @@ class Map {
         return lurd.map { Move(rawValue: String($0))! }
     }
     
-    var title: String? = nil
-    private var tiles: [[Tile]] = []
-    private var objects: [Object] = []
-    private var moves: [Move] = []
+    static func lurdStringFrom(moves: [Move]) -> String {
+        moves.map(\.rawValue).joined()
+    }
+    
+    private(set) var title: String? = nil
+    private(set) var tiles: [[Tile]] = []
+    private(set) var objects: [Object] = []
+    private(set) var moves: [Move] = []
     
     init(title: String?, tiles: [[Tile]], objects: [Object]) {
         self.title = title

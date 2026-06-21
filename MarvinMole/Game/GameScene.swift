@@ -9,6 +9,9 @@ import SpriteKit
 
 class GameScene: Scene {
     
+    let margin: CGFloat = 16
+    let spacing: CGFloat = 12
+    
     private var map: Map = .empty
     
     enum Input {
@@ -31,16 +34,17 @@ class GameScene: Scene {
     
     private lazy var nextButton = {
         let node = TextButton(title: "Next >>", target: self, action: #selector(onNext))
-        node.position = CGPoint(x: frame.size.width * 0.86, y: frame.size.height * 0.92)
+        node.position = CGPoint(x: frame.size.width - margin - node.size.width/2,
+                                y: frame.size.height - margin - node.size.height/2)
         return node
     }()
     
     @objc private func onNext() {
-        
-        
-        // register solution, TODO: fix me
-        var solution = MapManager.MapSolution(resourceName: MapManager.shared.selectedMap.resourceName,
-                                              moves: "TODO")
+
+        // register solution
+        let lurdString = Map.lurdStringFrom(moves: map.moves)
+        let solution = MapManager.MapSolution(resourceName: MapManager.shared.selectedMap.resourceName,
+                                              moves: lurdString)
         MapManager.shared.register(solution: solution)
         
         // advance to next
@@ -76,7 +80,8 @@ class GameScene: Scene {
     
     private lazy var quitButton = {
         let node = IconButton(imageName: "CloseIcon", target: self, action: #selector(onQuit))
-        node.position = CGPoint(x: frame.size.width * 0.05, y: frame.size.height * 0.95)
+        node.position = CGPoint(x: margin + node.size.width/2,
+                                y: frame.size.height - margin - node.size.height/2)
         return node
     }()
     
@@ -86,7 +91,8 @@ class GameScene: Scene {
 
     private lazy var undoButton = {
         let node = IconButton(imageName: "UndoIcon", target: self, action: #selector(onUndo))
-        node.position = CGPoint(x: frame.size.width * 0.05, y: frame.size.height * 0.05)
+        node.position = CGPoint(x: margin + node.size.width/2,
+                                y: margin + node.size.height/2)
         return node
     }()
     
@@ -96,25 +102,29 @@ class GameScene: Scene {
         
     private lazy var leftButton = {
         let node = IconButton(imageName: "ArrowLeftIcon", target: nil, action: nil)
-        node.position = CGPoint(x: frame.size.width * 0.81, y: frame.size.height * 0.05)
+        node.position = CGPoint(x: frame.size.width - margin - node.size.width - spacing - node.size.width - spacing - node.size.width/2,
+                                y: margin + node.size.height/2)
         return node
     }()
 
     private lazy var upButton = {
         let node = IconButton(imageName: "ArrowUpIcon", target: nil, action: nil)
-        node.position = CGPoint(x: frame.size.width * 0.88, y: frame.size.height * 0.15)
+        node.position = CGPoint(x: frame.size.width - margin - node.size.width - spacing - node.size.width/2,
+                                y: margin + node.size.height + spacing + node.size.height/2)
         return node
     }()
 
     private lazy var rightButton = {
         let node = IconButton(imageName: "ArrowRightIcon", target: nil, action: nil)
-        node.position = CGPoint(x: frame.size.width * 0.95, y: frame.size.height * 0.05)
+        node.position = CGPoint(x: frame.size.width - margin - node.size.width/2,
+                                y: margin + node.size.height/2)
         return node
     }()
 
     private lazy var downButton = {
         let node = IconButton(imageName: "ArrowDownIcon", target: nil, action: nil)
-        node.position = CGPoint(x: frame.size.width * 0.88, y: frame.size.height * 0.05)
+        node.position = CGPoint(x: frame.size.width - margin - node.size.width - spacing - node.size.width/2,
+                                y: margin + node.size.height/2)
         return node
     }()
 
