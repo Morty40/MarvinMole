@@ -9,6 +9,7 @@ import SpriteKit
 
 class DemoScene: Scene {
     
+    private var startTime: TimeInterval = 0.0
     private var map: Map = .empty
     private var moves: [Map.Move] = []
     
@@ -32,12 +33,29 @@ class DemoScene: Scene {
         
         addChild(backgroundImage)
         addChild(mapView)
+        
+        // load map from resource bundle
+        let resource = String(format: "Classic%02d", 1)
+        if let map = Map.mapFromBundle(resource: resource) {
+            
+            let moves = """
+            ullluuuLUllDlldddrRRRRRRRRRRdrUllllllluuululldDDuu
+            lldddrRRRRRRRRRRRRlllllllluuulLulDDDuulldddrRRRRRR
+            RRRRRllllllluuulluuurDDuullDDDDDuulldddrRRRRRRRRRR
+            uRRlDllllllluuuLLulDDDuulldddrRRRRRRRRRRdRRlUlllll
+            lllllllulldRRRRRRRRRRRRRuRDldR
+            """
+            
+            self.map = map
+            self.moves = Map.movesFrom(lurd: moves)
+            mapView.update(with: map)
+        }
     }
     
-    func load(map: Map, moves: [Map.Move]) {
-        self.map = map
-        self.moves = moves
-        mapView.update(with: map)
+    /// The scene is about to be presented by a view
+    /// - Parameter view: The view that is presenting the scene
+    override func didMove(to view: SKView) {
+        startTime = 0.0
     }
     
     override func handleKey(_ key: UIKey) {
@@ -61,6 +79,14 @@ class DemoScene: Scene {
                 mapView.hero.idle()
             }
         }
+        
+        // automatically go back to the menu after some time
+        if startTime.isZero {
+            startTime = currentTime
+        } else if currentTime - startTime > 30.0 {
+            transition(to: Scene.menuScene)
+        }
+        
     }
 
 }

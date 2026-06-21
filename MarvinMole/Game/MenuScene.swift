@@ -137,24 +137,7 @@ class MenuScene: Scene {
     override func handleKey(_ key: UIKey) {
         switch key.keyCode {
         case .keyboardD:
-            
-            // load map from resource bundle
-            let resource = String(format: "Classic%02d", 1)
-            if let map = Map.mapFromBundle(resource: resource) {
-                
-                let moves = """
-                ullluuuLUllDlldddrRRRRRRRRRRdrUllllllluuululldDDuu
-                lldddrRRRRRRRRRRRRlllllllluuulLulDDDuulldddrRRRRRR
-                RRRRRllllllluuulluuurDDuullDDDDDuulldddrRRRRRRRRRR
-                uRRlDllllllluuuLLulDDDuulldddrRRRRRRRRRRdRRlUlllll
-                lllllllulldRRRRRRRRRRRRRuRDldR
-                """
-                
-                Scene.demoScene.load(map: map,
-                                     moves: Map.movesFrom(lurd: moves))
-                
-                transition(to: Scene.demoScene)
-            }
+            transition(to: Scene.demoScene)
             
         default:
             break
