@@ -37,28 +37,39 @@ class FloodScene: Scene {
     /// - Parameter view: The view that is presenting the scene
     override func didMove(to view: SKView) {
         var floodingActions: [SKAction] = []
-        
-        let steps = map.size.width + map.size.height
 
+        // wait a bit
         floodingActions.append(SKAction.wait(forDuration: 1.0))
+        
+        let startPosition = map.randomPositionOf(tile: .floor)!
+        
+        let bfd = map.breadthFirstDistanceFrom(x: startPosition.x, y: startPosition.y)
+        let maxDistance = bfd.map({ $0.map({ $0 ?? 0 }).max() ?? 0 }).max() ?? 0
 
         floodingActions.append(SKAction.run {
             self.mapView.waterTileMap.alpha = 0.5
         })
 
-        for i in 0 ... steps {
-            let flooding = Double(i) / Double(steps)
+        for i in 0 ... maxDistance+1 {
             floodingActions.append(SKAction.run {
-                self.mapView.waterTileMap.draw(map: self.map, flooding: flooding)
+                self.mapView.waterTileMap.draw(map: self.map, bfd: bfd, distance: i, isDraining: false)
             })
-            floodingActions.append(SKAction.wait(forDuration: 0.02))
+            floodingActions.append(SKAction.wait(forDuration: 0.05))
         }
-
+        
+        // rising water level: alpha goes to 100%
         floodingActions.append(SKAction.run {
             self.mapView.waterTileMap.run(SKAction.fadeAlpha(to: 1.0, duration: 1.0))
         })
+        
+        // wait a bit
         floodingActions.append(SKAction.wait(forDuration: 1.0))
 
+        // switch to draining water tiles
+        floodingActions.append(SKAction.run {
+            self.mapView.waterTileMap.draw(map: self.map, bfd: bfd, distance: maxDistance+1, isDraining: true)
+        })
+        
         floodingActions.append(SKAction.run {
             self.mapView.boxContainer.isHidden = false
         })
@@ -78,6 +89,8 @@ class FloodScene: Scene {
 
         let floodingSequence = SKAction.sequence(floodingActions)
         mapView.run(floodingSequence)
+        
+        
     }
 
     func load(map: Map) {

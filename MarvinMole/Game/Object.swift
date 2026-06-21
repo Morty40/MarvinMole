@@ -12,7 +12,7 @@ class Object: SKSpriteNode {
     
     var id: Int = 0
     
-    func setMapPosition(x: Int, y: Int, tileMap: TileMap) {
+    func setMapPosition(x: Int, y: Int, tileMap: SKTileMapNode) {
         let w = tileMap.frame.width / tileMap.xScale
         let h = tileMap.frame.height / tileMap.yScale
         

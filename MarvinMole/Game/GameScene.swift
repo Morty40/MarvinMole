@@ -245,11 +245,11 @@ class GameScene: Scene {
             onQuit()
 #if DEBUG
         case .keyboardF:
-            mapView.toggleVisibility(layer: .floors)
+            mapView.floorTileMap.isHidden.toggle()
         case .keyboardS:
-            mapView.toggleVisibility(layer: .shadows)
+            mapView.shadowTileMap.isHidden.toggle()
         case .keyboardW:
-            mapView.toggleVisibility(layer: .walls)
+            mapView.wallTileMap.isHidden.toggle()
         case .keyboardO:
             let node = mapView.hero
             if let scene = node.scene {

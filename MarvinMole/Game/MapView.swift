@@ -10,14 +10,14 @@ import SpriteKit
 class MapView: SKNode {
         
     lazy var floorTileMap = {
-        let node = TileMap(layer: .floors)
+        let node = FloorTileMap()
         node.position = CGPoint(x: frame.size.width * 0.46, y: frame.size.height * 0.50) // TODO ?
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         return node
     }()
 
     lazy var shadowTileMap = {
-        let node = TileMap(layer: .shadows)
+        let node = ShadowTileMap()
         node.position = CGPoint(x: frame.size.width * 0.46, y: frame.size.height * 0.50)
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         return node
@@ -37,14 +37,14 @@ class MapView: SKNode {
     }()
 
     lazy var waterTileMap = {
-        let node = TileMap(layer: .water)
+        let node = WaterTileMap()
         node.position = CGPoint(x: frame.size.width * 0.46, y: frame.size.height * 0.50)
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         return node
     }()
 
     lazy var wallTileMap = {
-        let node = TileMap(layer: .walls)
+        let node = WallTileMap()
         node.position = CGPoint(x: frame.size.width * 0.46, y: frame.size.height * 0.50)
         node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         return node
@@ -81,7 +81,7 @@ class MapView: SKNode {
         // draw tilemaps
         floorTileMap.draw(map: map)
         shadowTileMap.draw(map: map)
-        waterTileMap.draw(map: map)
+        // waterTileMap is only used for the flooding sequence
         wallTileMap.draw(map: map)
         
         boxContainer.removeAllChildren()
@@ -138,19 +138,6 @@ class MapView: SKNode {
                     }
                 }
             }
-        }
-    }
-
-    func toggleVisibility(layer: TileMap.Layer) {
-        switch layer {
-        case .floors:
-            floorTileMap.isHidden.toggle()
-        case .shadows:
-            shadowTileMap.isHidden.toggle()
-        case .water:
-            waterTileMap.isHidden.toggle()
-        case .walls:
-            wallTileMap.isHidden.toggle()
         }
     }
     

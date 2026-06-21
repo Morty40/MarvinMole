@@ -11,7 +11,7 @@ import Foundation
 class Map {
     
     /// Static tile types
-    enum Tile {
+    enum Tile: CaseIterable {
         case void
         case wall
         case floor
@@ -456,5 +456,52 @@ class Map {
     
     static var empty: Map {
         Map(title: nil, tiles: [], objects: [])
+    }
+    
+    func breadthFirstDistanceFrom(x: Int, y: Int) -> [[Int?]] {
+        var distance: [[Int?]] = tiles.map({ $0.map({ _ in nil }) })
+        
+        distance[y][x] = 0
+        
+        var queue: [(x: Int, y: Int)] = [(x, y)]
+        
+        while !queue.isEmpty {
+            
+            let (xx, yy) = queue.removeFirst()
+
+            if distance[yy][xx - 1] == nil, tiles[yy][xx - 1] != .wall {
+                distance[yy][xx - 1] = distance[yy][xx]! + 1
+                queue.append((xx - 1, yy))
+            }
+
+            if distance[yy][xx + 1] == nil, tiles[yy][xx + 1] != .wall {
+                distance[yy][xx + 1] = distance[yy][xx]! + 1
+                queue.append((xx + 1, yy))
+            }
+
+            if distance[yy - 1][xx] == nil, tiles[yy - 1][xx] != .wall {
+                distance[yy - 1][xx] = distance[yy][xx]! + 1
+                queue.append((xx, yy - 1))
+            }
+
+            if distance[yy + 1][xx] == nil, tiles[yy + 1][xx] != .wall {
+                distance[yy + 1][xx] = distance[yy][xx]! + 1
+                queue.append((xx, yy + 1))
+            }
+        }
+        
+        return distance
+    }
+
+    func randomPositionOf(tile: Tile) -> (x: Int, y: Int)? {
+        var positions: [(x: Int, y: Int)] = []
+                
+        for (y, row) in tiles.enumerated() {
+            for (x, t) in row.enumerated() where tile == t {
+                positions.append((x, y))
+            }
+        }
+        
+        return positions.randomElement()
     }
 }
