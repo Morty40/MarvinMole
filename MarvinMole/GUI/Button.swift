@@ -14,6 +14,8 @@ class Button: SKSpriteNode {
     
     private(set) var isPressed = false
     
+    private var sfx = SKAction.playSoundFileNamed("ButtonClick.wav", waitForCompletion: false)
+    
     init(target: Any?, action: Selector?) {
         super.init(texture: nil,
                    color: .clear,
@@ -36,6 +38,8 @@ extension Button {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
         isPressed = true
+
+        run(sfx)
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
