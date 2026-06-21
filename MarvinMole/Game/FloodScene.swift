@@ -11,6 +11,8 @@ class FloodScene: Scene {
     
     private var map: Map = .empty
     
+    private var sfx = SKAction.playSoundFileNamed("WaterFlooding.wav", waitForCompletion: false)
+
     private lazy var backgroundImage = {
         let node = SKSpriteNode(imageNamed: "GameBackground")
         node.position = center
@@ -90,7 +92,7 @@ class FloodScene: Scene {
         let floodingSequence = SKAction.sequence(floodingActions)
         mapView.run(floodingSequence)
         
-        
+        run(sfx)
     }
 
     func load(map: Map) {
