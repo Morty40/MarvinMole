@@ -9,6 +9,8 @@ import SpriteKit
 
 class MenuScene: Scene {
         
+    private var startTime: TimeInterval = 0.0
+
     private lazy var backgroundImage = {
         let node = SKSpriteNode(imageNamed: "MenuBackground")
         node.position = center
@@ -49,6 +51,10 @@ class MenuScene: Scene {
     }()
     
     @objc func onStart() {
+
+        // reset idle timer
+        startTime = 0.0
+        
         MapManager.shared.save()
 
         // load current map and transition
@@ -63,6 +69,10 @@ class MenuScene: Scene {
     }()
     
     @objc func onMapCollection() {
+        
+        // reset idle timer
+        startTime = 0.0
+        
         var index = MapManager.MapCollection.allCases.firstIndex(of: MapManager.shared.selectedMap.collection)!
         index = (index + 1) % MapManager.MapCollection.allCases.count
         MapManager.shared.selectedMap.collection = MapManager.MapCollection.allCases[index]
@@ -78,6 +88,10 @@ class MenuScene: Scene {
     }()
     
     @objc func onMapNumber() {
+        
+        // reset idle timer
+        startTime = 0.0
+
         MapManager.shared.incrementMapNumber()
 
         refreshSelectedMap()
@@ -101,6 +115,8 @@ class MenuScene: Scene {
     /// The scene is about to be presented by a view
     /// - Parameter view: The view that is presenting the scene
     override func didMove(to view: SKView) {
+        startTime = 0.0
+        
         MapManager.shared.load()
         refreshSelectedMap()
         refreshSolvedMapsText()
@@ -133,18 +149,18 @@ class MenuScene: Scene {
 
         }
     }
-    
-    override func handleKey(_ key: UIKey) {
-        switch key.keyCode {
-        case .keyboardD:
+        
+    override func update(_ currentTime: TimeInterval) {
+        super.update(currentTime)
+        
+        // automatically go demo mode after some time
+        if startTime.isZero {
+            startTime = currentTime
+        } else if currentTime - startTime > 30.0 {
             transition(to: Scene.demoScene)
-            
-        default:
-            break
         }
     }
 
 }
 
-// TODO: auto start demo mode after some idle time
 // TODO: update UI according to selected map

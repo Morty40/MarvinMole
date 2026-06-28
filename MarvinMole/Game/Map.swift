@@ -496,16 +496,29 @@ class Map {
         
         return distance
     }
-
-    func randomPositionOf(tile: Tile) -> (x: Int, y: Int)? {
+    
+    func randomFloorPosition(adjacentTo: (x: Int, y: Int)? = nil) -> (x: Int, y: Int)? {
         var positions: [(x: Int, y: Int)] = []
                 
         for (y, row) in tiles.enumerated() {
-            for (x, t) in row.enumerated() where tile == t {
-                positions.append((x, y))
+            for (x, t) in row.enumerated() where t.isFloor {
+                
+                if let adjacentTo = adjacentTo {
+                    
+                    let dx = abs(x - adjacentTo.x)
+                    let dy = abs(y - adjacentTo.y)
+                    
+                    if (dx == 1 && dy == 0) || (dx == 0 && dy == 1) {
+                        positions.append((x, y))
+                    }
+                    
+                } else {
+                    positions.append((x, y))
+                }
             }
         }
         
         return positions.randomElement()
     }
+
 }

@@ -311,7 +311,7 @@ class GameScene: Scene {
                 // no more undo once map is completed
                 if !map.isCompleted {
                     map.undoMove()
-                    mapView.updateObjectPositions(map)
+                    mapView.updateSpritePositions(map)
                 }
             }
 

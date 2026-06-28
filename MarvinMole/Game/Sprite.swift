@@ -1,5 +1,5 @@
 //
-//  Object.swift
+//  Sprite.swift
 //  MarvinMole
 //
 //  (c) Morten Perriard 2026
@@ -7,15 +7,14 @@
 
 import SpriteKit
 
-/// Object base class
-class Object: SKSpriteNode {
+/// Sprite base class
+class Sprite: SKSpriteNode {
     
     var id: Int = 0
     
     func setMapPosition(x: Int, y: Int, tileMap: SKTileMapNode) {
         let w = tileMap.frame.width / tileMap.xScale
         let h = tileMap.frame.height / tileMap.yScale
-        
         position = CGPoint(x: 32*(CGFloat(x)+0.5) - w/2,
                            y: h/2 - 32*(CGFloat(y)+0.5))
     }

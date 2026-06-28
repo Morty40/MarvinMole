@@ -7,8 +7,8 @@
 
 import SpriteKit
 
-/// Box object
-class Box: Object {
+/// Box sprite
+class Box: Sprite {
     
     static let boxTextures = [SKTexture(imageNamed: "Box1"),
                               SKTexture(imageNamed: "Box2"),

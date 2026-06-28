@@ -203,16 +203,14 @@ struct MapTests {
         await #expect(testMap.isObjectAt(x: 5, y: 6) == false)
     }
 
-    @Test func randomPositionOfTile() async throws {
+    @Test func randomFloorPosition() async throws {
         let testMap = await Map.mapFromXsb(string: testXsb)!
 
         for _ in 0...10 {
-            for t in Map.Tile.allCases {
-                let p = await testMap.randomPositionOf(tile: t)!
-                await #expect(testMap.tileAt(x: p.x, y: p.y) == t)
-                #expect(p.x >= 0 && p.x < testMap.size.width)
-                #expect(p.y >= 0 && p.y < testMap.size.height)
-            }
+            let p = await testMap.randomFloorPosition()!
+            await #expect(testMap.tileAt(x: p.x, y: p.y).isFloor)
+            #expect(p.x >= 0 && p.x < testMap.size.width)
+            #expect(p.y >= 0 && p.y < testMap.size.height)
         }
     }
 

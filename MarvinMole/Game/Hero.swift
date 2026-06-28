@@ -7,8 +7,8 @@
 
 import SpriteKit
 
-/// Hero object
-class Hero: Object {
+/// Hero sprite
+class Hero: Sprite {
     
     // walking
     static let walkLeftTextures = SKTexture(imageNamed: "HeroWalkLeft").split()
@@ -57,7 +57,7 @@ class Hero: Object {
             (dx, dy, textures) = (0, -distance, Hero.pushDownTextures)
         }
         
-        // create action that moves the object and animates the texture
+        // create action that moves the sprite and animates the texture
         let action = SKAction.group([
             SKAction.moveBy(x: dx, y: dy, duration: duration),
             SKAction.animate(with: textures, timePerFrame: duration / Double(textures.count))])

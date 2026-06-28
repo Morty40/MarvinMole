@@ -89,7 +89,7 @@ class MapView: SKNode {
             let box = Box(id: b.id)
             boxContainer.addChild(box)
         }
-        updateObjectPositions(map)
+        updateSpritePositions(map)
         
         // map scale
         let scaleWidth = Double(1024 - 250) / Double(map.size.width * 32)
@@ -99,7 +99,7 @@ class MapView: SKNode {
         yScale = scale
     }
     
-    func updateObjectPositions(_ map: Map) {
+    func updateSpritePositions(_ map: Map) {
         if let heroPosition = map.heroPosition {
             hero.setMapPosition(x: heroPosition.x,
                                 y: heroPosition.y,
