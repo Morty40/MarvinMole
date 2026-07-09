@@ -10,11 +10,7 @@ import SpriteKit
 /// Box sprite
 class Box: Sprite {
     
-    static let boxTextures = [SKTexture(imageNamed: "Box1"),
-                              SKTexture(imageNamed: "Box2"),
-                              SKTexture(imageNamed: "Box3"),
-                              SKTexture(imageNamed: "Box4"),
-                              SKTexture(imageNamed: "Box5")]
+    static let boxTextures = SKTexture(imageNamed: "Boxes").split()
     static let boxOnGoalTexture = SKTexture(imageNamed: "BoxOnGoal")
     
     var boxTexture: SKTexture? = nil

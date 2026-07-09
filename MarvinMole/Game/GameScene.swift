@@ -60,9 +60,9 @@ class GameScene: Scene {
         let node = SKLabelNode()
         node.fontName = "Rubik-Bold"
         node.fontSize = 35
-        node.position = CGPoint(x: frame.size.width * 0.70, y: frame.size.height * 0.02)
+        node.position = CGPoint(x: frame.size.width * 0.5, y: frame.size.height * 0.02)
         node.fontColor = .white
-        node.horizontalAlignmentMode = .right
+        node.horizontalAlignmentMode = .center
         node.verticalAlignmentMode = .baseline
         return node
     }()
@@ -71,9 +71,9 @@ class GameScene: Scene {
         let node = SKLabelNode()
         node.fontName = "Rubik-Bold"
         node.fontSize = 35
-        node.position = CGPoint(x: frame.size.width * 0.48, y: frame.size.height * 0.02)
+        node.position = CGPoint(x: frame.size.width * 0.5, y: frame.size.height * 0.06)
         node.fontColor = .white
-        node.horizontalAlignmentMode = .right
+        node.horizontalAlignmentMode = .center
         node.verticalAlignmentMode = .baseline
         return node
     }()
@@ -198,8 +198,8 @@ class GameScene: Scene {
     }
     
     private func hudUpdate() {
-        pushesLabel.text = "\(map.numberOfPushes)"
-        movesLabel.text = "\(map.numberOfMoves)"
+        pushesLabel.text = "Pushes: \(map.numberOfPushes)"
+        movesLabel.text = "Moves: \(map.numberOfMoves)"
     }
     
     override func update(_ currentTime: TimeInterval) {
