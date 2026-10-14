@@ -17,13 +17,31 @@ class MenuScene: Scene {
         node.size = size
         return node
     }()
-    
+
+    /// "MARVIN MOLE" logo, placed where it was in the original title screen
+    private lazy var titleImage = {
+        let node = SKSpriteNode(imageNamed: "Title")
+        let width = frame.size.width * 0.519
+        node.size = CGSize(width: width, height: width * node.size.height / node.size.width)
+        node.position = CGPoint(x: frame.size.width * 0.317, y: frame.size.height * 0.843)
+        return node
+    }()
+
+    /// "IN TUNNEL TROUBLE", centered below the logo
+    private lazy var subtitleImage = {
+        let node = SKSpriteNode(imageNamed: "Subtitle")
+        let width = frame.size.width * 0.399
+        node.size = CGSize(width: width, height: width * node.size.height / node.size.width)
+        node.position = CGPoint(x: frame.size.width * 0.317, y: frame.size.height * 0.783)
+        return node
+    }()
+
     private lazy var storyText = {
         let node = SKLabelNode()
         node.fontName = "Rubik-Bold"
         node.fontSize = 30
         node.fontColor = .black
-        node.position = CGPoint(x: frame.size.width * 0.09, y: frame.size.height * 0.78)
+        node.position = CGPoint(x: frame.size.width * 0.09, y: frame.size.height * 0.745)
         node.preferredMaxLayoutWidth = 380
         node.horizontalAlignmentMode = .left
         node.verticalAlignmentMode = .top
@@ -103,6 +121,8 @@ class MenuScene: Scene {
         super.sceneDidLoad()
         
         addChild(backgroundImage)
+        addChild(titleImage)
+        addChild(subtitleImage)
         addChild(storyText)
         addChild(solvedMapsText)
         addChild(startButton)
