@@ -68,25 +68,12 @@ class GameScene: Scene {
         transition(to: Scene.loadingScene)
     }
 
-    private lazy var pushesLabel = {
-        let node = SKLabelNode()
-        node.fontName = "Rubik-Bold"
-        node.fontSize = 35
-        node.position = CGPoint(x: frame.size.width * 0.5, y: frame.size.height * 0.02)
-        node.fontColor = .white
-        node.horizontalAlignmentMode = .center
-        node.verticalAlignmentMode = .baseline
-        return node
-    }()
-    
+    /// Number of moves, shown large in the grey stones under the top-right flowers
     private lazy var movesLabel = {
-        let node = SKLabelNode()
-        node.fontName = "Rubik-Bold"
-        node.fontSize = 35
-        node.position = CGPoint(x: frame.size.width * 0.5, y: frame.size.height * 0.06)
-        node.fontColor = .white
-        node.horizontalAlignmentMode = .center
-        node.verticalAlignmentMode = .baseline
+        let node = OutlinedLabel(fontName: "Rubik-Bold", fontSize: 90,
+                                 horizontalAlignment: .right, verticalAlignment: .center)
+        // right aligned with the right edge of the Up/Down buttons
+        node.position = CGPoint(x: upButton.frame.maxX, y: frame.size.height * 0.575)
         return node
     }()
     
@@ -163,7 +150,6 @@ class GameScene: Scene {
         addChild(mapView)
         addChild(borderImage)
         addChild(nextButton)
-        addChild(pushesLabel)
         addChild(movesLabel)
         addChild(quitButton)
         addChild(undoButton)
@@ -225,8 +211,11 @@ class GameScene: Scene {
     }
     
     private func hudUpdate() {
-        pushesLabel.text = "Pushes: \(map.numberOfPushes)"
-        movesLabel.text = "Moves: \(map.numberOfMoves)"
+        // nothing until the first move
+        let moves = map.numberOfMoves > 0 ? "\(map.numberOfMoves)" : ""
+        if movesLabel.text != moves {
+            movesLabel.text = moves
+        }
     }
     
     override func update(_ currentTime: TimeInterval) {
