@@ -100,7 +100,7 @@ class MenuScene: Scene {
     }
 
     private lazy var mapNumberButton = {
-        let node = TextButton(title: "\(MapManager.shared.selectedMap.number)", target: self, action: #selector(onMapNumber))
+        let node = TextButton(title: "Level \(MapManager.shared.selectedMap.number)", subtitle: "Unsolved", target: self, action: #selector(onMapNumber))
         node.position = CGPoint(x: frame.size.width * 0.5, y: frame.size.height * 0.2)
         return node
     }()
@@ -146,12 +146,13 @@ class MenuScene: Scene {
         // map collection
         mapCollectionButton.title = MapManager.shared.selectedMap.collection.title
 
-        // map number
+        // map number, and whether it has been solved
+        mapNumberButton.title = "Level \(MapManager.shared.selectedMap.number)"
         if let _ = MapManager.shared.mapSolutionFor(resourceName: MapManager.shared.selectedMap.resourceName) {
-            mapNumberButton.title = "\(MapManager.shared.selectedMap.number) (solved)"
+            mapNumberButton.subtitle = "Solved"
 
         } else {
-            mapNumberButton.title = "\(MapManager.shared.selectedMap.number)"
+            mapNumberButton.subtitle = "Unsolved"
         }
     }
     
