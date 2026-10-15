@@ -11,10 +11,20 @@ class MenuScene: Scene {
         
     private var startTime: TimeInterval = 0.0
 
+    /// Rain falling over the whole background: in front of it, behind the title and buttons
+    private lazy var rain = {
+        let node = RainEmitter(size: size)
+        node.position.x += center.x
+        node.position.y += center.y
+        node.zPosition = -1
+        return node
+    }()
+
     private lazy var backgroundImage = {
         let node = SKSpriteNode(imageNamed: "MenuBackground")
         node.position = center
         node.size = size
+        node.zPosition = -2
         return node
     }()
 
@@ -124,6 +134,7 @@ class MenuScene: Scene {
         super.sceneDidLoad()
         
         addChild(backgroundImage)
+        addChild(rain)
         addChild(titleImage)
         addChild(subtitleImage)
         addChild(storyText)
@@ -137,6 +148,7 @@ class MenuScene: Scene {
     /// The scene is about to be presented by a view
     /// - Parameter view: The view that is presenting the scene
     override func didMove(to view: SKView) {
+        rain.prewarm()
         startTime = 0.0
         
         MapManager.shared.load()
