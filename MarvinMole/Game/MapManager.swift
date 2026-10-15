@@ -25,7 +25,7 @@ final class MapManager {
         
         var count: Int {
             switch self {
-            case .easy: return 4
+            case .easy: return 10
             case .medium: return 3
             case .classic: return 50
             }
