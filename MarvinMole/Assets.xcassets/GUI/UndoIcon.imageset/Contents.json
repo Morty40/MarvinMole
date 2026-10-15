@@ -1,15 +1,16 @@
 {
   "images" : [
     {
-      "filename" : "UndoIcon.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "UndoIcon@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "UndoIcon@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
