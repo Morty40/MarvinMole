@@ -14,7 +14,6 @@ class Scene: SKScene {
     static let gameScene = GameScene()
     static let loadingScene = LoadingScene()
     static let menuScene = MenuScene()
-    static let quitScene = QuitScene()
 
     override init() {
         super.init(size: CGSize(width: 1024, height: 768))

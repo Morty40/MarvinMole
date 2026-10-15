@@ -85,8 +85,22 @@ class GameScene: Scene {
         return node
     }()
     
+    /// The quit confirmation, while it is showing
+    private weak var quitPopup: ModalPopup? = nil
+
     @objc func onQuit() {
-        transition(to: Scene.quitScene)
+        if ModalPopup.isShowing(in: self) {
+            return
+        }
+        // wording and button order follow Apple's HIG for alerts: Cancel leading, action trailing
+        let popup = ModalPopup(title: "Quit This Level?",
+                               message: "Your moves on this level will be lost.",
+                               buttons: [.init(title: "Cancel"),
+                                         .init(title: "Quit") { [weak self] in
+                                             self?.transition(to: Scene.menuScene)
+                                         }])
+        popup.show(in: self)
+        quitPopup = popup
     }
 
     private lazy var undoButton = {
@@ -234,6 +248,10 @@ class GameScene: Scene {
     /// Queue up input
     /// - Parameter input: User input
     private func register(input: Input) {
+        // no game input while a popup is showing
+        if ModalPopup.isShowing(in: self) {
+            return
+        }
         if pendingInput.count < 3 {
             pendingInput.append(input)
         }
@@ -252,7 +270,12 @@ class GameScene: Scene {
         case .keyboardDeleteOrBackspace:
             register(input: .undo)
         case .keyboardEscape:
-            onQuit()
+            // Escape opens the quit confirmation, or cancels it when it is showing
+            if let quitPopup {
+                quitPopup.dismiss()
+            } else {
+                onQuit()
+            }
 #if DEBUG
         case .keyboardF:
             mapView.floorTileMap.isHidden.toggle()
