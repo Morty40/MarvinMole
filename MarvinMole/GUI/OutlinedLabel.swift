@@ -22,6 +22,7 @@ class OutlinedLabel: SKNode {
 
     init(fontName: String,
          fontSize: CGFloat,
+         horizontalAlignment: SKLabelHorizontalAlignmentMode = .center,
          verticalAlignment: SKLabelVerticalAlignmentMode = .baseline,
          maxWidth: CGFloat? = nil) {
         capHeight = UIFont(name: fontName, size: fontSize)?.capHeight ?? fontSize * 0.7
@@ -31,7 +32,7 @@ class OutlinedLabel: SKNode {
             node.fontName = fontName
             node.fontSize = fontSize
             node.fontColor = color
-            node.horizontalAlignmentMode = .center
+            node.horizontalAlignmentMode = horizontalAlignment
             node.verticalAlignmentMode = verticalAlignment
             if let maxWidth {
                 node.numberOfLines = 0

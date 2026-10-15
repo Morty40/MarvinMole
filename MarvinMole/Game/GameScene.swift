@@ -94,7 +94,7 @@ class GameScene: Scene {
         }
         // wording and button order follow Apple's HIG for alerts: Cancel leading, action trailing
         let popup = ModalPopup(title: "Quit This Level?",
-                               message: "Your moves on this level will be lost.",
+                               message: "Your progress on this level will be lost.",
                                buttons: [.init(title: "Cancel"),
                                          .init(title: "Quit") { [weak self] in
                                              self?.transition(to: Scene.menuScene)

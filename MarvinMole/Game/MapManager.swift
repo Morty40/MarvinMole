@@ -86,24 +86,12 @@ final class MapManager {
         solvedMaps.first(where: { $0.resourceName == resourceName })
     }
     
-    /// Total number of maps, counting all maps in all collections
-    var totalNumberOfMaps: Int {
-        MapCollection.allCases.map(\.count).reduce(0, +)
-    }
-    
-    /// Total number of maps with solutions, matching all maps in all collections
-    /// (in case maps are added or removed in an update, this should work)
-    var totalNumberOfSolvedMaps: Int {
-        var solved: Int = 0
-        for collection in MapCollection.allCases {
-            for i in 1 ... collection.count {
-                if solvedMaps.contains(where: { $0.resourceName == String(format: collection.resourceName, i) }) {
-                    solved += 1
-                }
-            }
+    /// Number of maps with solutions in one collection
+    /// (matched by resource name, so this keeps working if maps are added or removed in an update)
+    func numberOfSolvedMaps(in collection: MapCollection) -> Int {
+        (1 ... collection.count).count { i in
+            solvedMaps.contains(where: { $0.resourceName == String(format: collection.resourceName, i) })
         }
-        
-        return solved
     }
     
 }

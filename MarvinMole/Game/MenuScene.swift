@@ -19,52 +19,53 @@ class MenuScene: Scene {
     }()
 
     /// "MARVIN MOLE" logo, placed where it was in the original title screen
+    // menu layout: everything is left aligned with the title logo
+    private var menuLeft: CGFloat { frame.size.width * 0.0575 }
+    private let buttonSize = CGSize(width: 250, height: 90)
+    private let buttonSpacing: CGFloat = 12
+
+    /// "MARVIN MOLE" logo, placed where it was in the original title screen
     private lazy var titleImage = {
         let node = SKSpriteNode(imageNamed: "Title")
         let width = frame.size.width * 0.519
         node.size = CGSize(width: width, height: width * node.size.height / node.size.width)
-        node.position = CGPoint(x: frame.size.width * 0.317, y: frame.size.height * 0.843)
+        node.anchorPoint = CGPoint(x: 0, y: 0.5)
+        node.position = CGPoint(x: menuLeft, y: frame.size.height * 0.843)
         return node
     }()
 
-    /// "IN TUNNEL TROUBLE", centered below the logo
+    /// "IN TUNNEL TROUBLE", below the logo, right aligned with it
     private lazy var subtitleImage = {
         let node = SKSpriteNode(imageNamed: "Subtitle")
         let width = frame.size.width * 0.399
         node.size = CGSize(width: width, height: width * node.size.height / node.size.width)
-        node.position = CGPoint(x: frame.size.width * 0.317, y: frame.size.height * 0.783)
+        node.anchorPoint = CGPoint(x: 1, y: 0.5)
+        node.position = CGPoint(x: titleImage.frame.maxX, y: frame.size.height * 0.783)
         return node
     }()
 
     private lazy var storyText = {
-        let node = SKLabelNode()
-        node.fontName = "Rubik-Bold"
-        node.fontSize = 30
-        node.fontColor = .black
-        node.position = CGPoint(x: frame.size.width * 0.09, y: frame.size.height * 0.745)
-        node.preferredMaxLayoutWidth = 380
-        node.horizontalAlignmentMode = .left
-        node.verticalAlignmentMode = .top
-        node.text = "Oh dear! Marvin Mole's home is flooded and his food is all over the place.\n\nHelp him push his food back in the cupboards."
-        node.numberOfLines = 0
+        let node = OutlinedLabel(fontName: "Rubik-Bold",
+                                 fontSize: 30,
+                                 horizontalAlignment: .left,
+                                 verticalAlignment: .top,
+                                 maxWidth: titleImage.size.width)
+        node.position = CGPoint(x: menuLeft, y: frame.size.height * 0.742)
+        node.text = "Oh dear!  Marvin Mole's home is flooded after the rain, and his food is all over the place.  Help him push his food back in the cupboards."
         return node
     }()
 
-    private lazy var solvedMapsText = {
-        let node = SKLabelNode()
-        node.fontName = "Rubik-Bold"
-        node.fontSize = 30
-        node.fontColor = .white
-        node.position = CGPoint(x: frame.size.width * 0.5, y: frame.size.height * 0.01)
-        node.horizontalAlignmentMode = .center
-        node.verticalAlignmentMode = .baseline
-        node.numberOfLines = 1
-        return node
-    }()
+    /// Position of the n'th menu button (0 = top), stacked below the story text, left aligned with the title
+    private func buttonPosition(_ n: Int) -> CGPoint {
+        let top = storyText.position.y - storyText.textSize.height - 28
+        return CGPoint(x: menuLeft + buttonSize.width / 2,
+                       y: top - buttonSize.height / 2 - CGFloat(n) * (buttonSize.height + buttonSpacing))
+    }
 
     private lazy var startButton = {
         let node = TextButton(title: "Start", target: self, action: #selector(onStart))
-        node.position = CGPoint(x: frame.size.width * 0.22, y: frame.size.height * 0.35)
+        node.size = buttonSize
+        node.position = buttonPosition(0)
         return node
     }()
     
@@ -82,7 +83,8 @@ class MenuScene: Scene {
 
     private lazy var mapCollectionButton = {
         let node = TextButton(title: MapManager.shared.selectedMap.collection.title, target: self, action: #selector(onMapCollection))
-        node.position = CGPoint(x: frame.size.width * 0.22, y: frame.size.height * 0.2)
+        node.size = buttonSize
+        node.position = buttonPosition(1)
         return node
     }()
     
@@ -101,7 +103,8 @@ class MenuScene: Scene {
 
     private lazy var mapNumberButton = {
         let node = TextButton(title: "Level \(MapManager.shared.selectedMap.number)", subtitle: "Unsolved", target: self, action: #selector(onMapNumber))
-        node.position = CGPoint(x: frame.size.width * 0.5, y: frame.size.height * 0.2)
+        node.size = buttonSize
+        node.position = buttonPosition(2)
         return node
     }()
     
@@ -124,7 +127,6 @@ class MenuScene: Scene {
         addChild(titleImage)
         addChild(subtitleImage)
         addChild(storyText)
-        addChild(solvedMapsText)
         addChild(startButton)
         addChild(mapCollectionButton)
         addChild(mapNumberButton)
@@ -139,12 +141,26 @@ class MenuScene: Scene {
         
         MapManager.shared.load()
         refreshSelectedMap()
-        refreshSolvedMapsText()
     }
     
+    /// "Let's go!" when nothing is solved, "Done!" when everything is, otherwise the percentage.
+    /// The percentage is rounded down (so 100% only shows when done) and is at least 1%.
+    private func completionText(for collection: MapManager.MapCollection) -> String {
+        let solved = MapManager.shared.numberOfSolvedMaps(in: collection)
+        if solved == 0 {
+            return "Let's go!"
+        } else if solved >= collection.count {
+            return "All done!"
+        } else {
+            return "\(max(1, solved * 100 / collection.count))% done!"
+        }
+    }
+
     private func refreshSelectedMap() {
         // map collection
-        mapCollectionButton.title = MapManager.shared.selectedMap.collection.title
+        let collection = MapManager.shared.selectedMap.collection
+        mapCollectionButton.title = collection.title
+        mapCollectionButton.subtitle = completionText(for: collection)
 
         // map number, and whether it has been solved
         mapNumberButton.title = "Level \(MapManager.shared.selectedMap.number)"
@@ -156,21 +172,6 @@ class MenuScene: Scene {
         }
     }
     
-    private func refreshSolvedMapsText() {
-        let totalNumberOfMaps = MapManager.shared.totalNumberOfMaps
-        let totalNumberOfSolvedMaps = MapManager.shared.totalNumberOfSolvedMaps
-        if totalNumberOfSolvedMaps <= 0 {
-            solvedMapsText.text = ""
-
-        } else if totalNumberOfSolvedMaps >= totalNumberOfMaps {
-            solvedMapsText.text = "You solved all the maps! Marvin is happy!"
-
-        } else {
-            solvedMapsText.text = "You solved \(totalNumberOfSolvedMaps) of \(totalNumberOfMaps) maps. Good job!"
-
-        }
-    }
-        
     override func update(_ currentTime: TimeInterval) {
         super.update(currentTime)
         
