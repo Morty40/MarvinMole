@@ -65,6 +65,13 @@ class MapView: SKNode {
         fatalError("init(coder:) has not been implemented")
     }
     
+    /// Area of the scene the map is fitted into (scene coordinates)
+    var playArea = CGRect(x: 125, y: 125, width: 1024 - 250, height: 768 - 250)
+
+    /// The open area inside the flower and stone border (GameBorder), measured from the image:
+    /// the largest rectangle that fits, 8 points in from the border's edge
+    static let borderPlayArea = CGRect(x: 83, y: 122, width: 627, height: 540)
+
     func update(with map: Map) {
         // clear tilemaps
         floorTileMap.clear()
@@ -91,12 +98,13 @@ class MapView: SKNode {
         }
         updateSpritePositions(map)
         
-        // map scale
-        let scaleWidth = Double(1024 - 250) / Double(map.size.width * 32)
-        let scaleHeight = Double(768 - 250) / Double(map.size.height * 32)
-        let scale = min(3.0, CGFloat(min(scaleWidth, scaleHeight)))
+        // map scale and position: as large as fits in the play area (at most 3x), centred in it
+        let scaleWidth = playArea.width / CGFloat(map.size.width * 32)
+        let scaleHeight = playArea.height / CGFloat(map.size.height * 32)
+        let scale = min(3.0, scaleWidth, scaleHeight)
         xScale = scale
         yScale = scale
+        position = CGPoint(x: playArea.midX, y: playArea.midY)
     }
     
     func updateSpritePositions(_ map: Map) {

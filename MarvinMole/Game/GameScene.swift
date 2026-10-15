@@ -30,7 +30,7 @@ class GameScene: Scene {
         
     private lazy var mapView = {
         let node = MapView()
-        node.position = center
+        node.playArea = MapView.borderPlayArea      // inside the flower and stone border
         node.zPosition = -20        // its sprites sit 1 above this
         return node
     }()
