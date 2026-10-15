@@ -29,7 +29,7 @@ class Scene: SKScene {
     
     func transition(to scene: SKScene, animated: Bool = true) {
         if animated {
-            let transition = SKTransition.fade(withDuration: 0.3)
+            let transition = SKTransition.chessboard(withDuration: 1.2, from: self)
             //let transition = SKTransition.crossFade(withDuration: 0.1)
             view?.presentScene(scene, transition: transition)
         } else {
