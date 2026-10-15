@@ -9,8 +9,8 @@ import SpriteKit
 
 class IconButton: Button {
         
-    private let texture1 = SKTexture(imageNamed: "IconButtonNormal")
-    private let texture2 = SKTexture(imageNamed: "IconButtonPressed")
+    private let texture1 = Button.normalTexture
+    private let texture2 = Button.pressedTexture
 
     private lazy var iconSprite = {
         let node = SKSpriteNode()
@@ -22,8 +22,8 @@ class IconButton: Button {
         super.init(target: target, action: action)
     
         texture = texture1
-        size = texture1.size()
-    
+        size = CGSize(width: 64, height: 64)
+
         iconSprite.texture = SKTexture(imageNamed: imageName)
         iconSprite.size = iconSprite.texture!.size()
         addChild(iconSprite)

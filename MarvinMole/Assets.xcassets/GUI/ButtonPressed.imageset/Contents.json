@@ -1,15 +1,16 @@
 {
   "images" : [
     {
-      "filename" : "ButtonPressed.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "ButtonPressed@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "ButtonPressed@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

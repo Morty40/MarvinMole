@@ -9,8 +9,8 @@ import SpriteKit
 
 class TextButton: Button {
         
-    private let texture1 = SKTexture(imageNamed: "ButtonNormal")
-    private let texture2 = SKTexture(imageNamed: "ButtonPressed")
+    private let texture1 = Button.normalTexture
+    private let texture2 = Button.pressedTexture
 
     private lazy var titleLabel = {
         let node = SKLabelNode()

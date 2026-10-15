@@ -8,7 +8,15 @@
 import SpriteKit
 
 class Button: SKSpriteNode {
-    
+
+    /// 9-slice button frame (48 x 48 points), see `centerRect`
+    static let normalTexture = SKTexture(imageNamed: "ButtonNormal")
+    static let pressedTexture = SKTexture(imageNamed: "ButtonPressed")
+
+    /// The 16 point border of the frame (rim and corners) keeps its size, only the centre is stretched
+    static let frameCenterRect = CGRect(x: 16.0 / 48.0, y: 16.0 / 48.0,
+                                        width: 16.0 / 48.0, height: 16.0 / 48.0)
+
     private var target: Any? = nil
     private var action: Selector? = nil
     
@@ -26,6 +34,7 @@ class Button: SKSpriteNode {
         
         self.isUserInteractionEnabled = true
         self.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        self.centerRect = Button.frameCenterRect
     }
     
     required init?(coder aDecoder: NSCoder) {
