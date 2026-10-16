@@ -149,12 +149,35 @@ class MenuScene: Scene {
     /// - Parameter view: The view that is presenting the scene
     override func didMove(to view: SKView) {
         rain.prewarm()
+        startDripping()
         startTime = 0.0
         
         MapManager.shared.load()
         refreshSelectedMap()
     }
     
+    override func willMove(from view: SKView) {
+        removeAction(forKey: "drips")
+    }
+
+    /// Single water drips, played in random order
+    private let dripSounds = (1 ... 3).map {
+        SKAction.playSoundFileNamed("Drip\($0).wav", waitForCompletion: false)
+    }
+
+    /// Soundscape of dripping water: a random drip every 1 to 3 seconds
+    private func startDripping() {
+        let drip = SKAction.sequence([
+            SKAction.wait(forDuration: 2.0, withRange: 2.0),
+            SKAction.run { [weak self] in
+                if let self, let sound = self.dripSounds.randomElement() {
+                    self.run(sound)
+                }
+            }])
+        removeAction(forKey: "drips")
+        run(SKAction.repeatForever(drip), withKey: "drips")
+    }
+
     /// "Let's go!" when nothing is solved, "Done!" when everything is, otherwise the percentage.
     /// The percentage is rounded down (so 100% only shows when done) and is at least 1%.
     private func completionText(for collection: MapManager.MapCollection) -> String {
