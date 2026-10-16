@@ -23,7 +23,7 @@ class GameViewController: UIViewController {
             view.ignoresSiblingOrder = false
             view.presentScene(scene)
 
-            scene.transition(to: Scene.menuScene)
+            scene.transition(to: Scene.menuScene, animated: false)
         }
     }
     
