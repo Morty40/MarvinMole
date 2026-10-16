@@ -69,6 +69,14 @@ class GameScene: Scene {
         node.position = CGPoint(x: upButton.frame.maxX, y: frame.size.height * 0.575)
         return node
     }()
+
+    /// "move" / "moves", small, under the number of moves and right aligned with it
+    private lazy var movesUnitLabel = {
+        let node = OutlinedLabel(fontName: "Rubik-Bold", fontSize: 26,
+                                 horizontalAlignment: .right, verticalAlignment: .top)
+        node.position = CGPoint(x: movesLabel.position.x, y: movesLabel.position.y - movesLabel.capHeight / 2 - 12)
+        return node
+    }()
     
     private lazy var quitButton = {
         let node = IconButton(imageName: "CloseIcon", target: self, action: #selector(onQuit))
@@ -143,6 +151,7 @@ class GameScene: Scene {
         addChild(borderImage)
         addChild(nextButton)
         addChild(movesLabel)
+        addChild(movesUnitLabel)
         addChild(quitButton)
         addChild(undoButton)
         addChild(leftButton)
@@ -204,9 +213,11 @@ class GameScene: Scene {
     
     private func hudUpdate() {
         // nothing until the first move
-        let moves = map.numberOfMoves > 0 ? "\(map.numberOfMoves)" : ""
+        let count = map.numberOfMoves
+        let moves = count > 0 ? "\(count)" : ""
         if movesLabel.text != moves {
             movesLabel.text = moves
+            movesUnitLabel.text = count == 0 ? "" : count == 1 ? "move" : "moves"
         }
     }
     
