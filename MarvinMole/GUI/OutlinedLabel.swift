@@ -15,10 +15,15 @@ class OutlinedLabel: SKNode {
     private static let outlineWidth: CGFloat = 2.2
     private static let outlineCopies = 16
 
+    /// Opacity of the outline. The outline copies overlap, so they are drawn opaque into one
+    /// layer, and the whole layer gets this opacity (an even outline, no darker overlaps).
+    private static let outlineOpacity: CGFloat = 0.8
+
     let capHeight: CGFloat
 
     private let label: SKLabelNode
     private let outline: [SKLabelNode]
+    private let outlineLayer: SKEffectNode
 
     init(fontName: String,
          fontSize: CGFloat,
@@ -52,9 +57,14 @@ class OutlinedLabel: SKNode {
             node.zPosition = 1
             return node
         }
+        outlineLayer = SKEffectNode()
+        outlineLayer.shouldRasterize = true
+        outlineLayer.alpha = Self.outlineOpacity
+        outlineLayer.zPosition = 1
         super.init()
 
-        outline.forEach { addChild($0) }
+        outline.forEach { outlineLayer.addChild($0) }
+        addChild(outlineLayer)
         addChild(label)
     }
 
