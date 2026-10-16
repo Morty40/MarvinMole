@@ -86,6 +86,8 @@ class MenuScene: Scene {
         
         MapManager.shared.save()
 
+        MusicPlayer.shared.fadeOut(duration: 1.0)
+
         // load current map and transition
         Scene.loadingScene.loadCurrentMap()
         transition(to: Scene.loadingScene)
@@ -150,6 +152,7 @@ class MenuScene: Scene {
     override func didMove(to view: SKView) {
         rain.prewarm()
         startDripping()
+        startMusic()
         startTime = 0.0
         
         MapManager.shared.load()
@@ -158,6 +161,15 @@ class MenuScene: Scene {
     
     override func willMove(from view: SKView) {
         removeAction(forKey: "drips")
+        // the music keeps playing (e.g. into the demo); it fades out when a game starts
+    }
+
+    /// Background music: "Tunnel Tiptoe", an original loop rendered by Artwork/Music/compose_menu_music.py
+    private static let musicFile = "MenuMusic.m4a"
+
+    /// Loops the background music; carries on if it is already playing (back from the demo)
+    private func startMusic() {
+        MusicPlayer.shared.play(Self.musicFile, volume: 0.6)    // keep the drips audible on top
     }
 
     /// Single water drips, played in random order
