@@ -150,7 +150,7 @@ class FloodScene: Scene {
         floodingActions.append(SKAction.wait(forDuration: 1.0))
 
         floodingActions.append(SKAction.run {
-            self.transition(to: Scene.gameScene, animated: false)
+            self.transition(to: self.nextScene, animated: false)
         })
 
         let floodingSequence = SKAction.sequence(floodingActions)
@@ -158,16 +158,20 @@ class FloodScene: Scene {
         
     }
 
-    func load(map: Map) {
+    /// The scene that follows the flooding (it shows the same map)
+    private var nextScene: SKScene = Scene.demoScene
+
+    func load(map: Map, then nextScene: SKScene) {
         self.map = map
+        self.nextScene = nextScene
         mapView.update(with: map)
         mapView.hero.isHidden = true
         mapView.boxContainer.isHidden = true
     }
     
     override func handleKey(_ key: UIKey) {
-        // any key goes to the game
-        transition(to: Scene.gameScene, animated: false)
+        // any key skips to the next scene
+        transition(to: nextScene, animated: false)
     }
     
     override func update(_ currentTime: TimeInterval) {

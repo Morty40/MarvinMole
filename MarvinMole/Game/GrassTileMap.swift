@@ -7,11 +7,11 @@
 
 import SpriteKit
 
-/// Grass around the map: random tiles from the Grass sheet (4 x 4 seamless tiles).
-/// The first 9 tiles are plain grass, the last 7 have flowers, clover or a pebble.
+/// Grass around the map: random tiles from the Grass sheet (8 x 8 seamless tiles):
+///  0-31 plain grass, 32-43 flowers, 44-51 pebbles, 52-57 rocks, 58-63 mud patches.
 class GrassTileMap: SKTileMapNode {
 
-    let grass = SKTexture(imageNamed: "Grass").split(columns: 4, rows: 4).map {
+    let grass = SKTexture(imageNamed: "Grass").split(columns: 8, rows: 8).map {
         SKTileGroup(tileDefinition: SKTileDefinition(texture: $0)) }
 
     override init() {
@@ -27,10 +27,29 @@ class GrassTileMap: SKTileMapNode {
             state = state &* 6364136223846793005 &+ 1442695040888963407
             return Int((state >> 33) % UInt64(n))
         }
+        // decorated tiles (flowers, pebbles, rocks, mud) are never next to each other,
+        // not even diagonally; tiles are placed row by row, so only the neighbours to the
+        // left and in the row before can already be decorated
+        var decorated = Array(repeating: Array(repeating: false, count: numberOfColumns), count: numberOfRows)
+        func hasDecoratedNeighbour(_ column: Int, _ row: Int) -> Bool {
+            [(-1, 0), (-1, -1), (0, -1), (1, -1)].contains { dc, dr in
+                let c = column + dc, r = row + dr
+                return c >= 0 && c < numberOfColumns && r >= 0 && decorated[r][c]
+            }
+        }
+
         for row in 0 ..< numberOfRows {
             for column in 0 ..< numberOfColumns {
                 // mostly plain grass, now and then a decorated tile
-                let index = random(100) < 82 ? random(9) : 9 + random(7)
+                let roll = hasDecoratedNeighbour(column, row) ? 0 : random(100)
+                decorated[row][column] = roll >= 80
+                let index = switch roll {
+                case ..<80: random(32)              // plain grass
+                case ..<89: 32 + random(12)         // flowers
+                case ..<94: 44 + random(8)          // pebbles
+                case ..<97: 52 + random(6)          // rocks
+                default:    58 + random(6)          // mud
+                }
                 setTileGroup(grass[index], forColumn: column, row: row)
             }
         }

@@ -226,7 +226,11 @@ class MenuScene: Scene {
         if startTime.isZero {
             startTime = currentTime
         } else if currentTime - startTime > 30.0 {
-            transition(to: Scene.demoScene)
+            // demo mode: the map floods first, then the demo plays it
+            startTime = 0.0
+            let map = Scene.demoScene.prepare()
+            Scene.floodScene.load(map: map, then: Scene.demoScene)
+            transition(to: Scene.floodScene)
         }
     }
 

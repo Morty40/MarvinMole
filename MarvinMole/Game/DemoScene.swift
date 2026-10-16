@@ -38,7 +38,11 @@ class DemoScene: Scene {
         
         addChild(mapView)
         addChild(borderImage)
-        
+    }
+
+    /// The demo map, ready to replay from the start. Call before each demo,
+    /// as the replay uses up the moves.
+    func prepare() -> Map {
         // load map from resource bundle
         let resource = String(format: "Classic%02d", 1)
         if let map = Map.mapFromBundle(resource: resource) {
@@ -55,6 +59,7 @@ class DemoScene: Scene {
             self.moves = Map.movesFrom(lurd: moves)
             mapView.update(with: map)
         }
+        return map
     }
     
     /// The scene is about to be presented by a view
