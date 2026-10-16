@@ -295,6 +295,8 @@ class GameScene: Scene {
                 onQuit()
             }
 #if DEBUG
+        case .keyboardG:
+            mapView.grassTileMap.isHidden.toggle()
         case .keyboardF:
             mapView.floorTileMap.isHidden.toggle()
         case .keyboardS:
