@@ -45,9 +45,9 @@ final class ChessboardTransitionFilter: CIFilter {
     // (static, because SpriteKit copies the filter using the plain init())
     private static let columns = 8
     private static let rows = 6
-    // two browns with the hue (30 deg) and saturation (0.65) of the menu background's tunnel walls
-    private static let colors = [CIColor(red: 148/255, green: 100/255, blue: 52/255),  // medium-light brown
-                                 CIColor(red: 90/255, green: 61/255, blue: 32/255)]    // medium-dark brown
+    // the colours of Marvin's clothes in the menu picture: his blue overalls and teal striped shirt
+    private static let colors = [CIColor(red: 45/255, green: 128/255, blue: 182/255),  // overalls blue
+                                 CIColor(red: 46/255, green: 146/255, blue: 130/255)]  // shirt teal
 
     /// Time each square flips to opaque, as a fraction of the snake duration,
     /// indexed by `row * columns + column` (row 0 is the bottom row)
