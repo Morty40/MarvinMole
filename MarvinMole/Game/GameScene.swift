@@ -37,21 +37,33 @@ class GameScene: Scene {
         return node
     }()
     
-    private lazy var nextButton = {
-        let node = TextButton(title: "Next >>", target: self, action: #selector(onNext))
-        node.position = CGPoint(x: frame.size.width - margin - node.size.width/2,
-                                y: frame.size.height - margin - node.size.height/2)
-        return node
-    }()
-    
-    @objc private func onNext() {
+    /// Has the "level completed" popup been shown for the current map?
+    private var isCompletionShown = false
 
-        // register solution
+    /// Level completed: congratulate, and offer to go back to the menu or on to the next level
+    private func showCompletion() {
+        isCompletionShown = true
+        registerSolution()
+        let popup = ModalPopup(message: "You did it! Marvin is happy!",
+                               buttons: [.init(title: "Menu") { [weak self] in self?.onMenu() },
+                                         .init(title: "Next") { [weak self] in self?.onNext() }])
+        popup.show(in: self)
+    }
+
+    /// Register and save the solution of the completed map
+    private func registerSolution() {
         let lurdString = Map.lurdStringFrom(moves: map.moves)
         let solution = MapManager.MapSolution(resourceName: MapManager.shared.selectedMap.resourceName,
                                               moves: lurdString)
         MapManager.shared.register(solution: solution)
-        
+        MapManager.shared.save()
+    }
+
+    private func onMenu() {
+        transition(to: Scene.menuScene)
+    }
+
+    private func onNext() {
         // advance to next
         MapManager.shared.incrementMapNumber()
         MapManager.shared.save()
@@ -149,7 +161,6 @@ class GameScene: Scene {
         
         addChild(mapView)
         addChild(borderImage)
-        addChild(nextButton)
         addChild(movesLabel)
         addChild(movesUnitLabel)
         addChild(quitButton)
@@ -186,12 +197,11 @@ class GameScene: Scene {
             UISwipeGestureRecognizer(target: self,
                                      action: #selector(onSwipeDown),
                                      direction: .down))
-        
-        nextButton.isHidden = !map.isCompleted
     }
     
     func load(map: Map) {
         self.map = map
+        isCompletionShown = false
         mapView.update(with: map)
     }
 
@@ -230,7 +240,10 @@ class GameScene: Scene {
         
         if pendingInput.isEmpty, !mapView.hasActions() {
 
-            nextButton.isHidden = !map.isCompleted
+            // level completed (and the last move has finished animating)
+            if map.isCompleted, !isCompletionShown, !ModalPopup.isShowing(in: self) {
+                showCompletion()
+            }
 
             // read on-screen joystick input
             if leftButton.isPressed {
