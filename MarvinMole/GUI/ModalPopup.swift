@@ -25,12 +25,12 @@ class ModalPopup: SKSpriteNode {
         }
     }
 
-    /// 9-slice popup frame (80 x 80 points), same wood style as the buttons
+    /// 9-slice popup frame (100 x 100 points), same wood style as the buttons
     private static let backgroundTexture = SKTexture(imageNamed: "PopupBackground")
 
-    /// The 26 point border of the frame keeps its size, only the centre is stretched
-    private static let frameCenterRect = CGRect(x: 26.0 / 80.0, y: 26.0 / 80.0,
-                                                width: 28.0 / 80.0, height: 28.0 / 80.0)
+    /// The 46 point border of the frame keeps its size, only the centre is stretched
+    private static let frameCenterRect = CGRect(x: 46.0 / 100.0, y: 46.0 / 100.0,
+                                                width: 8.0 / 100.0, height: 8.0 / 100.0)
 
     private static let fontName = "Rubik-Bold"
     private static let titleFontSize: CGFloat = 40
