@@ -129,10 +129,18 @@ class ModalPopup: SKSpriteNode {
         scene.addChild(self)
     }
 
-    /// Closes the popup
+    /// Closes the popup. The completion runs a moment later, once the scene has been
+    /// drawn without the popup, so e.g. a scene transition doesn't capture the popup.
     func dismiss(completion: (() -> Void)? = nil) {
+        guard let scene else {
+            completion?()
+            return
+        }
         removeFromParent()
-        completion?()
+        if let completion {
+            scene.run(SKAction.sequence([SKAction.wait(forDuration: 0.15),
+                                         SKAction.run(completion)]))
+        }
     }
 
     @objc private func onButton0() {
