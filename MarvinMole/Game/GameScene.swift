@@ -19,14 +19,7 @@ class GameScene: Scene {
     }
     private var pendingInput: [Input] = []
     
-    // layers, back to front: background, map, border, then HUD and GUI (zPosition 0)
-    private lazy var backgroundImage = {
-        let node = SKSpriteNode(imageNamed: "GameBackground")
-        node.position = center
-        node.size = size
-        node.zPosition = -30
-        return node
-    }()
+    // layers, back to front: map (with its grass), border, then HUD and GUI (zPosition 0)
         
     private lazy var mapView = {
         let node = MapView()
@@ -146,7 +139,6 @@ class GameScene: Scene {
     override func sceneDidLoad() {
         super.sceneDidLoad()
         
-        addChild(backgroundImage)
         addChild(mapView)
         addChild(borderImage)
         addChild(nextButton)

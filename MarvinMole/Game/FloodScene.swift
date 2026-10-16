@@ -13,14 +13,7 @@ class FloodScene: Scene {
     
     private var sfx = SKAction.playSoundFileNamed("WaterFlooding.wav", waitForCompletion: false)
 
-    // layers, back to front: background, map, border (same as GameScene)
-    private lazy var backgroundImage = {
-        let node = SKSpriteNode(imageNamed: "GameBackground")
-        node.position = center
-        node.size = size
-        node.zPosition = -30
-        return node
-    }()
+    // layers, back to front: map (with its grass), border (same as GameScene)
     
     private lazy var mapView = {
         let node = MapView()
@@ -43,7 +36,6 @@ class FloodScene: Scene {
     override func sceneDidLoad() {
         super.sceneDidLoad()
         
-        addChild(backgroundImage)
         addChild(mapView)
         addChild(borderImage)
     }

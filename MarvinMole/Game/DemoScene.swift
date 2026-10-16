@@ -13,16 +13,21 @@ class DemoScene: Scene {
     private var map: Map = .empty
     private var moves: [Map.Move] = []
     
-    private lazy var backgroundImage = {
-        let node = SKSpriteNode(imageNamed: "GameBackground")
-        node.position = center
-        node.size = size
-        return node
-    }()
+    // layers, back to front: map (with its grass), border (same as GameScene)
     
     private lazy var mapView = {
         let node = MapView()
+        node.playArea = MapView.borderPlayArea      // inside the flower and stone border
+        node.zPosition = -20                        // its sprites sit 1 above this
+        return node
+    }()
+
+    /// Flower and stone border, framing the map
+    private lazy var borderImage = {
+        let node = SKSpriteNode(imageNamed: "GameBorder")
         node.position = center
+        node.size = size
+        node.zPosition = -10
         return node
     }()
     
@@ -31,8 +36,8 @@ class DemoScene: Scene {
     override func sceneDidLoad() {
         super.sceneDidLoad()
         
-        addChild(backgroundImage)
         addChild(mapView)
+        addChild(borderImage)
         
         // load map from resource bundle
         let resource = String(format: "Classic%02d", 1)

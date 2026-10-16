@@ -50,9 +50,20 @@ class MapView: SKNode {
         return node
     }()
     
+    /// Grass covering the whole scene, behind the map, on the same tile grid
+    lazy var grassTileMap = {
+        let node = GrassTileMap()
+        node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        return node
+    }()
+
+    /// Size of the scene the grass must cover
+    var sceneSize = CGSize(width: 1024, height: 768)
+
     override init() {
         super.init()
         
+        addChild(grassTileMap)
         addChild(floorTileMap)
         addChild(shadowTileMap)
         addChild(hero)
@@ -105,6 +116,21 @@ class MapView: SKNode {
         xScale = scale
         yScale = scale
         position = CGPoint(x: playArea.midX, y: playArea.midY)
+
+        // grass: enough tiles to cover the whole scene at this scale, centred on the map like the other
+        // tilemaps; an even difference in tile count keeps the grass on the same grid as the map
+        func tiles(_ mapTiles: Int, _ centre: CGFloat, _ extent: CGFloat) -> Int {
+            let half = max(centre, extent - centre) / scale
+            var n = Int((2 * half / 32).rounded(.up)) + 2
+            if (n - mapTiles) % 2 != 0 { n += 1 }
+            return max(n, mapTiles)
+        }
+        grassTileMap.clear()
+        grassTileMap.size = (tiles(map.size.width, position.x, sceneSize.width),
+                             tiles(map.size.height, position.y, sceneSize.height))
+        // stable seed per level (String.hashValue changes between launches)
+        let seed = (map.title ?? "").utf8.reduce(UInt64(map.size.width * 1000 + map.size.height)) { $0 &* 31 &+ UInt64($1) }
+        grassTileMap.draw(seed: seed)
     }
     
     func updateSpritePositions(_ map: Map) {
