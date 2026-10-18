@@ -53,7 +53,7 @@ class RainEmitter: SKEmitterNode {
         particleSpeedRange = 300
         particleLifetime = (size.height + band + 120) / (fallSpeed - 150)
 
-        particleBirthRate = 20
+        particleBirthRate = 10
         particleScale = 0.6
         particleScaleRange = 0.4
         particleAlpha = 0.35

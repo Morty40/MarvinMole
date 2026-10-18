@@ -27,6 +27,9 @@ final class ChessboardTransitionFilter: CIFilter {
     /// SpriteKit's own `inputImage` is still empty on the first frame, which shows as a black blink.
     @objc dynamic var inputSnapshotImage: CIImage?
 
+    /// Optional overlay (e.g. the level title), scene sized, shown while the screen is fully covered
+    @objc dynamic var inputOverlayImage: CIImage?
+
     /// Seconds for the snakes to cover the whole screen (and again to uncover it)
     @objc dynamic var inputSnakeDuration: NSNumber = 0.5
 
@@ -45,9 +48,9 @@ final class ChessboardTransitionFilter: CIFilter {
     // (static, because SpriteKit copies the filter using the plain init())
     private static let columns = 8
     private static let rows = 6
-    // the colours of Marvin's clothes in the menu picture: his blue overalls and teal striped shirt
-    private static let colors = [CIColor(red: 45/255, green: 128/255, blue: 182/255),  // overalls blue
-                                 CIColor(red: 46/255, green: 146/255, blue: 130/255)]  // shirt teal
+    // two blues from the face gradient of the MARVIN MOLE title logo
+    private static let colors = [CIColor(red: 49/255, green: 109/255, blue: 156/255),  // logo medium blue
+                                 CIColor(red: 24/255, green: 62/255, blue: 114/255)]   // logo navy
 
     /// Time each square flips to opaque, as a fraction of the snake duration,
     /// indexed by `row * columns + column` (row 0 is the bottom row)
@@ -176,7 +179,23 @@ final class ChessboardTransitionFilter: CIFilter {
             }
         }
 
-        return board.composited(over: background).cropped(to: extent)
+        var output = board.composited(over: background)
+        if progress >= 1, let overlay = fitted(inputOverlayImage, in: extent) {
+            output = overlay.composited(over: output)
+        }
+        return output.cropped(to: extent)
+    }
+
+    /// A scene sized image fitted inside `extent` keeping its aspect ratio, centred
+    /// (the same way the view shows the scene)
+    private func fitted(_ image: CIImage?, in extent: CGRect) -> CIImage? {
+        guard let image, !image.extent.isEmpty else {
+            return nil
+        }
+        let scale = min(extent.width / image.extent.width, extent.height / image.extent.height)
+        let scaled = image.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+        return scaled.transformed(by: CGAffineTransform(translationX: extent.midX - scaled.extent.midX,
+                                                        y: extent.midY - scaled.extent.midY))
     }
 
     /// The snapshot of the old scene, fitted inside `extent` keeping its aspect ratio,
@@ -202,13 +221,20 @@ extension SKTransition {
     ///   - snakeDuration: Seconds for the snakes to cover the whole screen (and again to uncover it)
     ///   - waitDuration: Seconds the screen stays fully covered, before uncovering
     ///   - scene: The scene being replaced, snapshotted to avoid a black first frame
+    ///   - title: Optional title shown in large text while the screen is fully covered
+    ///   - subtitle: Optional smaller line under the title
     /// - Returns: Transition
     static func chessboard(snakeDuration: TimeInterval,
                            waitDuration: TimeInterval,
-                           from scene: SKScene? = nil) -> SKTransition {
+                           from scene: SKScene? = nil,
+                           title: String? = nil,
+                           subtitle: String? = nil) -> SKTransition {
         let filter = ChessboardTransitionFilter()
         filter.inputSnakeDuration = NSNumber(value: snakeDuration)
         filter.inputWaitDuration = NSNumber(value: waitDuration)
+        if let title, let scene {
+            filter.inputOverlayImage = titleImage(title: title, subtitle: subtitle, size: scene.size)
+        }
         if let scene, let view = scene.view, let texture = view.texture(from: scene) {
             filter.inputSnapshotImage = CIImage(cgImage: texture.cgImage())
         }
@@ -218,8 +244,39 @@ extension SKTransition {
         let transition = SKTransition(ciFilter: filter, duration: filter.totalDuration * 1.25)
 
         // the new scene stays paused until the transition has ended (SpriteKit's default),
-        // so its own timers (e.g. LoadingScene moving on) can't cut the transition short
+        // so its own timers and animations only start once the transition has finished
         transition.pausesIncomingScene = true
         return transition
+    }
+
+    /// Title (and subtitle) centred on a transparent, scene sized image:
+    /// white Rubik-Bold with a soft, 80% black outline, like OutlinedLabel
+    private static func titleImage(title: String, subtitle: String?, size: CGSize) -> CIImage? {
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 2
+        let image = UIGraphicsImageRenderer(size: size, format: format).image { _ in
+            func lines() -> [(String, CGFloat)] {
+                [(title, 96)] + (subtitle.map { [($0, 46)] } ?? [])
+            }
+            let spacing: CGFloat = 18
+            let fonts = lines().map { UIFont(name: "Rubik-Bold", size: $0.1) ?? .boldSystemFont(ofSize: $0.1) }
+            let heights = fonts.map(\.lineHeight)
+            var y = (size.height - heights.reduce(0, +) - spacing * CGFloat(heights.count - 1)) / 2
+            for ((text, _), font) in zip(lines(), fonts) {
+                let outline: [NSAttributedString.Key: Any] = [
+                    .font: font,
+                    .foregroundColor: UIColor(white: 0, alpha: 0.8),
+                    .strokeColor: UIColor(white: 0, alpha: 0.8),
+                    .strokeWidth: -2 * 2.2 / font.pointSize * 100,   // stroke is centred on the glyph edge: 2.2 pt outside
+                ]
+                let fill: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: UIColor.white]
+                let width = (text as NSString).size(withAttributes: fill).width
+                let origin = CGPoint(x: (size.width - width) / 2, y: y)
+                (text as NSString).draw(at: origin, withAttributes: outline)
+                (text as NSString).draw(at: origin, withAttributes: fill)
+                y += font.lineHeight + spacing
+            }
+        }
+        return image.cgImage.map { CIImage(cgImage: $0) }
     }
 }

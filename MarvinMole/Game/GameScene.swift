@@ -68,9 +68,8 @@ class GameScene: Scene {
         MapManager.shared.incrementMapNumber()
         MapManager.shared.save()
 
-        // load current map and transition
-        Scene.loadingScene.loadCurrentMap()
-        transition(to: Scene.loadingScene)
+        // via the progress scene: SpriteKit can't transition from this scene to itself
+        transition(to: Scene.progressScene)
     }
 
     /// Number of moves, shown large in the grey stones under the top-right flowers
@@ -199,6 +198,21 @@ class GameScene: Scene {
                                      direction: .down))
     }
     
+    /// Starts the selected map: loads it, and presents this scene from `scene` with a transition
+    /// that shows the level title while the screen is covered, uncovering straight into the game.
+    /// `scene` must be another scene: SpriteKit can't transition from a scene to itself.
+    func startCurrentMap(from scene: SKScene) {
+        let selected = MapManager.shared.selectedMap
+        guard let map = Map.mapFromBundle(resource: selected.resourceName) else {
+            return
+        }
+        load(map: map)
+        let transition = SKTransition.chessboard(snakeDuration: 0.6, waitDuration: 1.6, from: scene,
+                                                 title: "\(selected.collection.title) \(selected.number)",
+                                                 subtitle: map.title?.trimmingCharacters(in: .whitespaces))
+        scene.view?.presentScene(self, transition: transition)
+    }
+
     func load(map: Map) {
         self.map = map
         isCompletionShown = false

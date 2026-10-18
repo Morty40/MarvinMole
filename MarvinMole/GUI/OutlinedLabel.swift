@@ -73,6 +73,29 @@ class OutlinedLabel: SKNode {
         set {
             label.text = newValue
             outline.forEach { $0.text = newValue }
+            alignLines()
+        }
+    }
+
+    /// SKLabelNode aligns a wrapped text block as a whole, but its lines stay left aligned.
+    /// For multi-line text, set an attributed string so each line follows the horizontal alignment.
+    private func alignLines() {
+        guard label.numberOfLines == 0, let text = label.text, let fontName = label.fontName else {
+            return
+        }
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.alignment = switch label.horizontalAlignmentMode {
+        case .left: .left
+        case .right: .right
+        default: .center
+        }
+        let font = UIFont(name: fontName, size: label.fontSize) ?? .boldSystemFont(ofSize: label.fontSize)
+        for node in [label] + outline {
+            node.attributedText = NSAttributedString(string: text, attributes: [
+                .font: font,
+                .foregroundColor: node.fontColor ?? .white,
+                .paragraphStyle: paragraph,
+            ])
         }
     }
 

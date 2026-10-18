@@ -88,9 +88,8 @@ class MenuScene: Scene {
 
         MusicPlayer.shared.fadeOut(duration: 1.0)
 
-        // load current map and transition
-        Scene.loadingScene.loadCurrentMap()
-        transition(to: Scene.loadingScene)
+        // straight into the game; the transition shows the level title
+        Scene.gameScene.startCurrentMap(from: self)
     }
 
     private lazy var mapCollectionButton = {
@@ -160,7 +159,7 @@ class MenuScene: Scene {
     }
     
     override func willMove(from view: SKView) {
-        removeAction(forKey: "drips")
+        stopDripping()
         // the music keeps playing (e.g. into the demo); it fades out when a game starts
     }
 
@@ -170,24 +169,6 @@ class MenuScene: Scene {
     /// Loops the background music; carries on if it is already playing (back from the demo)
     private func startMusic() {
         MusicPlayer.shared.play(Self.musicFile, volume: 0.6)    // keep the drips audible on top
-    }
-
-    /// Single water drips, played in random order
-    private let dripSounds = (1 ... 3).map {
-        SKAction.playSoundFileNamed("Drip\($0).wav", waitForCompletion: false)
-    }
-
-    /// Soundscape of dripping water: a random drip every 1 to 3 seconds
-    private func startDripping() {
-        let drip = SKAction.sequence([
-            SKAction.wait(forDuration: 2.0, withRange: 2.0),
-            SKAction.run { [weak self] in
-                if let self, let sound = self.dripSounds.randomElement() {
-                    self.run(sound)
-                }
-            }])
-        removeAction(forKey: "drips")
-        run(SKAction.repeatForever(drip), withKey: "drips")
     }
 
     /// "Let's go!" when nothing is solved, "Done!" when everything is, otherwise the percentage.
