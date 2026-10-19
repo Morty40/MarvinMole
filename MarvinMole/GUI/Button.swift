@@ -21,6 +21,15 @@ class Button: SKSpriteNode {
     private var action: Selector? = nil
     
     private(set) var isPressed = false
+
+    /// Optional action for a long press (held for `longPressDuration`), run on `target` instead of the
+    /// normal action: the press is handled once it is long enough, and releasing it does nothing more
+    var longPressAction: Selector? = nil
+
+    /// The same duration as UIKit's long press gesture
+    static let longPressDuration: TimeInterval = 0.5
+
+    private var isLongPressHandled = false
     
     private var sfx = SKAction.playSoundFileNamed("ButtonClick.wav", waitForCompletion: false)
     
@@ -47,8 +56,16 @@ extension Button {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
         isPressed = true
+        isLongPressHandled = false
 
         run(sfx)
+
+        if let target, let longPressAction {
+            run(SKAction.sequence([SKAction.wait(forDuration: Self.longPressDuration),
+                                   SKAction.run { [weak self] in self?.isLongPressHandled = true },
+                                   SKAction.perform(longPressAction, onTarget: target)]),
+                withKey: "longPress")
+        }
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -58,8 +75,9 @@ extension Button {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
         isPressed = false
+        removeAction(forKey: "longPress")
 
-        if let touch = touches.first {
+        if !isLongPressHandled, let touch = touches.first {
             
             // translate touch event coordinate to node local coordinate
             let locationInNode = touch.location(in: self)
@@ -81,6 +99,7 @@ extension Button {
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesCancelled(touches, with: event)
         isPressed = false
+        removeAction(forKey: "longPress")
     }
     
 }

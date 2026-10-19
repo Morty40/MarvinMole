@@ -116,6 +116,7 @@ class GameScene: Scene {
 
     private lazy var undoButton = {
         let node = IconButton(imageName: "UndoIcon", target: self, action: #selector(onUndo))
+        node.longPressAction = #selector(onReset)
         node.position = CGPoint(x: margin + node.size.width/2,
                                 y: margin + node.size.height/2)
         return node
@@ -123,6 +124,28 @@ class GameScene: Scene {
     
     @objc func onUndo() {
         register(input: .undo)
+    }
+
+    /// Long press on Undo: offer to start the level over
+    @objc func onReset() {
+        if ModalPopup.isShowing(in: self) || map.isCompleted {
+            return
+        }
+        // wording and button order follow Apple's HIG for alerts: Cancel leading, action trailing
+        let popup = ModalPopup(title: "Reset This Level?",
+                               message: "All your moves on this level will be undone.",
+                               buttons: [.init(title: "Cancel"),
+                                         .init(title: "Reset") { [weak self] in self?.resetMap() }])
+        popup.show(in: self)
+    }
+
+    /// Starts the current level over, from its starting position
+    private func resetMap() {
+        guard let map = Map.mapFromBundle(resource: MapManager.shared.selectedMap.resourceName) else {
+            return
+        }
+        pendingInput.removeAll()
+        load(map: map)
     }
         
     private lazy var leftButton = {
