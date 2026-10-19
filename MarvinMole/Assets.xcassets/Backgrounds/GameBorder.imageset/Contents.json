@@ -1,11 +1,11 @@
 {
   "images" : [
     {
+      "filename" : "GameBorder.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "GameBorder@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

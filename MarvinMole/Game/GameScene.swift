@@ -72,12 +72,12 @@ class GameScene: Scene {
         transition(to: Scene.progressScene)
     }
 
-    /// Number of moves, shown large in the grey stones under the top-right flowers
+    /// Number of moves, shown large in the top-right corner
     private lazy var movesLabel = {
         let node = OutlinedLabel(fontName: "Rubik-Bold", fontSize: 90,
                                  horizontalAlignment: .right, verticalAlignment: .center)
-        // right aligned with the right edge of the Up/Down buttons
-        node.position = CGPoint(x: upButton.frame.maxX, y: frame.size.height * 0.575)
+        // the top of the digits the same margin from the corner as the buttons
+        node.position = CGPoint(x: frame.size.width - margin, y: frame.size.height - margin - node.capHeight / 2)
         return node
     }()
 

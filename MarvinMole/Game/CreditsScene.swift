@@ -18,7 +18,7 @@ class CreditsScene: Scene {
 
     // TODO: own background image
     private lazy var backgroundImage = {
-        let node = SKSpriteNode(imageNamed: "ProgressBackground")
+        let node = SKSpriteNode(imageNamed: "CreditsBackground")
         node.position = center
         node.size = size
         node.zPosition = -10
@@ -28,7 +28,6 @@ class CreditsScene: Scene {
     /// Headings, each followed by its names, one per line, top to bottom
     private let credits: [(heading: String, names: [String])] = [
         ("a game by:", ["Morten Perriard", "Guus Oosterbaan"]),
-        ("original Sokoban levels:", ["Thinking Rabbit"]),
     ]
 
     private let headingFontSize: CGFloat = 30
