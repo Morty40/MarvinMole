@@ -44,7 +44,7 @@ class DemoScene: Scene {
     /// as the replay uses up the moves.
     func prepare() -> Map {
         // load map from resource bundle
-        let resource = String(format: "Classic%02d", 1)
+        let resource = String(format: "Hard%02d", 1)
         if let map = Map.mapFromBundle(resource: resource) {
             
             let moves = """

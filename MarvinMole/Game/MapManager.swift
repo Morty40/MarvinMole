@@ -13,21 +13,21 @@ final class MapManager {
     enum MapCollection: String, Codable, CaseIterable {
         case easy = "EASY"
         case medium = "MEDIUM"
-        case classic = "CLASSIC"
+        case hard = "HARD"
         
         var title: String {
             switch self {
             case .easy: return "Easy"
             case .medium: return "Medium"
-            case .classic: return "Classic"
+            case .hard: return "Hard"
             }
         }
         
         var count: Int {
             switch self {
             case .easy: return 10
-            case .medium: return 3
-            case .classic: return 50
+            case .medium: return 30
+            case .hard: return 50
             }
         }
         
@@ -35,7 +35,7 @@ final class MapManager {
             switch self {
             case .easy: return "Easy%02d"
             case .medium: return "Medium%02d"
-            case .classic: return "Classic%02d"
+            case .hard: return "Hard%02d"
             }
         }
     }
