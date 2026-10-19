@@ -9,6 +9,7 @@ import SpriteKit
 
 class Scene: SKScene {
     
+    static let creditsScene = CreditsScene()
     static let demoScene = DemoScene()
     static let floodScene = FloodScene()
     static let gameScene = GameScene()

@@ -11,6 +11,9 @@ class MenuScene: DrippingScene {
         
     private var startTime: TimeInterval = 0.0
 
+    /// When idle, the menu shows the demo and the credits in turns
+    private var showsCreditsNext = false
+
     /// Rain falling over the whole background: in front of it, behind the title and buttons
     private lazy var rain = {
         let node = RainEmitter(size: size)
@@ -203,15 +206,20 @@ class MenuScene: DrippingScene {
     override func update(_ currentTime: TimeInterval) {
         super.update(currentTime)
         
-        // automatically go demo mode after some time
+        // automatically go to demo mode or the credits (taking turns) after some time
         if startTime.isZero {
             startTime = currentTime
         } else if currentTime - startTime > 30.0 {
-            // demo mode: the map floods first, then the demo plays it
             startTime = 0.0
-            let map = Scene.demoScene.prepare()
-            Scene.floodScene.load(map: map, then: Scene.demoScene)
-            transition(to: Scene.floodScene)
+            if showsCreditsNext {
+                transition(to: Scene.creditsScene)
+            } else {
+                // demo mode: the map floods first, then the demo plays it
+                let map = Scene.demoScene.prepare()
+                Scene.floodScene.load(map: map, then: Scene.demoScene)
+                transition(to: Scene.floodScene)
+            }
+            showsCreditsNext.toggle()
         }
     }
 
