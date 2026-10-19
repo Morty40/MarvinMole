@@ -42,26 +42,4 @@ class Scene: SKScene {
     var center: CGPoint {
         CGPoint(x: frame.size.width * 0.5, y: frame.size.height * 0.5)
     }
-
-    /// Single water drips, played in random order
-    private static let dripSounds = (1 ... 3).map {
-        SKAction.playSoundFileNamed("Drip\($0).wav", waitForCompletion: false)
-    }
-
-    /// Soundscape of dripping water: a random drip every 1 to 3 seconds
-    func startDripping() {
-        let drip = SKAction.sequence([
-            SKAction.wait(forDuration: 2.0, withRange: 2.0),
-            SKAction.run { [weak self] in
-                if let self, let sound = Scene.dripSounds.randomElement() {
-                    self.run(sound)
-                }
-            }])
-        stopDripping()
-        run(SKAction.repeatForever(drip), withKey: "drips")
-    }
-
-    func stopDripping() {
-        removeAction(forKey: "drips")
-    }
 }

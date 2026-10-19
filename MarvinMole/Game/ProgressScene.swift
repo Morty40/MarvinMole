@@ -9,7 +9,7 @@ import SpriteKit
 
 /// Shown between levels, after a level is completed: a background with rain, dripping water and music,
 /// and a "Next" button, which starts the next level in the game scene.
-class ProgressScene: Scene {
+class ProgressScene: DrippingScene {
 
     /// Rain falling over the whole background: in front of it, behind the text and button (as on the menu)
     private lazy var rain = {

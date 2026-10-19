@@ -7,7 +7,7 @@
 
 import SpriteKit
 
-class MenuScene: Scene {
+class MenuScene: DrippingScene {
         
     private var startTime: TimeInterval = 0.0
 
