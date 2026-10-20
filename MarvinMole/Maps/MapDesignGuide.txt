@@ -1,0 +1,45 @@
+Map Design Guide
+
+
+Requirements:
+- All levels must be tested and solvable.
+- All levels must be in landscape format, meaning the width is greater than the height.
+- All levels must take inspiration from the layouts and puzzles found in the original 50 Sokoban levels.
+- All levels must be defined in the SOK format.
+- All levels must have a playful title of 2-4 words that matches the game theme.
+
+
+Considerations:
+- Goal tiles are often grouped together in a level, but may also be distributed across the level in smaller groups.
+- A good variation between the levels, within the constraints given below, should be prioritized.
+- Within each level collection, the levels are sorted by difficulty (number of boxes, length of the solutions).
+
+
+Easy Levels:
+- Number of levels: 10
+- Number of boxes per level: 2-4
+- Width of map: 6-12
+- Height of map: 4–8
+- Solution length: 10-100
+
+
+Medium:
+- Number of levels: 20
+- Number of boxes per level:  4-8
+- Width of map: 8-16
+- Height of map: 6-12
+- Solution length: 20-200
+
+
+Hard:
+- Number of levels: 30
+- Number of boxes per level: 8-16
+- Width of map: 10-20
+- Height of map: 8-16
+- Solution length: 40-400
+
+
+Links:
+- SOK format: https://alonso-delarte.medium.com/the-basics-of-sokoban-level-formats-for-designing-your-own-sokoban-levels-51882a7a36f0
+- Original Sokoban levels: https://www-static.sokoban.dk/wp-content/uploads/2016/02/Thinking-Rabbit-Original-Plus-Extra.txt
+- Level building: https://games4brains.de/sokoban-leveldesign.php

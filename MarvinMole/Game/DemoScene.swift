@@ -48,11 +48,9 @@ class DemoScene: Scene {
         if let map = Map.mapFromBundle(resource: resource) {
             
             let moves = """
-            ullluuuLUllDlldddrRRRRRRRRRRdrUllllllluuululldDDuu
-            lldddrRRRRRRRRRRRRlllllllluuulLulDDDuulldddrRRRRRR
-            RRRRRllllllluuulluuurDDuullDDDDDuulldddrRRRRRRRRRR
-            uRRlDllllllluuuLLulDDDuulldddrRRRRRRRRRRdRRlUlllll
-            lllllllulldRRRRRRRRRRRRRuRDldR
+            RDrrrrruruulDrddddddllddlUUluRRdrruuuullllldLurrrd
+            LurrrrddlUrdddlUUruuLLLLLrrrrruulDrdLLLLUruLrddrrr
+            ddlUruLLLdlLrruulDrdL
             """
             
             self.map = map
