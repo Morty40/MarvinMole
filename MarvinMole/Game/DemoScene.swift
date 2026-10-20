@@ -10,6 +10,16 @@ import SpriteKit
 class DemoScene: Scene {
     
     private var startTime: TimeInterval = 0.0
+
+    /// When the map was completed (its last push animated), zero until then
+    private var completedTime: TimeInterval = 0.0
+
+    /// Set once going back to the menu, so it only happens once
+    private var isClosing = false
+
+    /// Seconds the demo lasts at most, and seconds the completed map stays on screen
+    private let maxDuration: TimeInterval = 30.0
+    private let completedDuration: TimeInterval = 3.0
     private var map: Map = .empty
     private var moves: [Map.Move] = []
     
@@ -40,22 +50,20 @@ class DemoScene: Scene {
         addChild(borderImage)
     }
 
-    /// The demo map, ready to replay from the start. Call before each demo,
-    /// as the replay uses up the moves.
+    /// The demo map: a random level from any collection, ready to replay its solution from the start.
+    /// Call before each demo, as the replay uses up the moves.
     func prepare() -> Map {
-        // load map from resource bundle
-        let resource = String(format: "Hard%02d", 1)
-        if let map = Map.mapFromBundle(resource: resource) {
-            
-            let moves = """
-            RDrrrrruruulDrddddddllddlUUluRRdrruuuullllldLurrrd
-            LurrrrddlUrdddlUUruuLLLLLrrrrruulDrdLLLLUruLrddrrr
-            ddlUruLLLdlLrruulDrdL
-            """
-            
-            self.map = map
-            self.moves = Map.movesFrom(lurd: moves)
-            mapView.update(with: map)
+        let levels = MapManager.MapCollection.allCases.flatMap { collection in
+            (1 ... collection.count).map { String(format: collection.resourceName, $0) }
+        }
+        // a level with a solution (all levels have one, but don't rely on it)
+        for resource in levels.shuffled() {
+            if let map = Map.mapFromBundle(resource: resource), let solution = map.solution {
+                self.map = map
+                self.moves = Map.movesFrom(lurd: solution)
+                mapView.update(with: map)
+                return map
+            }
         }
         return map
     }
@@ -64,11 +72,20 @@ class DemoScene: Scene {
     /// - Parameter view: The view that is presenting the scene
     override func didMove(to view: SKView) {
         startTime = 0.0
+        completedTime = 0.0
+        isClosing = false
     }
     
     override func handleKey(_ key: UIKey) {
         // any key goes back to the menu
-        transition(to: Scene.menuScene)
+        close()
+    }
+
+    private func close() {
+        if !isClosing {
+            isClosing = true
+            transition(to: Scene.menuScene)
+        }
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -88,11 +105,16 @@ class DemoScene: Scene {
             }
         }
         
-        // automatically go back to the menu after some time
+        // back to the menu a moment after the map is completed, or after some time in any case
         if startTime.isZero {
             startTime = currentTime
-        } else if currentTime - startTime > 30.0 {
-            transition(to: Scene.menuScene)
+        }
+        if completedTime.isZero, map.isCompleted, !mapView.hasActions() {
+            completedTime = currentTime
+        }
+        if currentTime - startTime > maxDuration
+            || (!completedTime.isZero && currentTime - completedTime > completedDuration) {
+            close()
         }
         
     }

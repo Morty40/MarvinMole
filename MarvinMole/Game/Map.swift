@@ -116,12 +116,17 @@ class Map {
     }
     
     private(set) var title: String? = nil
+
+    /// A solution to the map, in LURD notation (lower case walks, upper case pushes), if the file has one
+    private(set) var solution: String? = nil
+
     private(set) var tiles: [[Tile]] = []
     private(set) var objects: [Object] = []
     private(set) var moves: [Move] = []
     
-    init(title: String?, tiles: [[Tile]], objects: [Object]) {
+    init(title: String?, solution: String? = nil, tiles: [[Tile]], objects: [Object]) {
         self.title = title
+        self.solution = solution
         self.tiles = tiles
         self.objects = objects
         self.moves = []
@@ -396,8 +401,14 @@ class Map {
             title = String(line.split(separator: ":").last ?? "")
         }
         
-        // TODO: fix me
-        lines = lines.filter({ !$0.hasPrefix("Title:") })
+        // parse the solution (LURD notation)
+        var solution: String? = nil
+        if let line = lines.first(where: { $0.hasPrefix("Solution:") }) {
+            solution = line.dropFirst("Solution:".count).trimmingCharacters(in: .whitespaces)
+        }
+
+        // the remaining lines are the map
+        lines = lines.filter({ !$0.hasPrefix("Title:") && !$0.hasPrefix("Solution:") })
         
         // parse wall tiles
         var tiles: [[Tile]] = lines.map({ $0.map({
@@ -455,7 +466,7 @@ class Map {
             })
         })
         
-        return Map(title: title, tiles: tiles, objects: objects)
+        return Map(title: title, solution: solution, tiles: tiles, objects: objects)
     }
     
     static var empty: Map {
