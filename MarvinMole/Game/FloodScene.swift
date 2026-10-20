@@ -91,6 +91,7 @@ class FloodScene: Scene {
                         let y = randomPostion.y
                         
                         box.setMapPosition(x: x, y: y, tileMap: self.mapView.floorTileMap)
+                        box.updateTexture(on: .floor)     // food, while it floats in the water
                     }
                 }
             }
@@ -127,7 +128,10 @@ class FloodScene: Scene {
                         let waitAction = SKAction.wait(forDuration: randomTime1)
                         let moveAction = SKAction.move(to: CGPoint(x: xx, y: yy), duration: 1.0 + 2.0 * randomTime2)
                         moveAction.timingMode = .easeOut
-                        box.run(SKAction.sequence([waitAction, moveAction]))
+                        // once it has settled, a crate if it stands on a cupboard tile
+                        let tile = self.map.tileAt(x: x, y: y)
+                        let textureAction = SKAction.run { box.updateTexture(on: tile) }
+                        box.run(SKAction.sequence([waitAction, moveAction, textureAction]))
                     }
                 }
             }

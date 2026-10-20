@@ -400,5 +400,3 @@ class GameScene: Scene {
     }
         
 }
-
-// TODO: Undo will move boxes back, but not update texture...

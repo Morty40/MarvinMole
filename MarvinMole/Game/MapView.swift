@@ -98,7 +98,7 @@ class MapView: SKNode {
         wallTileMap.size = map.size
         
         // draw tilemaps
-        floorTileMap.draw(map: map)
+        floorTileMap.draw(map: map, seed: seed(for: map))
         shadowTileMap.draw(map: map)
         // waterTileMap is only used for the flooding sequence
         wallTileMap.draw(map: map)
@@ -129,11 +129,15 @@ class MapView: SKNode {
         grassTileMap.clear()
         grassTileMap.size = (tiles(map.size.width, position.x, sceneSize.width),
                              tiles(map.size.height, position.y, sceneSize.height))
-        // stable seed per level (String.hashValue changes between launches)
-        let seed = (map.title ?? "").utf8.reduce(UInt64(map.size.width * 1000 + map.size.height)) { $0 &* 31 &+ UInt64($1) }
-        grassTileMap.draw(seed: seed)
+        grassTileMap.draw(seed: seed(for: map))
     }
     
+    /// A stable seed per level, for its random floor and grass
+    /// (String.hashValue changes between launches, so it can't be used)
+    private func seed(for map: Map) -> UInt64 {
+        (map.title ?? "").utf8.reduce(UInt64(map.size.width * 1000 + map.size.height)) { $0 &* 31 &+ UInt64($1) }
+    }
+
     func updateSpritePositions(_ map: Map) {
         if let heroPosition = map.heroPosition {
             hero.setMapPosition(x: heroPosition.x,
@@ -147,6 +151,8 @@ class MapView: SKNode {
                     box.setMapPosition(x: object.position.x,
                                        y: object.position.y,
                                        tileMap: floorTileMap)
+                    // a crate on a cupboard tile, food elsewhere (at the start, and after an undo)
+                    box.updateTexture(on: map.tileAt(x: object.position.x, y: object.position.y))
                 }
             }
         }

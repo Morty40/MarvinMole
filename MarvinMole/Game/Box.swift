@@ -21,6 +21,11 @@ class Box: Sprite {
         self.texture = boxTexture
     }
     
+    /// Shows the box as a crate when it stands on a cupboard (goal) tile, otherwise as food
+    func updateTexture(on tile: Map.Tile) {
+        texture = tile == .floorGoal ? Box.boxOnGoalTexture : boxTexture
+    }
+
     @MainActor required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -47,7 +52,7 @@ class Box: Sprite {
         
         let action = SKAction.sequence([
             SKAction.moveBy(x: dx, y: dy, duration: duration),
-            SKAction.setTexture(toTile == .floor ? boxTexture! : Box.boxOnGoalTexture)])
+            SKAction.run { [weak self] in self?.updateTexture(on: toTile) }])
         action.timingMode = .linear
         return action
     }

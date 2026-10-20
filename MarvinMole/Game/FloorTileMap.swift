@@ -7,20 +7,32 @@
 
 import SpriteKit
 
+/// Floor under the map: random tiles from the Floor sheet (4 x 4 tiles), and cupboards on the goals.
 class FloorTileMap: SKTileMapNode {
     
-    let floor = SKTexture(imageNamed: "Floor").split().map {
-        SKTileGroup(tileDefinition: SKTileDefinition(texture: $0)) }
+    /// The floor and goal tiles are 64 pixels: drawn at 32 points, the same size as the other
+    /// tile maps (and sharp on retina screens)
+    private static let tileSize = CGSize(width: 32, height: 32)
+
+    let floor = SKTexture(imageNamed: "Floor").split(columns: 4, rows: 4).map {
+        SKTileGroup(tileDefinition: SKTileDefinition(texture: $0, size: tileSize)) }
     
-    let goal = SKTileGroup(imageNamed: "Goal")
+    let goal = SKTileGroup(tileDefinition: SKTileDefinition(texture: SKTexture(imageNamed: "Goal"), size: tileSize))
 
     override init() {
         super.init()
         tileSet = SKTileSet(tileGroups: floor + [goal])
     }
     
-    func draw(map: Map) {
-        
+    /// Draws the floor with random tiles. The layout is seeded, so the same seed always
+    /// gives the same floor (e.g. every time a level is played).
+    func draw(map: Map, seed: UInt64) {
+        var state = seed &* 6364136223846793005 &+ 1442695040888963407
+        func random(_ n: Int) -> Int {
+            state = state &* 6364136223846793005 &+ 1442695040888963407
+            return Int((state >> 33) % UInt64(n))
+        }
+
         for y in 0 ..< map.size.height {
             for x in 0 ..< map.size.width {
                 
@@ -29,8 +41,7 @@ class FloorTileMap: SKTileMapNode {
 
                 switch tile {
                 case .floor, .wall:
-                    let n = floor.count
-                    setTileGroup(floor[(c+r) % n], forColumn: c, row: r)
+                    setTileGroup(floor[random(floor.count)], forColumn: c, row: r)
                     
                 case .floorGoal:
                     setTileGroup(goal, forColumn: c, row: r)
