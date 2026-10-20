@@ -80,8 +80,9 @@ class MapView: SKNode {
     var playArea = CGRect(x: 125, y: 125, width: 1024 - 250, height: 768 - 250)
 
     /// The open area inside the flower and stone border (GameBorder), measured from the image:
-    /// the largest rectangle that fits, 8 points in from the border's edge
-    static let borderPlayArea = CGRect(x: 83, y: 122, width: 627, height: 540)
+    /// the largest rectangle that fits, 8 points in from the border's edge,
+    /// and clear of the buttons and the move counter in the corners
+    static let borderPlayArea = CGRect(x: 93, y: 153, width: 660, height: 486)
 
     func update(with map: Map) {
         // clear tilemaps

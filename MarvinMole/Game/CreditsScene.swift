@@ -37,7 +37,7 @@ class CreditsScene: Scene {
     private let groupSpacing: CGFloat = 90
     private let lineSpacing: CGFloat = 24
 
-    /// The credits as centered lines, the whole block centered on the screen
+    /// The credits as centered lines, the whole block just below the middle of the screen
     private lazy var creditLabels: [OutlinedLabel] = {
         func makeLabel(_ text: String, fontSize: CGFloat) -> OutlinedLabel {
             let node = OutlinedLabel(fontName: "Rubik-Bold", fontSize: fontSize)
@@ -60,8 +60,9 @@ class CreditsScene: Scene {
                 labels.append(nameLabel)
             }
         }
+        // centred 5% of the screen height below the middle, clear of Marvin's mouth in the background
         let height = labels[0].capHeight + gaps.reduce(0, +)
-        var baseline = center.y + height / 2 - labels[0].capHeight
+        var baseline = center.y - frame.size.height * 0.05 + height / 2 - labels[0].capHeight
         for (i, label) in labels.enumerated() {
             if i > 0 {
                 baseline -= gaps[i - 1]
