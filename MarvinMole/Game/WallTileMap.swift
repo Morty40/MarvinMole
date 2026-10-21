@@ -9,11 +9,15 @@ import SpriteKit
 
 class WallTileMap: SKTileMapNode {
         
+    /// The wall tiles are 64 pixels: drawn at 32 points, the same size as the other tile maps
+    /// (and sharp on retina screens)
+    private static let tileSize = CGSize(width: 32, height: 32)
+
     let outerWalls = SKTexture(imageNamed: "OuterWalls").split(columns: 3, rows: 7).map {
-        SKTileGroup(tileDefinition: SKTileDefinition(texture: $0)) }
+        SKTileGroup(tileDefinition: SKTileDefinition(texture: $0, size: tileSize)) }
     
     let innerWalls = SKTexture(imageNamed: "InnerWalls").split(columns: 3, rows: 5).map {
-        SKTileGroup(tileDefinition: SKTileDefinition(texture: $0)) }
+        SKTileGroup(tileDefinition: SKTileDefinition(texture: $0, size: tileSize)) }
 
     override init() {
         super.init()

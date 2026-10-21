@@ -144,7 +144,6 @@ class GameScene: Scene {
         guard let map = Map.mapFromBundle(resource: MapManager.shared.selectedMap.resourceName) else {
             return
         }
-        pendingInput.removeAll()
         load(map: map)
     }
         
@@ -239,6 +238,7 @@ class GameScene: Scene {
     func load(map: Map) {
         self.map = map
         isCompletionShown = false
+        pendingInput.removeAll()        // moves queued for the previous map
         mapView.update(with: map)
     }
 
