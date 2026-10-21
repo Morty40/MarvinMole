@@ -11,8 +11,9 @@ class MenuScene: DrippingScene {
         
     private var startTime: TimeInterval = 0.0
 
-    /// When idle, the menu shows the demo and the credits in turns
-    private var showsCreditsNext = false
+    /// When idle, the menu shows the demo, the dig scene and the credits in turns
+    private enum IdleScene: CaseIterable { case demo, dig, credits }
+    private var nextIdleScene = IdleScene.demo
 
     /// Rain falling over the whole background: in front of it, behind the title and buttons
     private lazy var rain = {
@@ -145,6 +146,9 @@ class MenuScene: DrippingScene {
         addChild(startButton)
         addChild(mapCollectionButton)
         addChild(mapNumberButton)
+#if DEBUG
+        debugButtons.forEach { addChild($0) }
+#endif
         
         refreshSelectedMap()
     }
@@ -206,22 +210,55 @@ class MenuScene: DrippingScene {
     override func update(_ currentTime: TimeInterval) {
         super.update(currentTime)
         
-        // automatically go to demo mode or the credits (taking turns) after some time
+        // automatically go to demo mode, the dig scene or the credits (taking turns) after some time
         if startTime.isZero {
             startTime = currentTime
         } else if currentTime - startTime > 30.0 {
-            startTime = 0.0
-            if showsCreditsNext {
-                transition(to: Scene.creditsScene)
-            } else {
-                // demo mode: the map floods first, then the demo plays it
-                let map = Scene.demoScene.prepare()
-                Scene.floodScene.load(map: map, then: Scene.demoScene)
-                transition(to: Scene.floodScene)
-            }
-            showsCreditsNext.toggle()
+            show(nextIdleScene)
+            let all = IdleScene.allCases
+            nextIdleScene = all[(all.firstIndex(of: nextIdleScene)! + 1) % all.count]
         }
     }
+
+    /// Goes to the demo, the dig scene or the credits
+    private func show(_ idleScene: IdleScene) {
+        startTime = 0.0
+        switch idleScene {
+        case .demo:
+            // demo mode: the map floods first, then the demo plays it
+            let map = Scene.demoScene.prepare()
+            Scene.floodScene.load(map: map, then: Scene.demoScene)
+            transition(to: Scene.floodScene)
+        case .dig:
+            Scene.digScene.prepare()
+            transition(to: Scene.digScene)
+        case .credits:
+            transition(to: Scene.creditsScene)
+        }
+    }
+
+#if DEBUG
+    /// Small buttons on the right edge, to open the idle scenes straight away
+    private lazy var debugButtons: [TextButton] = {
+        let buttons: [(String, Selector)] = [("Demo", #selector(onDebugDemo)),
+                                             ("Credits", #selector(onDebugCredits)),
+                                             ("Dig", #selector(onDebugDig))]
+        let size = CGSize(width: 160, height: 64)
+        let spacing: CGFloat = 12
+        let height = CGFloat(buttons.count) * size.height + CGFloat(buttons.count - 1) * spacing
+        return buttons.enumerated().map { i, button in
+            let node = TextButton(title: button.0, target: self, action: button.1)
+            node.size = size
+            node.position = CGPoint(x: frame.size.width - 16 - size.width / 2,
+                                    y: center.y + height / 2 - size.height / 2 - CGFloat(i) * (size.height + spacing))
+            return node
+        }
+    }()
+
+    @objc private func onDebugDemo() { show(.demo) }
+    @objc private func onDebugCredits() { show(.credits) }
+    @objc private func onDebugDig() { show(.dig) }
+#endif
 
 }
 

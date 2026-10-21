@@ -60,6 +60,10 @@ class MapView: SKNode {
     /// Size of the scene the grass must cover
     var sceneSize = CGSize(width: 1024, height: 768)
 
+    /// Set when the view will zoom in on parts of the map (larger scale, moved position):
+    /// the grass then covers the scene for any part of the map
+    var coversZoom = false
+
     override init() {
         super.init()
         
@@ -85,23 +89,10 @@ class MapView: SKNode {
     static let borderPlayArea = CGRect(x: 93, y: 153, width: 660, height: 486)
 
     func update(with map: Map) {
-        // clear tilemaps
-        floorTileMap.clear()
-        shadowTileMap.clear()
         waterTileMap.clear()
-        wallTileMap.clear()
-        
-        // set size
-        floorTileMap.size = map.size
-        shadowTileMap.size = map.size
         waterTileMap.size = map.size
-        wallTileMap.size = map.size
-        
-        // draw tilemaps
-        floorTileMap.draw(map: map, seed: seed(for: map))
-        shadowTileMap.draw(map: map)
         // waterTileMap is only used for the flooding sequence
-        wallTileMap.draw(map: map)
+        redrawTiles(map)
         
         boxContainer.removeAllChildren()
         for b in map.objectsOfType(.box) {
@@ -121,7 +112,8 @@ class MapView: SKNode {
         // grass: enough tiles to cover the whole scene at this scale, centred on the map like the other
         // tilemaps; an even difference in tile count keeps the grass on the same grid as the map
         func tiles(_ mapTiles: Int, _ centre: CGFloat, _ extent: CGFloat) -> Int {
-            let half = max(centre, extent - centre) / scale
+            // (when the view zooms in on parts of the map, the grass must reach further)
+            let half = (coversZoom ? extent : max(centre, extent - centre)) / scale
             var n = Int((2 * half / 32).rounded(.up)) + 2
             if (n - mapTiles) % 2 != 0 { n += 1 }
             return max(n, mapTiles)
@@ -132,6 +124,22 @@ class MapView: SKNode {
         grassTileMap.draw(seed: seed(for: map))
     }
     
+    /// Redraws the floor, shadow and wall tile maps from the map's tiles, e.g. after the map has changed;
+    /// the sprites, scale and position stay as they are
+    func redrawTiles(_ map: Map) {
+        floorTileMap.clear()
+        shadowTileMap.clear()
+        wallTileMap.clear()
+
+        floorTileMap.size = map.size
+        shadowTileMap.size = map.size
+        wallTileMap.size = map.size
+
+        floorTileMap.draw(map: map, seed: seed(for: map))
+        shadowTileMap.draw(map: map)
+        wallTileMap.draw(map: map)
+    }
+
     /// A stable seed per level, for its random floor and grass
     /// (String.hashValue changes between launches, so it can't be used)
     private func seed(for map: Map) -> UInt64 {

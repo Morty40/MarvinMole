@@ -156,6 +156,13 @@ class Map {
     ///   - x: X-coordinate
     ///   - y: Y-coordinate
     /// - Returns: Tile or .void if outside the map
+    /// Changes the static tile at (x, y), if it is inside the map (e.g. while digging)
+    func setTile(_ tile: Tile, x: Int, y: Int) {
+        if y >= 0, y < tiles.count, x >= 0, x < tiles[y].count {
+            tiles[y][x] = tile
+        }
+    }
+
     func tileAt(x: Int, y: Int) -> Tile {
         if y >= 0, y < tiles.count {
             let row = tiles[y]
