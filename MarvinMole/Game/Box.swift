@@ -10,7 +10,8 @@ import SpriteKit
 /// Box sprite
 class Box: Sprite {
     
-    static let boxTextures = SKTexture(imageNamed: "Boxes").split()
+    /// Food: Box00 ... Box09 (64 x 64 pixels, drawn at 32 points), one per box id, in turn
+    static let boxTextures = (0 ..< 10).map { SKTexture(imageNamed: String(format: "Box%02d", $0)) }
     static let boxOnGoalTexture = SKTexture(imageNamed: "BoxOnGoal")
     
     var boxTexture: SKTexture? = nil
