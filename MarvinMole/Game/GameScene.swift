@@ -61,7 +61,8 @@ class GameScene: Scene {
     /// Congratulate, and offer to go back to the menu or on to the next level
     private func showCompletion() {
         isFanfareFinished = false
-        let popup = ModalPopup(message: "You did it! Marvin is happy!",
+        let popup = ModalPopup(title: "Level Complete",
+                               message: "You did it! Marvin is happy!",
                                buttons: [.init(title: "Menu") { [weak self] in self?.onMenu() },
                                          .init(title: "Next") { [weak self] in self?.onNext() }])
         popup.show(in: self)
