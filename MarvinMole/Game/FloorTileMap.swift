@@ -25,12 +25,17 @@ class FloorTileMap: SKTileMapNode {
     }
     
     /// Draws the floor with random tiles. The layout is seeded, so the same seed always
-    /// gives the same floor (e.g. every time a level is played).
+    /// gives the same floor (e.g. every time a level is played). Each cell's tile depends only on
+    /// the seed and the cell's position, not on the rest of the map: when more of the map is
+    /// dug out (the dig scene), the tiles already showing stay as they are.
     func draw(map: Map, seed: UInt64) {
-        var state = seed &* 6364136223846793005 &+ 1442695040888963407
-        func random(_ n: Int) -> Int {
-            state = state &* 6364136223846793005 &+ 1442695040888963407
-            return Int((state >> 33) % UInt64(n))
+        func random(_ n: Int, x: Int, y: Int) -> Int {
+            // a hash of the seed and the position (splitmix64 finaliser)
+            var h = seed &+ UInt64(x) &* 0x9E3779B97F4A7C15 &+ UInt64(y) &* 0xC2B2AE3D27D4EB4F
+            h = (h ^ (h >> 30)) &* 0xBF58476D1CE4E5B9
+            h = (h ^ (h >> 27)) &* 0x94D049BB133111EB
+            h ^= h >> 31
+            return Int(h % UInt64(n))
         }
 
         for y in 0 ..< map.size.height {
@@ -41,7 +46,7 @@ class FloorTileMap: SKTileMapNode {
 
                 switch tile {
                 case .floor, .wall:
-                    setTileGroup(floor[random(floor.count)], forColumn: c, row: r)
+                    setTileGroup(floor[random(floor.count, x: x, y: y)], forColumn: c, row: r)
                     
                 case .floorGoal:
                     setTileGroup(goal, forColumn: c, row: r)

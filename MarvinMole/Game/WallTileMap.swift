@@ -110,6 +110,21 @@ class WallTileMap: SKTileMapNode {
 
                         } else if tileLeft.isWall, tileLeftUp.isVoid, tileUp.isWall {
                             index = 20
+
+                        // outer corners with a wall diagonally across them: this doesn't happen in a
+                        // level, but does while the dig scene digs out a level (walls appear around
+                        // each dug out cell); the corner's look only depends on the two sides
+                        } else if tileLeft.isVoid, tileUp.isVoid {
+                            index = 0
+
+                        } else if tileUp.isVoid, tileRight.isVoid {
+                            index = 2
+
+                        } else if tileLeft.isVoid, tileDown.isVoid {
+                            index = 6
+
+                        } else if tileRight.isVoid, tileDown.isVoid {
+                            index = 8
                         }
                         
                         setTileGroup(outerWalls[index], forColumn: c, row: r)
