@@ -7,7 +7,8 @@
 
 import SpriteKit
 
-/// Hero sprite
+/// Hero sprite. The sprite sheets have 64 x 64 pixel frames in a row; the hero is drawn at
+/// 32 x 32 points (the sprite's size, which changing texture doesn't affect), sharp on retina screens.
 class Hero: Sprite {
     
     // walking
@@ -17,10 +18,10 @@ class Hero: Sprite {
     static let walkDownTextures = SKTexture(imageNamed: "HeroWalkDown").split()
     
     // pushing
-    static let pushLeftTextures = SKTexture(imageNamed: "HeroWalkLeft").split()
-    static let pushUpTextures = SKTexture(imageNamed: "HeroWalkUp").split()
-    static let pushRightTextures = SKTexture(imageNamed: "HeroWalkRight").split()
-    static let pushDownTextures = SKTexture(imageNamed: "HeroWalkDown").split()
+    static let pushLeftTextures = SKTexture(imageNamed: "HeroPushLeft").split()
+    static let pushUpTextures = SKTexture(imageNamed: "HeroPushUp").split()
+    static let pushRightTextures = SKTexture(imageNamed: "HeroPushRight").split()
+    static let pushDownTextures = SKTexture(imageNamed: "HeroPushDown").split()
 
     // idling
     static let idleTextures = SKTexture(imageNamed: "HeroIdle").split()
@@ -60,7 +61,8 @@ class Hero: Sprite {
         // create action that moves the sprite and animates the texture
         let action = SKAction.group([
             SKAction.moveBy(x: dx, y: dy, duration: duration),
-            SKAction.animate(with: textures, timePerFrame: duration / Double(textures.count))])
+            SKAction.animate(with: textures, timePerFrame: duration / Double(textures.count),
+                             resize: false, restore: false)])
         action.timingMode = .linear
         return action
     }
