@@ -37,13 +37,30 @@ class GameScene: Scene {
         return node
     }()
     
-    /// Has the "level completed" popup been shown for the current map?
+    /// Has the current map's completion started (the fanfare, then the popup)?
     private var isCompletionShown = false
 
-    /// Level completed: congratulate, and offer to go back to the menu or on to the next level
-    private func showCompletion() {
+    /// Has the fanfare finished, so the "level completed" popup can be shown?
+    private var isFanfareFinished = false
+
+    /// Short fanfares, one picked at random each time (Artwork/Music/compose_fanfare.py):
+    /// "Food Away!", "Tidy Cupboards", "Call and Answer" and "Happy Dance"
+    private let fanfares = (1 ... 4).map {
+        SKAction.playSoundFileNamed("Fanfare\($0).m4a", waitForCompletion: true)
+    }
+
+    /// Level completed: save the solution, and play the fanfare; the popup follows once it has finished
+    private func startCompletion() {
         isCompletionShown = true
+        isFanfareFinished = false
         registerSolution()
+        run(SKAction.sequence([fanfares.randomElement()!, SKAction.run { [weak self] in self?.isFanfareFinished = true }]),
+            withKey: "fanfare")
+    }
+
+    /// Congratulate, and offer to go back to the menu or on to the next level
+    private func showCompletion() {
+        isFanfareFinished = false
         let popup = ModalPopup(message: "You did it! Marvin is happy!",
                                buttons: [.init(title: "Menu") { [weak self] in self?.onMenu() },
                                          .init(title: "Next") { [weak self] in self?.onNext() }])
@@ -238,6 +255,8 @@ class GameScene: Scene {
     func load(map: Map) {
         self.map = map
         isCompletionShown = false
+        isFanfareFinished = false
+        removeAction(forKey: "fanfare")     // the previous level's, if it was left during the fanfare
         pendingInput.removeAll()        // moves queued for the previous map
         mapView.update(with: map)
     }
@@ -277,8 +296,11 @@ class GameScene: Scene {
         
         if pendingInput.isEmpty, !mapView.hasActions() {
 
-            // level completed (and the last move has finished animating)
-            if map.isCompleted, !isCompletionShown, !ModalPopup.isShowing(in: self) {
+            // level completed (and the last move has finished animating): fanfare, then the popup
+            // (if another popup is showing, e.g. the quit question, it waits until that is closed)
+            if map.isCompleted, !isCompletionShown {
+                startCompletion()
+            } else if isFanfareFinished, !ModalPopup.isShowing(in: self) {
                 showCompletion()
             }
 
