@@ -46,6 +46,7 @@ final class ChessboardTransitionFilter: CIFilter {
 
     // board layout and look
     // (static, because SpriteKit copies the filter using the plain init())
+    // always 8 x 6: square on a 4:3 iPad, a little wider than tall on wider ones
     private static let columns = 8
     private static let rows = 6
     // two blues from the face gradient of the MARVIN MOLE title logo

@@ -21,9 +21,7 @@ class ProgressScene: DrippingScene {
     }()
 
     private lazy var backgroundImage = {
-        let node = SKSpriteNode(imageNamed: "ProgressBackground")
-        node.position = center
-        node.size = size
+        let node = backgroundSprite(imageNamed: "ProgressBackground")
         node.zPosition = -10
         return node
     }()
@@ -37,7 +35,7 @@ class ProgressScene: DrippingScene {
                                  fontSize: 30,
                                  horizontalAlignment: .right,
                                  verticalAlignment: .top,
-                                 maxWidth: frame.size.width * 0.65)
+                                 maxWidth: frame.size.height * 0.65 * 4 / 3)   // the same on every iPad
         node.position = CGPoint(x: frame.size.width - margin, y: frame.size.height - margin)
         node.text = "Oh dear!  Just as Marvin Mole finished up in one place, he needs to hurry to the next.  He would be so grateful for your help again."
         return node

@@ -25,23 +25,23 @@ class MenuScene: DrippingScene {
     }()
 
     private lazy var backgroundImage = {
-        let node = SKSpriteNode(imageNamed: "MenuBackground")
-        node.position = center
-        node.size = size
+        let node = backgroundSprite(imageNamed: "MenuBackground")
         node.zPosition = -2
         return node
     }()
 
     /// "MARVIN MOLE" logo, placed where it was in the original title screen
-    // menu layout: everything is left aligned with the title logo
-    private var menuLeft: CGFloat { frame.size.width * 0.0575 }
+    // menu layout: everything is left aligned with the title logo. Sizes and margins are fractions of
+    // the height (the same on every iPad; the width varies with the screen's shape). The fractions
+    // are the logo's place in the original 4:3 title screen, 4/3 of a fraction of the 4:3 width.
+    private var menuLeft: CGFloat { frame.size.height * 0.0575 * 4 / 3 }
     private let buttonSize = CGSize(width: 250, height: 90)
     private let buttonSpacing: CGFloat = 12
 
     /// "MARVIN MOLE" logo, placed where it was in the original title screen
     private lazy var titleImage = {
         let node = SKSpriteNode(imageNamed: "Title")
-        let width = frame.size.width * 0.519
+        let width = frame.size.height * 0.519 * 4 / 3
         node.size = CGSize(width: width, height: width * node.size.height / node.size.width)
         node.anchorPoint = CGPoint(x: 0, y: 0.5)
         node.position = CGPoint(x: menuLeft, y: frame.size.height * 0.843)
@@ -51,7 +51,7 @@ class MenuScene: DrippingScene {
     /// "IN TUNNEL TROUBLE", below the logo, right aligned with it
     private lazy var subtitleImage = {
         let node = SKSpriteNode(imageNamed: "Subtitle")
-        let width = frame.size.width * 0.399
+        let width = frame.size.height * 0.399 * 4 / 3
         node.size = CGSize(width: width, height: width * node.size.height / node.size.width)
         node.anchorPoint = CGPoint(x: 1, y: 0.5)
         node.position = CGPoint(x: titleImage.frame.maxX, y: frame.size.height * 0.783)

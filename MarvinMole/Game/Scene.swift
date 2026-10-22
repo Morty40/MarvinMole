@@ -17,8 +17,21 @@ class Scene: SKScene {
     static let menuScene = MenuScene()
     static let progressScene = ProgressScene()
 
+    /// All scenes are 768 points high, and as wide as the screen's shape asks for: 1024 points on a
+    /// 4:3 iPad, up to about 1170 on wider ones. Shown with `.aspectFit` at exactly the screen's shape,
+    /// a scene fills the whole screen (no black bars) without being stretched, and everything in it has
+    /// the same size, relative to the screen's height, on every iPad.
+    static let designHeight: CGFloat = 768
+
+    /// The size of every scene, from the screen (in landscape; never narrower than 4:3)
+    static let sceneSize: CGSize = {
+        let bounds = UIScreen.main.bounds
+        let aspect = max(bounds.width, bounds.height) / min(bounds.width, bounds.height)
+        return CGSize(width: (designHeight * max(aspect, 4.0 / 3.0)).rounded(), height: designHeight)
+    }()
+
     override init() {
-        super.init(size: CGSize(width: 1024, height: 768))
+        super.init(size: Scene.sceneSize)
         backgroundColor = .black
         scaleMode = .aspectFit
         anchorPoint = .zero
@@ -43,5 +56,20 @@ class Scene: SKScene {
     
     var center: CGPoint {
         CGPoint(x: frame.size.width * 0.5, y: frame.size.height * 0.5)
+    }
+
+    /// A background image that covers the whole scene: centred, and scaled up evenly (never stretched)
+    /// until it fills both the width and the height; what doesn't fit is cropped
+    func backgroundSprite(imageNamed name: String) -> SKSpriteNode {
+        let node = SKSpriteNode(imageNamed: name)
+        node.position = center
+        node.size = Self.coverSize(of: node.texture?.size() ?? size, in: size)
+        return node
+    }
+
+    /// The size of an image (of `imageSize`'s shape) scaled evenly to cover `area`
+    static func coverSize(of imageSize: CGSize, in area: CGSize) -> CGSize {
+        let scale = max(area.width / imageSize.width, area.height / imageSize.height)
+        return CGSize(width: imageSize.width * scale, height: imageSize.height * scale)
     }
 }

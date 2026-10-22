@@ -17,16 +17,14 @@ class FloodScene: Scene {
     
     private lazy var mapView = {
         let node = MapView()
-        node.playArea = MapView.borderPlayArea      // inside the flower and stone border
+        node.playArea = MapView.borderPlayArea(in: Scene.sceneSize)    // inside the flower and stone border
         node.zPosition = -20        // its sprites sit 1 above this
         return node
     }()
 
     /// Flower and stone border, framing the map
     private lazy var borderImage = {
-        let node = SKSpriteNode(imageNamed: "GameBorder")
-        node.position = center
-        node.size = size
+        let node = backgroundSprite(imageNamed: "GameBorder")
         node.zPosition = -10
         return node
     }()

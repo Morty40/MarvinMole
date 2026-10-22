@@ -58,7 +58,7 @@ class MapView: SKNode {
     }()
 
     /// Size of the scene the grass must cover
-    var sceneSize = CGSize(width: 1024, height: 768)
+    var sceneSize = Scene.sceneSize
 
     /// Set when the view will zoom in on parts of the map (larger scale, moved position):
     /// the grass then covers the scene for any part of the map
@@ -81,13 +81,24 @@ class MapView: SKNode {
     }
     
     /// Area of the scene the map is fitted into (scene coordinates)
-    var playArea = CGRect(x: 125, y: 125, width: 1024 - 250, height: 768 - 250)
+    var playArea = CGRect(origin: .zero, size: Scene.sceneSize).insetBy(dx: 125, dy: 125)
 
-    /// The open area inside the flower and stone border (GameBorder), measured from the image:
-    /// 8 points in from the border's edge, and clear of the buttons and the move counter in the corners.
-    /// On the right it reaches a little past the pink flowers in the top-right corner: a map there may
-    /// touch, or slightly overlap, them
-    static let borderPlayArea = CGRect(x: 93, y: 153, width: 697, height: 486)
+    /// The open area inside the flower and stone border (GameBorder), measured from the image as drawn
+    /// at 1024 x 768 points: 8 points in from the border's edge, and clear of the buttons and the move
+    /// counter in the corners. On the right it reaches a little past the pink flowers in the top-right
+    /// corner: a map there may touch, or slightly overlap, them
+    private static let borderOpening = CGRect(x: 93, y: 153, width: 697, height: 486)
+
+    /// The border's opening in a scene of `sceneSize`: the border covers the scene (scaled evenly and
+    /// centred, see `Scene.backgroundSprite`), and the opening scales and moves with it
+    static func borderPlayArea(in sceneSize: CGSize) -> CGRect {
+        let designSize = CGSize(width: 1024, height: 768)
+        let drawn = Scene.coverSize(of: designSize, in: sceneSize)
+        let scale = drawn.width / designSize.width
+        let origin = CGPoint(x: (sceneSize.width - drawn.width) / 2, y: (sceneSize.height - drawn.height) / 2)
+        return CGRect(x: origin.x + borderOpening.minX * scale, y: origin.y + borderOpening.minY * scale,
+                      width: borderOpening.width * scale, height: borderOpening.height * scale)
+    }
 
     func update(with map: Map) {
         waterTileMap.clear()

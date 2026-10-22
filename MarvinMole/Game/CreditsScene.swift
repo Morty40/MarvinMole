@@ -18,9 +18,7 @@ class CreditsScene: Scene {
 
     // TODO: own background image
     private lazy var backgroundImage = {
-        let node = SKSpriteNode(imageNamed: "CreditsBackground")
-        node.position = center
-        node.size = size
+        let node = backgroundSprite(imageNamed: "CreditsBackground")
         node.zPosition = -10
         return node
     }()
