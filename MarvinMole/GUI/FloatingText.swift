@@ -10,8 +10,13 @@ import SpriteKit
 class FloatingText: SKLabelNode {
         
     private var label: SKLabelNode!
+
+    /// Seconds the text is shown: longer texts get more time to read (about 16 characters per second
+    /// on top of a second), within limits
+    let duration: TimeInterval
     
     init(text: String) {
+        duration = min(max(1.0 + 0.06 * Double(text.count), 1.2), 3.5)
         super.init()
         
         fontName = "Rubik-Bold"
@@ -50,10 +55,11 @@ class FloatingText: SKLabelNode {
         fatalError("init(coder:) has not been implemented")
     }
     
+    /// Floats up slowly (10 points per second) for `duration` seconds, fading out at the end
     func runAnimation() {
-        let moveUp = SKAction.moveBy(x: 0, y: 10, duration: 1.0)
+        let moveUp = SKAction.moveBy(x: 0, y: 10 * duration, duration: duration)
         
-        let wait = SKAction.wait(forDuration: 0.7)
+        let wait = SKAction.wait(forDuration: duration - 0.3)
         let fadeOut = SKAction.fadeOut(withDuration: 0.3)
         let fadeOutSequence = SKAction.sequence([wait, fadeOut])
         

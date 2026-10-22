@@ -22,6 +22,18 @@ class DemoScene: Scene {
     private let completedDuration: TimeInterval = 3.0
     private var map: Map = .empty
     private var moves: [Map.Move] = []
+
+    /// Before solving the level, Marvin idles for a moment, says something, and waits a little longer
+    private let pauseBeforeSaying: TimeInterval = 0.5
+    private let waitAfterSaying: ClosedRange<TimeInterval> = 1 ... 2
+
+    /// Set while Marvin idles before he starts solving the level
+    private var isStarting = true
+
+    /// What Marvin says when he sees his flooded burrow, and his food all over the floor
+    private let startSayings = ["What a mess!", "Let's get this cleaned up!", "Oh dear!",
+                                "Food everywhere!", "Who left the tap on?",
+                                "Soggy snacks again!", "Time to tidy up.", "Not again!"]
     
     // layers, back to front: map (with its grass), border (same as GameScene)
     
@@ -72,6 +84,29 @@ class DemoScene: Scene {
         startTime = 0.0
         completedTime = 0.0
         isClosing = false
+
+        // as actions: they are paused while a transition into this scene runs, so this only starts
+        // once the scene is showing
+        isStarting = true
+        removeAction(forKey: "start")
+        run(SKAction.sequence([SKAction.wait(forDuration: pauseBeforeSaying),
+                               SKAction.run { [weak self] in self?.say(from: self?.startSayings ?? []) },
+                               SKAction.wait(forDuration: .random(in: waitAfterSaying)),
+                               SKAction.run { [weak self] in self?.isStarting = false }]),
+            withKey: "start")
+    }
+
+    /// Marvin says one of `list`, floating up above him
+    private func say(from list: [String]) {
+        guard let saying = list.randomElement() else {
+            return
+        }
+        let hero = mapView.hero
+        let text = FloatingText(text: saying)
+        text.position = hero.parent!.convert(hero.position, to: self)
+        text.position.y += 20 * mapView.yScale
+        addChild(text)
+        text.runAnimation()
     }
     
     override func handleKey(_ key: UIKey) {
@@ -93,7 +128,7 @@ class DemoScene: Scene {
         
         if !mapView.hasActions() {
             
-            if let move = moves.first {
+            if !isStarting, let move = moves.first {
                 let movedObjects = map.makeMove(move)
                 mapView.animateMovedObjects(movedObjects: movedObjects, move: move, map: map)
                 moves.removeFirst()

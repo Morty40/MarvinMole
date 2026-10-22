@@ -11,14 +11,16 @@ class FloodScene: Scene {
     
     private var map: Map = .empty
     
-    private var sfx = SKAction.playSoundFileNamed("WaterFlooding.wav", waitForCompletion: false)
-
     // layers, back to front: map (with its grass), border (same as GameScene)
     
     private lazy var mapView = {
         let node = MapView()
         node.playArea = MapView.borderPlayArea(in: Scene.sceneSize)    // inside the flower and stone border
         node.zPosition = -20        // its sprites sit 1 above this
+        // the food is under the water, and the water under the walls (the water is also drawn on the
+        // walls next to it, so the walls' rounded corners show water)
+        node.waterTileMap.zPosition = 1.5
+        node.wallTileMap.zPosition = 2
         return node
     }()
 
@@ -41,123 +43,116 @@ class FloodScene: Scene {
     /// The scene is about to be presented by a view
     /// - Parameter view: The view that is presenting the scene
     override func didMove(to view: SKView) {
-        var floodingActions: [SKAction] = []
+        // a sequence left over from the last time (e.g. skipped with a key) must not run along
+        removeAction(forKey: "flooding")
+        run(floodingSequence(), withKey: "flooding")
+    }
 
-        // wait a bit
-        floodingActions.append(SKAction.wait(forDuration: 0.5))
+    // timing, in seconds
+    private let pause: TimeInterval = 0.6                // between the steps
+    private let floodStepDuration: TimeInterval = 0.05   // per step of the water spreading
+    private let riseDuration: TimeInterval = 1.0
+    private let drainDuration: TimeInterval = 1.0
 
-        floodingActions.append(sfx)
+    /// The water is see-through while it spreads, and opaque once it has risen
+    private let spreadingAlpha: CGFloat = 0.5
 
-        let startPosition = map.randomFloorPosition()!
-        
-        let bfd = map.breadthFirstDistanceFrom(x: startPosition.x, y: startPosition.y)
-        let maxDistance = bfd.map({ $0.map({ $0 ?? 0 }).max() ?? 0 }).max() ?? 0
-
-        floodingActions.append(SKAction.run {
-            self.mapView.waterTileMap.alpha = 0.5
-        })
-
-        for i in 0 ... maxDistance+1 {
-            floodingActions.append(SKAction.run {
-                self.mapView.waterTileMap.draw(map: self.map, bfd: bfd, distance: i, isDraining: false)
-            })
-            floodingActions.append(SKAction.wait(forDuration: 0.05))
+    /// The flooding, step by step:
+    /// 1. the empty map (floor, shadows, walls, cupboards; no food, no Marvin)
+    /// 2. water spreads from a random floor tile, breadth first, semi transparent
+    /// 3. the water rises: it becomes opaque
+    /// 4. the food appears where it belongs, and Marvin where he starts, under the water
+    /// 5. the water drops: it fades out
+    /// 6. on to the next scene (the demo), which shows the same map
+    private func floodingSequence() -> SKAction {
+        let water = mapView.waterTileMap
+        let floor = floorCells()
+        guard let start = floor.randomElement() else {
+            return SKAction.run { [weak self] in self?.finish() }
         }
-        
-        // rising water level: alpha goes to 100%
-        floodingActions.append(SKAction.run {
-            self.mapView.waterTileMap.run(SKAction.fadeAlpha(to: 1.0, duration: 1.0))
-        })
-        
-        // wait a bit
-        floodingActions.append(SKAction.wait(forDuration: 2.0))
+        let distance = distances(from: start, in: floor)
+        let maxDistance = distance.values.max() ?? 0
 
-        // switch to draining water tiles
-        /*floodingActions.append(SKAction.run {
-            self.mapView.waterTileMap.draw(map: self.map, bfd: bfd, distance: maxDistance+1, isDraining: true)
-        })*/
-        
-        // show boxes in random positions
-        floodingActions.append(SKAction.run {
-            for box in self.mapView.boxContainer.children {
-                if let box = box as? Box {
-                    if let object = self.map.objectsOfType(.box).first(where: { $0.id == box.id }) {
-                     
-                        let randomPostion = self.map.randomFloorPosition(adjacentTo: object.position)!
-                        
-                        let x = randomPostion.x
-                        let y = randomPostion.y
-                        
-                        box.setMapPosition(x: x, y: y, tileMap: self.mapView.floorTileMap)
-                        box.updateTexture(on: .floor)     // food, while it floats in the water
-                    }
-                }
-            }
+        var steps: [SKAction] = []
+
+        // 1. the empty map, without water
+        steps.append(SKAction.run { [weak self] in
+            guard let self else { return }
+            water.clear()
+            water.alpha = self.spreadingAlpha
+            self.mapView.boxContainer.isHidden = true
+            self.mapView.hero.isHidden = true
+        })
+        steps.append(SKAction.wait(forDuration: pause))
+
+        // 2. the water spreads, one step of the breadth first search at a time
+        for d in 0 ... maxDistance + 1 {
+            steps.append(SKAction.run { [weak self] in
+                guard let self else { return }
+                water.draw(map: self.map, isWater: { distance[Cell(x: $0, y: $1)].map { $0 < d } ?? false })
+            })
+            steps.append(SKAction.wait(forDuration: floodStepDuration))
+        }
+        steps.append(SKAction.wait(forDuration: pause))
+
+        // 3. the water rises
+        steps.append(SKAction.run { water.run(SKAction.fadeAlpha(to: 1.0, duration: self.riseDuration)) })
+        steps.append(SKAction.wait(forDuration: riseDuration + pause))
+
+        // 4. the food where it belongs, and Marvin, under the (opaque) water
+        steps.append(SKAction.run { [weak self] in
+            guard let self else { return }
+            self.mapView.updateSpritePositions(self.map)
             self.mapView.boxContainer.isHidden = false
+            self.mapView.hero.isHidden = false
         })
-        
-        // wait a bit
-        floodingActions.append(SKAction.wait(forDuration: 2.0))
+        steps.append(SKAction.wait(forDuration: pause))
 
-//        let boxObjects = map.objectsOfType(.box)
-//        let boxSprites = mapView.boxContainer.children
-        
-        // TODO: move boxes to correct position while draining water
-        
-        
-        floodingActions.append(SKAction.run {
-            for box in self.mapView.boxContainer.children {
-                if let box = box as? Box {
-                    
-                    if let object = self.map.objectsOfType(.box).first(where: { $0.id == box.id }) {
-                        
-                        let x = object.position.x
-                        let y = object.position.y
-                        
-                        let w = self.mapView.floorTileMap.frame.width / self.mapView.floorTileMap.xScale
-                        let h = self.mapView.floorTileMap.frame.height / self.mapView.floorTileMap.yScale
-                        
-                        let xx = 32*(CGFloat(x)+0.5) - w/2
-                        let yy = h/2 - 32*(CGFloat(y)+0.5)
-                        
-                        let randomTime1 = Double.random(in: 0.0 ... 1.0)
-                        let randomTime2 = Double.random(in: 0.0 ... 1.0)
+        // 5. the water drops
+        steps.append(SKAction.run { water.run(SKAction.fadeAlpha(to: 0, duration: self.drainDuration)) })
+        steps.append(SKAction.wait(forDuration: drainDuration + pause))
 
-                        let waitAction = SKAction.wait(forDuration: randomTime1)
-                        let moveAction = SKAction.move(to: CGPoint(x: xx, y: yy), duration: 1.0 + 2.0 * randomTime2)
-                        moveAction.timingMode = .easeOut
-                        // once it has settled, a crate if it stands on a cupboard tile
-                        let tile = self.map.tileAt(x: x, y: y)
-                        let textureAction = SKAction.run { box.updateTexture(on: tile) }
-                        box.run(SKAction.sequence([waitAction, moveAction, textureAction]))
-                    }
-                }
+        // 6. on to the next scene
+        steps.append(SKAction.run { [weak self] in self?.finish() })
+        return SKAction.sequence(steps)
+    }
+
+    /// A cell of the map
+    private struct Cell: Hashable {
+        let x: Int, y: Int
+        var neighbours: [Cell] {
+            [Cell(x: x - 1, y: y), Cell(x: x + 1, y: y), Cell(x: x, y: y - 1), Cell(x: x, y: y + 1)]
+        }
+    }
+
+    private func floorCells() -> Set<Cell> {
+        var cells = Set<Cell>()
+        for y in 0 ..< map.size.height {
+            for x in 0 ..< map.size.width where map.tileAt(x: x, y: y).isFloor {
+                cells.insert(Cell(x: x, y: y))
             }
-        })
+        }
+        return cells
+    }
 
-        // wait a bit
-        floodingActions.append(SKAction.wait(forDuration: 1.0))
+    /// Breadth first: the number of steps from `start` to every floor cell reachable from it
+    private func distances(from start: Cell, in floor: Set<Cell>) -> [Cell: Int] {
+        var distance = [start: 0]
+        var queue = [start]
+        var i = 0
+        while i < queue.count {
+            let cell = queue[i]; i += 1
+            for n in cell.neighbours where floor.contains(n) && distance[n] == nil {
+                distance[n] = distance[cell]! + 1
+                queue.append(n)
+            }
+        }
+        return distance
+    }
 
-        floodingActions.append(SKAction.run {
-            self.mapView.waterTileMap.run(SKAction.fadeAlpha(to: 0.3, duration: 2.0))
-        })
-        floodingActions.append(SKAction.wait(forDuration: 2.0))
-
-        floodingActions.append(SKAction.run {
-            self.mapView.waterTileMap.run(SKAction.fadeAlpha(to: 0.0, duration: 0.5))
-        })
-        floodingActions.append(SKAction.wait(forDuration: 0.5))
-
-        // wait a bit
-        floodingActions.append(SKAction.wait(forDuration: 1.0))
-
-        floodingActions.append(SKAction.run {
-            self.transition(to: self.nextScene, animated: false)
-        })
-
-        let floodingSequence = SKAction.sequence(floodingActions)
-        mapView.run(floodingSequence)
-        
+    private func finish() {
+        removeAction(forKey: "flooding")
+        transition(to: nextScene, animated: false)
     }
 
     /// The scene that follows the flooding (it shows the same map)
@@ -173,14 +168,16 @@ class FloodScene: Scene {
     
     override func handleKey(_ key: UIKey) {
         // any key skips to the next scene
-        transition(to: nextScene, animated: false)
+        finish()
     }
     
     override func update(_ currentTime: TimeInterval) {
         super.update(currentTime)
 
         mapView.hero.update(currentTime)
-        
+        if !mapView.hero.isHidden {
+            mapView.hero.idle()     // (the idle animation also gives him his picture)
+        }
     }
 
 }
