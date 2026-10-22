@@ -13,6 +13,7 @@ Considerations:
 - Goal tiles are often grouped together in a level, but may also be distributed across the level in smaller groups.
 - A good variation between the levels, within the constraints given below, should be prioritized.
 - Within each level collection, the levels are sorted by difficulty (number of boxes, length of the solutions).
+- There can be no duplicate, or near duplicate, levels.
 
 
 Easy Levels:
