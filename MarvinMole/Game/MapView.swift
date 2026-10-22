@@ -84,9 +84,10 @@ class MapView: SKNode {
     var playArea = CGRect(x: 125, y: 125, width: 1024 - 250, height: 768 - 250)
 
     /// The open area inside the flower and stone border (GameBorder), measured from the image:
-    /// the largest rectangle that fits, 8 points in from the border's edge,
-    /// and clear of the buttons and the move counter in the corners
-    static let borderPlayArea = CGRect(x: 93, y: 153, width: 660, height: 486)
+    /// 8 points in from the border's edge, and clear of the buttons and the move counter in the corners.
+    /// On the right it reaches a little past the pink flowers in the top-right corner: a map there may
+    /// touch, or slightly overlap, them
+    static let borderPlayArea = CGRect(x: 93, y: 153, width: 697, height: 486)
 
     func update(with map: Map) {
         waterTileMap.clear()
