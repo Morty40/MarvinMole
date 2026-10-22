@@ -94,9 +94,14 @@ class MapView: SKNode {
         // waterTileMap is only used for the flooding sequence
         redrawTiles(map)
         
+        // one type of food per level, chosen at random, but always the same for the same level
+        var mixed = seed(for: map) &* 0x9E3779B97F4A7C15
+        mixed ^= mixed >> 31
+        let boxType = Int(mixed % UInt64(Box.boxTextures.count))
+
         boxContainer.removeAllChildren()
         for b in map.objectsOfType(.box) {
-            let box = Box(id: b.id)
+            let box = Box(id: b.id, type: boxType)
             boxContainer.addChild(box)
         }
         updateSpritePositions(map)
@@ -140,7 +145,7 @@ class MapView: SKNode {
         wallTileMap.draw(map: map)
     }
 
-    /// A stable seed per level, for its random floor and grass
+    /// A stable seed per level, for its random floor, grass and food
     /// (String.hashValue changes between launches, so it can't be used)
     private func seed(for map: Map) -> UInt64 {
         (map.title ?? "").utf8.reduce(UInt64(map.size.width * 1000 + map.size.height)) { $0 &* 31 &+ UInt64($1) }
