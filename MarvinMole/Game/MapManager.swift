@@ -111,6 +111,12 @@ extension MapManager: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.selectedMap = try container.decode(MapSelection.self, forKey: .selectedMap)
         self.solvedMaps = try container.decode([MapSolution].self, forKey: .solvedMaps)
+
+        // a level that no longer exists (e.g. the collection has fewer levels since the save) starts over
+        // at level 1, so the menu shows a real level and Start always has one to start
+        if !(1 ... selectedMap.collection.count).contains(selectedMap.number) {
+            selectedMap.number = 1
+        }
     }
 
     func encode(to encoder: Encoder) throws {
