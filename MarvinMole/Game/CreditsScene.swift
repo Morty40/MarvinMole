@@ -16,7 +16,6 @@ class CreditsScene: Scene {
     /// Set once going back to the menu, so it only happens once
     private var isClosing = false
 
-    // TODO: own background image
     private lazy var backgroundImage = {
         let node = backgroundSprite(imageNamed: "CreditsBackground")
         node.zPosition = -10
