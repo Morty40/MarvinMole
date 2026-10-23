@@ -101,6 +101,12 @@ class MapView: SKNode {
     }
 
     func update(with map: Map) {
+        // stop a move that may still be animating from the previous map (when a scene was left in the
+        // middle of a move): moves animate relative to the hero's position, so the rest of that move
+        // would push the hero off his tile once the scene runs again
+        hero.removeAllActions()
+        hero.lastTime = 0
+
         waterTileMap.clear()
         waterTileMap.size = map.size
         // waterTileMap is only used for the flooding sequence
