@@ -208,32 +208,25 @@ class GameScene: Scene {
         addChild(downButton)
     }
     
+    /// Swipes for four way navigation; on the view only while this scene is showing, so they don't
+    /// delay or cancel touches in the other scenes (e.g. the menu buttons), or queue moves from there
+    private lazy var swipeRecognizers: [UISwipeGestureRecognizer] = [
+        (#selector(onSwipeLeft), .left), (#selector(onSwipeUp), .up),
+        (#selector(onSwipeRight), .right), (#selector(onSwipeDown), .down),
+    ].map { action, direction in
+        let recognizer = UISwipeGestureRecognizer(target: self, action: action)
+        recognizer.direction = direction
+        return recognizer
+    }
+
     /// The scene is about to be presented by a view
     /// - Parameter view: The view that is presenting the scene
     override func didMove(to view: SKView) {
-        
-        // remove any old gesture recognizers
-        for recognizer in view.gestureRecognizers ?? [] {
-            view.removeGestureRecognizer(recognizer)
-        }
-        
-        // add gesture recognizers for four way navigation
-        view.addGestureRecognizer(
-            UISwipeGestureRecognizer(target: self,
-                                     action: #selector(onSwipeLeft),
-                                     direction: .left))
-        view.addGestureRecognizer(
-            UISwipeGestureRecognizer(target: self,
-                                     action: #selector(onSwipeUp),
-                                     direction: .up))
-        view.addGestureRecognizer(
-            UISwipeGestureRecognizer(target: self,
-                                     action: #selector(onSwipeRight),
-                                     direction: .right))
-        view.addGestureRecognizer(
-            UISwipeGestureRecognizer(target: self,
-                                     action: #selector(onSwipeDown),
-                                     direction: .down))
+        swipeRecognizers.forEach { view.addGestureRecognizer($0) }
+    }
+
+    override func willMove(from view: SKView) {
+        swipeRecognizers.forEach { view.removeGestureRecognizer($0) }
     }
     
     /// Starts the selected map: loads it, and presents this scene from `scene` with a transition
