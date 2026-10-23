@@ -112,6 +112,7 @@ class MenuScene: DrippingScene {
         index = (index + 1) % MapManager.MapCollection.allCases.count
         MapManager.shared.selectedMap.collection = MapManager.MapCollection.allCases[index]
         MapManager.shared.selectedMap.number = 1
+        MapManager.shared.save()            // the menu reloads the saved state each time it appears
         
         refreshSelectedMap()
     }
@@ -129,6 +130,7 @@ class MenuScene: DrippingScene {
         startTime = 0.0
 
         MapManager.shared.incrementMapNumber()
+        MapManager.shared.save()            // the menu reloads the saved state each time it appears
 
         refreshSelectedMap()
     }
