@@ -6,13 +6,46 @@
 //
 
 import AVFoundation
+import UIKit
 
-/// Background music, independent of scenes, so it keeps playing across scene transitions
+/// Background music, independent of scenes, so it keeps playing across scene transitions.
+/// It pauses while the app is in the background (or interrupted, e.g. by Control Center or a call),
+/// and carries on when the app is back.
 final class MusicPlayer {
     static let shared = MusicPlayer()
 
     private var player: AVAudioPlayer? = nil
     private var fileName: String? = nil
+
+    /// Set while the music is paused because the app is not active
+    private var isPausedForBackground = false
+
+    private init() {
+        // game music: mixes with other apps' audio, and is silent when the ring/silent switch says so
+        try? AVAudioSession.sharedInstance().setCategory(.ambient)
+
+        let center = NotificationCenter.default
+        center.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: .main) { [weak self] _ in
+            self?.pauseForBackground()
+        }
+        center.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
+            self?.resumeFromBackground()
+        }
+    }
+
+    private func pauseForBackground() {
+        if let player, player.isPlaying {
+            player.pause()
+            isPausedForBackground = true
+        }
+    }
+
+    private func resumeFromBackground() {
+        if isPausedForBackground {
+            isPausedForBackground = false
+            player?.play()
+        }
+    }
 
     /// Starts looping the music, unless it is already playing (then nothing changes)
     /// - Parameters:
