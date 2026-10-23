@@ -114,6 +114,11 @@ class DemoScene: Scene {
         close()
     }
 
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        // a tap anywhere goes back to the menu
+        close()
+    }
+
     private func close() {
         if !isClosing {
             isClosing = true
@@ -153,5 +158,3 @@ class DemoScene: Scene {
     }
 
 }
-
-// TODO: add tap gesture recognizer, that transitions back to the menu. Check menu buttons are still working (bug?)

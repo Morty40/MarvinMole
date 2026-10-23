@@ -43,6 +43,7 @@ class FloodScene: Scene {
     /// The scene is about to be presented by a view
     /// - Parameter view: The view that is presenting the scene
     override func didMove(to view: SKView) {
+        isClosing = false
         // a sequence left over from the last time (e.g. skipped with a key) must not run along
         removeAction(forKey: "flooding")
         run(floodingSequence(), withKey: "flooding")
@@ -155,6 +156,18 @@ class FloodScene: Scene {
         transition(to: nextScene, animated: false)
     }
 
+    /// Set once leaving early (with a tap), so it only happens once
+    private var isClosing = false
+
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        // a tap anywhere goes back to the menu (the flood is the start of the menu's idle demo)
+        if !isClosing {
+            isClosing = true
+            removeAction(forKey: "flooding")
+            transition(to: Scene.menuScene)
+        }
+    }
+
     /// The scene that follows the flooding (it shows the same map)
     private var nextScene: SKScene = Scene.demoScene
 
@@ -181,5 +194,3 @@ class FloodScene: Scene {
     }
 
 }
-
-// TODO: add tap gesture recognizer, that transitions back to the menu. Check menu buttons are still working (bug?)
