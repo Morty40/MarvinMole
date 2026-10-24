@@ -73,11 +73,14 @@ class Box: Sprite {
         let action = SKAction.sequence([
             SKAction.moveBy(x: dx, y: dy, duration: duration),
             SKAction.run { [weak self] in
+                guard let self else { return }
                 // only the picture: the state was set when the push started, and a newer push
                 // may already have started (when a button is held, it can start a frame before this)
-                self?.showCrate(toTile == .floorGoal)
-                if changes {
-                    self?.popIn()
+                self.showCrate(toTile == .floorGoal)
+                // no pop when the crate is already disappearing into its cabinet: the level's completion
+                // can start a frame before this, and the pop would stop it disappearing
+                if changes, !self.isDisappearing {
+                    self.popIn()
                 }
             }])
         action.timingMode = .linear
@@ -107,8 +110,12 @@ class Box: Sprite {
     /// How long a crate takes to disappear into its cabinet
     static let disappearDuration: TimeInterval = 0.3
 
+    /// Set once the crate is disappearing into its cabinet
+    private var isDisappearing = false
+
     /// The crate shrinks into its cabinet and is gone, with a puff of smoke (the level is completed)
     func disappearIntoCabinet() {
+        isDisappearing = true
         removeAction(forKey: "pop")
         puff(with: Self.smokeTexture)
         let shrink = SKAction.group([SKAction.scale(to: 0.2, duration: Self.disappearDuration),
@@ -120,6 +127,7 @@ class Box: Sprite {
     /// Placed on a tile (e.g. at the start, or after an undo): a pop in progress stops, at full size
     override func setMapPosition(x: Int, y: Int, tileMap: SKTileMapNode) {
         removeAction(forKey: "pop")
+        isDisappearing = false
         setScale(1.0)
         alpha = 1.0
         isHidden = false
