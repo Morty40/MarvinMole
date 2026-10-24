@@ -49,7 +49,11 @@ class ProgressScene: DrippingScene {
         return node
     }()
 
-    /// In the bottom-right corner
+    /// Set each time the scene is shown: are all levels of the current collection solved?
+    private var isCollectionCompleted = false
+
+    /// In the bottom-right corner: "Next" (on to the next level), or "Menu" once all levels of the
+    /// collection are solved (its title is set each time the scene is shown)
     private lazy var nextButton = {
         let node = TextButton(title: "Next", target: self, action: #selector(onNext))
         node.position = CGPoint(x: frame.size.width - margin - node.size.width / 2,
@@ -59,7 +63,11 @@ class ProgressScene: DrippingScene {
 
     @objc private func onNext() {
         MusicPlayer.shared.fadeOut(duration: 1.0)
-        Scene.gameScene.startCurrentMap(from: self)
+        if isCollectionCompleted {
+            transition(to: Scene.menuScene)
+        } else {
+            Scene.gameScene.startCurrentMap(from: self)
+        }
     }
 
     /// This is called once after the scene has been initialized,
@@ -78,8 +86,9 @@ class ProgressScene: DrippingScene {
     override func didMove(to view: SKView) {
         // the story and background: all levels of the current collection solved, or more to go
         let collection = MapManager.shared.selectedMap.collection
-        let isCollectionCompleted = MapManager.shared.numberOfSolvedMaps(in: collection) >= collection.count
+        isCollectionCompleted = MapManager.shared.numberOfSolvedMaps(in: collection) >= collection.count
         storyText.text = isCollectionCompleted ? collectionCompletedText : collectionNotCompletedText
+        nextButton.title = isCollectionCompleted ? "Menu" : "Next"
         let background = SKTexture(imageNamed: isCollectionCompleted ? "LevelsCompleteBackground" : "LevelsIncompleteBackground")
         backgroundImage.texture = background
         backgroundImage.size = Scene.coverSize(of: background.size(), in: size)
