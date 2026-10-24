@@ -17,7 +17,7 @@ class CreditsScene: Scene {
     private var isClosing = false
 
     private lazy var backgroundImage = {
-        let node = backgroundSprite(imageNamed: "CreditsBackground")
+        let node = backgroundSprite(imageNamed: "CreditsBackground", focus: CGPoint(x: 0.6, y: 0.5))
         node.zPosition = -10
         return node
     }()
@@ -81,6 +81,7 @@ class CreditsScene: Scene {
     /// The scene is about to be presented by a view
     /// - Parameter view: The view that is presenting the scene
     override func didMove(to view: SKView) {
+        backgroundImage.startKenBurns()
         startTime = 0.0
         isClosing = false
     }

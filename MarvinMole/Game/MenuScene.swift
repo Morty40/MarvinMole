@@ -25,7 +25,7 @@ class MenuScene: DrippingScene {
     }()
 
     private lazy var backgroundImage = {
-        let node = backgroundSprite(imageNamed: "MenuBackground")
+        let node = backgroundSprite(imageNamed: "MenuBackground", focus: CGPoint(x: 0.7, y: 0.5))
         node.zPosition = -2
         return node
     }()
@@ -158,6 +158,7 @@ class MenuScene: DrippingScene {
     /// The scene is about to be presented by a view
     /// - Parameter view: The view that is presenting the scene
     override func didMove(to view: SKView) {
+        backgroundImage.startKenBurns()
         rain.prewarm()
         startDripping()
         startMusic()

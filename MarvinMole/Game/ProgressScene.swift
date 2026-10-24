@@ -23,7 +23,7 @@ class ProgressScene: DrippingScene {
     /// The background: one for when all levels of the collection are solved, one for when they're not
     /// (its image is set each time the scene is shown)
     private lazy var backgroundImage = {
-        let node = backgroundSprite(imageNamed: "LevelsIncompleteBackground")
+        let node = backgroundSprite(imageNamed: "LevelsIncompleteBackground", focus: CGPoint(x: 0.4, y: 0.5))
         node.zPosition = -10
         return node
     }()

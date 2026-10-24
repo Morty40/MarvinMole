@@ -59,12 +59,11 @@ class Scene: SKScene {
     }
 
     /// A background image that covers the whole scene: centred, and scaled up evenly (never stretched)
-    /// until it fills both the width and the height; what doesn't fit is cropped
-    func backgroundSprite(imageNamed name: String) -> SKSpriteNode {
-        let node = SKSpriteNode(imageNamed: name)
-        node.position = center
-        node.size = Self.coverSize(of: node.texture?.size() ?? size, in: size)
-        return node
+    /// until it fills both the width and the height; what doesn't fit is cropped.
+    /// - Parameter focus: The point to slowly pan and zoom in on (see `BackgroundSprite.startKenBurns`),
+    ///   in unit coordinates of the image from its top-left corner; nil for a still image
+    func backgroundSprite(imageNamed name: String, focus: CGPoint? = nil) -> BackgroundSprite {
+        BackgroundSprite(imageNamed: name, focus: focus, sceneSize: size)
     }
 
     /// The size of an image (of `imageSize`'s shape) scaled evenly to cover `area`
