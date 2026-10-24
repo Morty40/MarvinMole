@@ -7,7 +7,8 @@
 
 import SpriteKit
 
-/// Floor under the map: random tiles from the Floor sheet (4 x 4 tiles), and cupboards on the goals.
+/// Floor under the map: random tiles from the Floor sheet (4 x 4 tiles), and cabinets on the goals,
+/// open or closed.
 class FloorTileMap: SKTileMapNode {
     
     /// The floor and goal tiles are 64 pixels: drawn at 32 points, the same size as the other
@@ -17,11 +18,15 @@ class FloorTileMap: SKTileMapNode {
     let floor = SKTexture(imageNamed: "Floor").split(columns: 4, rows: 4).map {
         SKTileGroup(tileDefinition: SKTileDefinition(texture: $0, size: tileSize)) }
     
-    let goal = SKTileGroup(tileDefinition: SKTileDefinition(texture: SKTexture(imageNamed: "CabinetClosed"), size: tileSize))
+    let goalOpen = SKTileGroup(tileDefinition: SKTileDefinition(texture: SKTexture(imageNamed: "CabinetOpen"), size: tileSize))
+    let goalClosed = SKTileGroup(tileDefinition: SKTileDefinition(texture: SKTexture(imageNamed: "CabinetClosed"), size: tileSize))
+
+    /// Whether the cabinets are drawn open or closed
+    var isCabinetOpen = true
 
     override init() {
         super.init()
-        tileSet = SKTileSet(tileGroups: floor + [goal])
+        tileSet = SKTileSet(tileGroups: floor + [goalOpen, goalClosed])
     }
     
     /// Draws the floor with random tiles. The layout is seeded, so the same seed always
@@ -49,13 +54,30 @@ class FloorTileMap: SKTileMapNode {
                     setTileGroup(floor[random(floor.count, x: x, y: y)], forColumn: c, row: r)
                     
                 case .floorGoal:
-                    setTileGroup(goal, forColumn: c, row: r)
+                    setTileGroup(isCabinetOpen ? goalOpen : goalClosed, forColumn: c, row: r)
                     
                 default:
                     break
                 }
             }
         }        
+    }
+
+    /// Opens or closes all the cabinets
+    func setCabinetsOpen(_ open: Bool) {
+        isCabinetOpen = open
+        for r in 0 ..< numberOfRows {
+            for c in 0 ..< numberOfColumns {
+                if let group = tileGroup(atColumn: c, row: r), group === goalOpen || group === goalClosed {
+                    setTileGroup(open ? goalOpen : goalClosed, forColumn: c, row: r)
+                }
+            }
+        }
+    }
+
+    /// Opens or closes the cabinet at a map position
+    func setCabinet(open: Bool, x: Int, y: Int) {
+        setTileGroup(open ? goalOpen : goalClosed, forColumn: x, row: numberOfRows - y - 1)
     }
 
     func clear() {

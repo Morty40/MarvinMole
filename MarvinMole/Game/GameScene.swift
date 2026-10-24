@@ -47,11 +47,13 @@ class GameScene: Scene {
         SKAction.playSoundFileNamed("Fanfare\($0).m4a", waitForCompletion: true)
     }
 
-    /// Level completed: save the solution, and play the fanfare; the popup follows once it has finished
+    /// Level completed: save the solution, and play the fanfare while the cabinets close one by one;
+    /// the popup follows once it has finished
     private func startCompletion() {
         isCompletionShown = true
         isFanfareFinished = false
         registerSolution()
+        mapView.closeCabinets(map, within: 3.0)     // (the fanfares are 3.6 seconds)
         run(SKAction.sequence([fanfares.randomElement()!, SKAction.run { [weak self] in self?.isFanfareFinished = true }]),
             withKey: "fanfare")
     }

@@ -9,7 +9,7 @@ import SpriteKit
 
 /// Marvin Mole shows how he digs his tunnels. Shown by the menu now and then (taking turns with the demo
 /// and the credits). He starts in a single dug out spot, surrounded by walls, and digs out the floor of a
-/// random level (with its cupboards, without food), the view zooming out as the tunnels grow. Every so
+/// random level (with its cabinets, without food), the view zooming out as the tunnels grow. Every so
 /// often he stops for a moment, and says something.
 /// Back to the menu a moment after the level is dug out, after some time in any case, or on a tap or key.
 class DigScene: Scene {
@@ -67,7 +67,7 @@ class DigScene: Scene {
     /// Marvin's steps, in order: digging into new ground, and walking back through his tunnels
     private var steps: [Map.Move] = []
     
-    /// The level's goals: dug out, they show cupboards
+    /// The level's goals: dug out, they show cabinets
     private var goals = Set<Cell>()
     
     /// A rectangle of cells (tile coordinates)
@@ -84,6 +84,7 @@ class DigScene: Scene {
         let node = MapView()
         node.playArea = MapView.borderPlayArea(in: Scene.sceneSize)    // inside the flower and stone border
         node.coversZoom = true                      // the view zooms in on the tunnels
+        node.floorTileMap.isCabinetOpen = false     // the cabinets stay closed
         node.zPosition = -20                        // its sprites sit 1 above this
         return node
     }()
@@ -115,7 +116,7 @@ class DigScene: Scene {
             return
         }
         
-        // the floor to dig out: the level's floor, and its goals, which show up as cupboards when dug out
+        // the floor to dig out: the level's floor, and its goals, which show up as cabinets when dug out
         var floor = Set<Cell>()
         goals = []
         for y in 0 ..< level.size.height {
@@ -188,7 +189,7 @@ class DigScene: Scene {
         return steps
     }
     
-    /// Digs out a cell: it becomes floor (or a cupboard), and everything around it that isn't dug yet becomes wall
+    /// Digs out a cell: it becomes floor (or a cabinet), and everything around it that isn't dug yet becomes wall
     private func dig(_ cell: Cell) {
         map.setTile(goals.contains(cell) ? .floorGoal : .floor, x: cell.x, y: cell.y)
         for dy in -1 ... 1 {

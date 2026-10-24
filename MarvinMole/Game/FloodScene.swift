@@ -59,11 +59,12 @@ class FloodScene: Scene {
     private let spreadingAlpha: CGFloat = 0.5
 
     /// The flooding, step by step:
-    /// 1. the empty map (floor, shadows, walls, cupboards; no food, no Marvin)
+    /// 1. the empty map (floor, shadows, walls, closed cabinets; no food, no Marvin)
     /// 2. water spreads from a random floor tile, breadth first, semi transparent
     /// 3. the water rises: it becomes opaque
-    /// 4. the food appears where it belongs, and Marvin where he starts, under the water
-    /// 5. the water drops: it fades out
+    /// 4. the cabinets open, the food floats out of them to where it belongs, and Marvin appears
+    ///    where he starts, all under the water
+    /// 5. the water drops: it fades out, showing the open cabinets and the food
     /// 6. on to the next scene (the demo), which shows the same map
     private func floodingSequence() -> SKAction {
         let water = mapView.waterTileMap
@@ -81,6 +82,7 @@ class FloodScene: Scene {
             guard let self else { return }
             water.clear()
             water.alpha = self.spreadingAlpha
+            self.mapView.floorTileMap.setCabinetsOpen(false)
             self.mapView.boxContainer.isHidden = true
             self.mapView.hero.isHidden = true
         })
@@ -100,9 +102,10 @@ class FloodScene: Scene {
         steps.append(SKAction.run { water.run(SKAction.fadeAlpha(to: 1.0, duration: self.riseDuration)) })
         steps.append(SKAction.wait(forDuration: riseDuration + pause))
 
-        // 4. the food where it belongs, and Marvin, under the (opaque) water
+        // 4. the cabinets open, letting the food out, and Marvin, under the (opaque) water
         steps.append(SKAction.run { [weak self] in
             guard let self else { return }
+            self.mapView.floorTileMap.setCabinetsOpen(true)
             self.mapView.updateSpritePositions(self.map)
             self.mapView.boxContainer.isHidden = false
             self.mapView.hero.isHidden = false
@@ -174,6 +177,7 @@ class FloodScene: Scene {
     func load(map: Map, then nextScene: SKScene) {
         self.map = map
         self.nextScene = nextScene
+        mapView.floorTileMap.isCabinetOpen = false      // until the water is at its highest
         mapView.update(with: map)
         mapView.hero.isHidden = true
         mapView.boxContainer.isHidden = true

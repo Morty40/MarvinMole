@@ -106,6 +106,7 @@ class MapView: SKNode {
         // would push the hero off his tile once the scene runs again
         hero.removeAllActions()
         hero.lastTime = 0
+        removeAction(forKey: "cabinets")    // cabinets still closing on the previous map
 
         waterTileMap.clear()
         waterTileMap.size = map.size
@@ -182,11 +183,39 @@ class MapView: SKNode {
                     box.setMapPosition(x: object.position.x,
                                        y: object.position.y,
                                        tileMap: floorTileMap)
-                    // a crate on a cupboard tile, food elsewhere (at the start, and after an undo)
+                    // a crate on a cabinet tile, food elsewhere (at the start, and after an undo)
                     box.updateTexture(on: map.tileAt(x: object.position.x, y: object.position.y))
                 }
             }
         }
+    }
+
+    /// Closes the cabinets with a crate on them, one at a time, top to bottom and left to right:
+    /// each crate disappears into its cabinet with a puff of smoke, and the cabinet closes.
+    /// - Parameter duration: The time to spread them over (with at most half a second between them)
+    /// - Returns: How long it takes, in seconds
+    @discardableResult
+    func closeCabinets(_ map: Map, within duration: TimeInterval) -> TimeInterval {
+        let crates = map.objectsOfType(.box)
+            .filter { map.tileAt(x: $0.position.x, y: $0.position.y) == .floorGoal }
+            .sorted { ($0.position.y, $0.position.x) < ($1.position.y, $1.position.x) }
+        let interval = crates.count > 1
+            ? min(0.5, max(0, duration - Box.disappearDuration) / Double(crates.count - 1)) : 0
+        var steps: [SKAction] = []
+        for (i, crate) in crates.enumerated() {
+            guard let box = boxContainer.children.first(where: { ($0 as? Box)?.id == crate.id }) as? Box else {
+                continue
+            }
+            if i > 0 {
+                steps.append(SKAction.wait(forDuration: interval))
+            }
+            steps.append(SKAction.run { [weak self] in
+                box.disappearIntoCabinet()
+                self?.floorTileMap.setCabinet(open: false, x: crate.position.x, y: crate.position.y)
+            })
+        }
+        run(SKAction.sequence(steps), withKey: "cabinets")
+        return Double(max(crates.count - 1, 0)) * interval + Box.disappearDuration
     }
 
     override func hasActions() -> Bool {

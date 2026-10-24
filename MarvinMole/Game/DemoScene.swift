@@ -18,8 +18,9 @@ class DemoScene: Scene {
     private var isClosing = false
 
     /// Seconds the demo lasts at most, and seconds the completed map stays on screen
+    /// (while its cabinets close, and a moment after)
     private let maxDuration: TimeInterval = 30.0
-    private let completedDuration: TimeInterval = 3.0
+    private var completedDuration: TimeInterval = 3.0
     private var map: Map = .empty
     private var moves: [Map.Move] = []
 
@@ -149,6 +150,7 @@ class DemoScene: Scene {
         }
         if completedTime.isZero, map.isCompleted, !mapView.hasActions() {
             completedTime = currentTime
+            completedDuration = mapView.closeCabinets(map, within: 2.5) + 1.5
         }
         if currentTime - startTime > maxDuration
             || (!completedTime.isZero && currentTime - completedTime > completedDuration) {
