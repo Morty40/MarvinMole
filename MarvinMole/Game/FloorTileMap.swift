@@ -17,7 +17,7 @@ class FloorTileMap: SKTileMapNode {
     let floor = SKTexture(imageNamed: "Floor").split(columns: 4, rows: 4).map {
         SKTileGroup(tileDefinition: SKTileDefinition(texture: $0, size: tileSize)) }
     
-    let goal = SKTileGroup(tileDefinition: SKTileDefinition(texture: SKTexture(imageNamed: "Goal"), size: tileSize))
+    let goal = SKTileGroup(tileDefinition: SKTileDefinition(texture: SKTexture(imageNamed: "CabinetClosed"), size: tileSize))
 
     override init() {
         super.init()
