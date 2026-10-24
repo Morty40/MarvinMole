@@ -20,8 +20,10 @@ class ProgressScene: DrippingScene {
         return node
     }()
 
+    /// The background: one for when all levels of the collection are solved, one for when they're not
+    /// (its image is set each time the scene is shown)
     private lazy var backgroundImage = {
-        let node = backgroundSprite(imageNamed: "ProgressBackground")
+        let node = backgroundSprite(imageNamed: "LevelsIncompleteBackground")
         node.zPosition = -10
         return node
     }()
@@ -29,7 +31,14 @@ class ProgressScene: DrippingScene {
     /// Margin to the screen edges, the same as the game scene's GUI
     private let margin: CGFloat = 16
 
+    /// Story text between two levels of a collection
+    private let collectionNotCompletedText = "Oh dear!  Just as Marvin Mole finished up in one place, he needs to hurry to the next.  He would be so grateful for your help again."
+
+    /// Story text after the last level of a collection
+    private let collectionCompletedText = "Hooray!  Every last bit of Marvin Mole's food is back in the cupboards, and his burrow is cosy again.  Thank you so much for all your help!"
+
     /// Story text in the top-right corner, right aligned; same font, size and width as on the menu
+    /// (its text is set each time the scene is shown)
     private lazy var storyText = {
         let node = OutlinedLabel(fontName: "Rubik-Bold",
                                  fontSize: 30,
@@ -37,7 +46,6 @@ class ProgressScene: DrippingScene {
                                  verticalAlignment: .top,
                                  maxWidth: frame.size.height * 0.65 * 4 / 3)   // the same on every iPad
         node.position = CGPoint(x: frame.size.width - margin, y: frame.size.height - margin)
-        node.text = "Oh dear!  Just as Marvin Mole finished up in one place, he needs to hurry to the next.  He would be so grateful for your help again."
         return node
     }()
 
@@ -68,6 +76,14 @@ class ProgressScene: DrippingScene {
     /// The scene is about to be presented by a view
     /// - Parameter view: The view that is presenting the scene
     override func didMove(to view: SKView) {
+        // the story and background: all levels of the current collection solved, or more to go
+        let collection = MapManager.shared.selectedMap.collection
+        let isCollectionCompleted = MapManager.shared.numberOfSolvedMaps(in: collection) >= collection.count
+        storyText.text = isCollectionCompleted ? collectionCompletedText : collectionNotCompletedText
+        let background = SKTexture(imageNamed: isCollectionCompleted ? "LevelsCompleteBackground" : "LevelsIncompleteBackground")
+        backgroundImage.texture = background
+        backgroundImage.size = Scene.coverSize(of: background.size(), in: size)
+
         rain.prewarm()
         startDripping()
         MusicPlayer.shared.play(Self.musicFile, volume: 0.6)    // same level as the menu, drips audible on top
