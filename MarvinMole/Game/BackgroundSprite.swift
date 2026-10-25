@@ -18,7 +18,7 @@ class BackgroundSprite: SKSpriteNode {
 
     /// How long the pan and zoom takes, and how far it zooms in
     private let kenBurnsDuration: TimeInterval = 20.0
-    private let kenBurnsZoom: CGFloat = 1.01
+    private let kenBurnsZoom: CGFloat = 1.02
 
     /// The size of the scene to cover
     private var sceneSize: CGSize = .zero

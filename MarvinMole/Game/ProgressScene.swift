@@ -35,7 +35,7 @@ class ProgressScene: DrippingScene {
     private let collectionNotCompletedText = "Oh dear!  Just as Marvin Mole finished up in one place, he needs to hurry to the next.  He would be so grateful for your help again."
 
     /// Story text after the last level of a collection
-    private let collectionCompletedText = "Hooray!  Every last bit of Marvin Mole's food is back in the cupboards, and his burrow is cosy again.  Thank you so much for all your help!"
+    private let collectionCompletedText = "Hooray!  Every last bit of Marvin Mole's food is back in the cupboards, and his burrow is cosy again.  Thank you for all your help!"
 
     /// Story text in the top-right corner, right aligned; same font, size and width as on the menu
     /// (its text is set each time the scene is shown)
@@ -89,9 +89,9 @@ class ProgressScene: DrippingScene {
         isCollectionCompleted = MapManager.shared.numberOfSolvedMaps(in: collection) >= collection.count
         storyText.text = isCollectionCompleted ? collectionCompletedText : collectionNotCompletedText
         nextButton.title = isCollectionCompleted ? "Menu" : "Next"
-        let background = SKTexture(imageNamed: isCollectionCompleted ? "LevelsCompleteBackground" : "LevelsIncompleteBackground")
-        backgroundImage.texture = background
-        backgroundImage.size = Scene.coverSize(of: background.size(), in: size)
+        backgroundImage.setImage(named: isCollectionCompleted ? "LevelsCompleteBackground" : "LevelsIncompleteBackground",
+                                 focus: backgroundImage.focus)      // (the same focus point for both images)
+        backgroundImage.startKenBurns()
 
         rain.prewarm()
         startDripping()
