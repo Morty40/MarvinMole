@@ -241,28 +241,59 @@ class MenuScene: DrippingScene {
     }
 
 #if DEBUG
-    /// Small buttons on the right edge, to open the idle scenes straight away
+    /// Small buttons on the right edge, to open the idle scenes straight away and to change which levels
+    /// are solved; hidden until "+" is pressed
     private lazy var debugButtons: [TextButton] = {
-        let buttons: [(String, Selector)] = [("Demo", #selector(onDebugDemo)),
+        let buttons: [(String, Selector)] = [("Demo Mode", #selector(onDebugDemo)),
                                              ("Credits", #selector(onDebugCredits)),
-                                             ("Dig", #selector(onDebugDig))]
-        let size = CGSize(width: 160, height: 64)
-        let spacing: CGFloat = 12
+                                             ("Start Digging", #selector(onDebugDig)),
+                                             ("Solve All", #selector(onDebugSolveAll)),
+                                             ("Unsolve All", #selector(onDebugUnsolveAll)),
+                                             ("Solve Some", #selector(onDebugSolveSome))]
+        let size = CGSize(width: 260, height: 60)
+        let spacing: CGFloat = 10
         let height = CGFloat(buttons.count) * size.height + CGFloat(buttons.count - 1) * spacing
         return buttons.enumerated().map { i, button in
             let node = TextButton(title: button.0, target: self, action: button.1)
             node.size = size
             node.position = CGPoint(x: frame.size.width - 16 - size.width / 2,
                                     y: center.y + height / 2 - size.height / 2 - CGFloat(i) * (size.height + spacing))
+            node.isHidden = true
             return node
         }
     }()
 
+    override func handleKey(_ key: UIKey) {
+        // "+" shows or hides the debug buttons
+        if key.characters == "+" || key.keyCode == .keypadPlus {
+            startTime = 0.0     // reset idle timer
+            debugButtons.forEach { $0.isHidden.toggle() }
+        }
+    }
+
     @objc private func onDebugDemo() { show(.demo) }
     @objc private func onDebugCredits() { show(.credits) }
     @objc private func onDebugDig() { show(.dig) }
+    @objc private func onDebugSolveAll() { setDebugSolved { true } }
+    @objc private func onDebugUnsolveAll() { setDebugSolved { false } }
+    @objc private func onDebugSolveSome() { setDebugSolved { Bool.random() } }
+
+    /// Marks every level of every collection as solved or not, as `isSolved` says, and saves.
+    /// A solved level gets its own solution from the level file.
+    private func setDebugSolved(_ isSolved: () -> Bool) {
+        startTime = 0.0     // reset idle timer
+        MapManager.shared.solvedMaps = MapManager.MapCollection.allCases.flatMap { collection in
+            (1 ... collection.count).compactMap { number -> MapManager.MapSolution? in
+                let resourceName = String(format: collection.resourceName, number)
+                guard isSolved(), let solution = Map.mapFromBundle(resource: resourceName)?.solution else {
+                    return nil
+                }
+                return MapManager.MapSolution(resourceName: resourceName, moves: solution)
+            }
+        }
+        MapManager.shared.save()
+        refreshSelectedMap()
+    }
 #endif
 
 }
-
-// TODO: update UI according to selected map
