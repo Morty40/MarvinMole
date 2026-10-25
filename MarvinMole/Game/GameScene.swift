@@ -47,14 +47,37 @@ class GameScene: Scene {
         SKAction.playSoundFileNamed("Fanfare\($0).m4a", waitForCompletion: true)
     }
 
-    /// Level completed: save the solution and play the fanfare; once it has finished, the cabinets close
-    /// one by one, and then the popup follows
+    /// What Marvin says when a level is completed: a proud mole with a tidy burrow, and a few words of wisdom
+    private let completedSayings = ["Good job!", "Amazing!",
+                                    "Everything in its place!",
+                                    "One crate at a time", "Push smart, not hard.",
+                                    "Every tunnel has a way out.",
+                                    "Mmm, smells like home again."]
+
+    /// Level completed: save the solution and play the fanfare, and Marvin says something a moment into it;
+    /// once the fanfare has finished, the cabinets close one by one, and then the popup follows
     private func startCompletion() {
         isCompletionShown = true
         isCompletionFinished = false
         registerSolution()
         run(SKAction.sequence([fanfares.randomElement()!, SKAction.run { [weak self] in self?.closeCabinets() }]),
             withKey: "fanfare")
+        run(SKAction.sequence([SKAction.wait(forDuration: 0.5),
+                               SKAction.run { [weak self] in self?.say(from: self?.completedSayings ?? []) }]),
+            withKey: "saying")
+    }
+
+    /// Marvin says one of `list`, floating up above him
+    private func say(from list: [String]) {
+        guard let saying = list.randomElement() else {
+            return
+        }
+        let hero = mapView.hero
+        let text = FloatingText(text: saying)
+        text.position = hero.parent!.convert(hero.position, to: self)
+        text.position.y += 20 * mapView.yScale
+        addChild(text)
+        text.runAnimation()
     }
 
     /// The cabinets close one at a time; a moment after the last one, the popup can be shown
@@ -259,6 +282,7 @@ class GameScene: Scene {
         isCompletionFinished = false
         removeAction(forKey: "fanfare")     // the previous level's, if it was left during the fanfare
         removeAction(forKey: "closing")     // or while its cabinets were closing
+        removeAction(forKey: "saying")      // or before Marvin said something
         pendingInput.removeAll()        // moves queued for the previous map
         mapView.update(with: map)
     }
