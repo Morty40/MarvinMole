@@ -10,8 +10,8 @@ import SpriteKit
 /// Box sprite
 class Box: Sprite {
     
-    /// Food: Box00 ... Box09 (64 x 64 pixels, drawn at 32 points); a level uses one of them for all its boxes
-    static let boxTextures = (0 ..< 10).map { SKTexture(imageNamed: String(format: "Box%02d", $0)) }
+    /// Food: Food00 ... Food09 (64 x 64 pixels, drawn at 32 points); a level uses one of them for all its boxes
+    static let boxTextures = (0 ..< 10).map { SKTexture(imageNamed: String(format: "Food%02d", $0)) }
     static let boxOnGoalTexture = SKTexture(imageNamed: "BoxOnGoal")
     
     var boxTexture: SKTexture? = nil
