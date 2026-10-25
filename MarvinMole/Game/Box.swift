@@ -17,6 +17,11 @@ class Box: Sprite {
     
     var boxTexture: SKTexture? = nil
     var crateTexture: SKTexture? = nil
+
+    /// Played when food turns into a crate or a crate back into food, one picked at random each time
+    private static let crateSounds = (1 ... 2).map {
+        SKAction.playSoundFileNamed("FoodCrate\($0).wav", waitForCompletion: false)
+    }
     
     /// - Parameters:
     ///   - id: The box's object id in the map
@@ -80,6 +85,9 @@ class Box: Sprite {
                 // only the picture: the state was set when the push started, and a newer push
                 // may already have started (when a button is held, it can start a frame before this)
                 self.showCrate(toTile == .floorGoal)
+                if changes {
+                    self.run(Box.crateSounds.randomElement()!)
+                }
                 // no pop when the crate is already disappearing into its cabinet: the level's completion
                 // can start a frame before this, and the pop would stop it disappearing
                 if changes, !self.isDisappearing {
@@ -116,11 +124,17 @@ class Box: Sprite {
     /// Set once the crate is disappearing into its cabinet
     private var isDisappearing = false
 
+    /// Played as a crate disappears into its cabinet and the cabinet closes, one picked at random each time
+    private static let cabinetCloseSounds = (1 ... 2).map {
+        SKAction.playSoundFileNamed("CabinetClose\($0).wav", waitForCompletion: false)
+    }
+
     /// The crate shrinks into its cabinet and is gone, with a puff of smoke (the level is completed)
     func disappearIntoCabinet() {
         isDisappearing = true
         removeAction(forKey: "pop")
         puff(with: Self.smokeTexture)
+        run(Self.cabinetCloseSounds.randomElement()!)
         let shrink = SKAction.group([SKAction.scale(to: 0.2, duration: Self.disappearDuration),
                                      SKAction.fadeOut(withDuration: Self.disappearDuration)])
         shrink.timingMode = .easeIn

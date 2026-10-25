@@ -38,8 +38,8 @@ class GameScene: Scene {
     /// Has the current map's completion started (the fanfare, then the popup)?
     private var isCompletionShown = false
 
-    /// Has the fanfare finished, so the "level completed" popup can be shown?
-    private var isFanfareFinished = false
+    /// Have the fanfare and the closing of the cabinets finished, so the "level completed" popup can be shown?
+    private var isCompletionFinished = false
 
     /// Short fanfares, one picked at random each time (Artwork/Music/compose_fanfare.py):
     /// "Food Away!", "Tidy Cupboards", "Call and Answer" and "Happy Dance"
@@ -47,20 +47,27 @@ class GameScene: Scene {
         SKAction.playSoundFileNamed("Fanfare\($0).m4a", waitForCompletion: true)
     }
 
-    /// Level completed: save the solution, and play the fanfare while the cabinets close one by one;
-    /// the popup follows once it has finished
+    /// Level completed: save the solution and play the fanfare; once it has finished, the cabinets close
+    /// one by one, and then the popup follows
     private func startCompletion() {
         isCompletionShown = true
-        isFanfareFinished = false
+        isCompletionFinished = false
         registerSolution()
-        mapView.closeCabinets(map, within: 3.0)     // (the fanfares are 3.6 seconds)
-        run(SKAction.sequence([fanfares.randomElement()!, SKAction.run { [weak self] in self?.isFanfareFinished = true }]),
+        run(SKAction.sequence([fanfares.randomElement()!, SKAction.run { [weak self] in self?.closeCabinets() }]),
             withKey: "fanfare")
+    }
+
+    /// The cabinets close one at a time; a moment after the last one, the popup can be shown
+    private func closeCabinets() {
+        let duration = mapView.closeCabinets(map, within: 3.0)
+        run(SKAction.sequence([SKAction.wait(forDuration: duration + 0.4),
+                               SKAction.run { [weak self] in self?.isCompletionFinished = true }]),
+            withKey: "closing")
     }
 
     /// Congratulate, and offer to go back to the menu or on to the next level
     private func showCompletion() {
-        isFanfareFinished = false
+        isCompletionFinished = false
         let popup = ModalPopup(title: "Level Complete",
                                message: "You did it! Marvin is happy!",
                                buttons: [.init(title: "Menu") { [weak self] in self?.onMenu() },
@@ -249,8 +256,9 @@ class GameScene: Scene {
     func load(map: Map) {
         self.map = map
         isCompletionShown = false
-        isFanfareFinished = false
+        isCompletionFinished = false
         removeAction(forKey: "fanfare")     // the previous level's, if it was left during the fanfare
+        removeAction(forKey: "closing")     // or while its cabinets were closing
         pendingInput.removeAll()        // moves queued for the previous map
         mapView.update(with: map)
     }
@@ -290,11 +298,11 @@ class GameScene: Scene {
         
         if pendingInput.isEmpty, !mapView.hasActions() {
 
-            // level completed (and the last move has finished animating): fanfare, then the popup
+            // level completed (and the last move has finished animating): fanfare, cabinets closing, then the popup
             // (if another popup is showing, e.g. the quit question, it waits until that is closed)
             if map.isCompleted, !isCompletionShown {
                 startCompletion()
-            } else if isFanfareFinished, !ModalPopup.isShowing(in: self) {
+            } else if isCompletionFinished, !ModalPopup.isShowing(in: self) {
                 showCompletion()
             }
 
