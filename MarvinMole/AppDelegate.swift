@@ -10,7 +10,7 @@ import UIKit
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-    var window: UIWindow?
+    // (the window belongs to the scene: see SceneDelegate)
 
 
     func application(_ application: UIApplication,
