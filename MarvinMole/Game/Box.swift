@@ -12,9 +12,11 @@ class Box: Sprite {
     
     /// Food: Food00 ... Food09 (64 x 64 pixels, drawn at 32 points); a level uses one of them for all its boxes
     static let boxTextures = (0 ..< 10).map { SKTexture(imageNamed: String(format: "Food%02d", $0)) }
-    static let boxOnGoalTexture = SKTexture(imageNamed: "BoxOnGoal")
+    /// Crates: Crate00 ... Crate09, each with its food (the same index) showing at the top
+    static let crateTextures = (0 ..< 10).map { SKTexture(imageNamed: String(format: "Crate%02d", $0)) }
     
     var boxTexture: SKTexture? = nil
+    var crateTexture: SKTexture? = nil
     
     /// - Parameters:
     ///   - id: The box's object id in the map
@@ -22,6 +24,7 @@ class Box: Sprite {
     init(id: Int, type: Int) {
         super.init(id: id)
         boxTexture = Box.boxTextures[type % Box.boxTextures.count]
+        crateTexture = Box.crateTextures[type % Box.crateTextures.count]
         self.texture = boxTexture
     }
     
@@ -38,7 +41,7 @@ class Box: Sprite {
 
     /// Only the picture: a crate or food
     private func showCrate(_ crate: Bool) {
-        texture = crate ? Box.boxOnGoalTexture : boxTexture
+        texture = crate ? crateTexture : boxTexture
     }
 
     @MainActor required init?(coder aDecoder: NSCoder) {
