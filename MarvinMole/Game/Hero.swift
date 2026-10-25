@@ -12,19 +12,19 @@ import SpriteKit
 class Hero: Sprite {
     
     // walking
-    static let walkLeftTextures = SKTexture(imageNamed: "HeroWalkLeft").split()
-    static let walkUpTextures = SKTexture(imageNamed: "HeroWalkUp").split()
-    static let walkRightTextures = SKTexture(imageNamed: "HeroWalkRight").split()
-    static let walkDownTextures = SKTexture(imageNamed: "HeroWalkDown").split()
+    static let walkLeftTextures = SKTexture(imageNamed: "MarvinWalkLeft").split()
+    static let walkUpTextures = SKTexture(imageNamed: "MarvinWalkUp").split()
+    static let walkRightTextures = SKTexture(imageNamed: "MarvinWalkRight").split()
+    static let walkDownTextures = SKTexture(imageNamed: "MarvinWalkDown").split()
     
     // pushing
-    static let pushLeftTextures = SKTexture(imageNamed: "HeroPushLeft").split()
-    static let pushUpTextures = SKTexture(imageNamed: "HeroPushUp").split()
-    static let pushRightTextures = SKTexture(imageNamed: "HeroPushRight").split()
-    static let pushDownTextures = SKTexture(imageNamed: "HeroPushDown").split()
+    static let pushLeftTextures = SKTexture(imageNamed: "MarvinPushLeft").split()
+    static let pushUpTextures = SKTexture(imageNamed: "MarvinPushUp").split()
+    static let pushRightTextures = SKTexture(imageNamed: "MarvinPushRight").split()
+    static let pushDownTextures = SKTexture(imageNamed: "MarvinPushDown").split()
 
     // idling
-    static let idleTextures = SKTexture(imageNamed: "HeroIdle").split()
+    static let idleTextures = SKTexture(imageNamed: "MarvinIdle").split()
 
     /// Animation action for a hero walk/push move
     /// - Parameters:
