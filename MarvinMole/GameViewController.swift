@@ -24,7 +24,17 @@ class GameViewController: UIViewController {
             scene.transition(to: Scene.menuScene, animated: false)
         }
         view.addSubview(rotateHint)
+        // its height comes from its icon and text; only its place is set (see viewDidLayoutSubviews)
+        rotateHint.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            rotateHint.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 32),
+            rotateHint.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -32),
+            rotateHintCenterY,
+        ])
     }
+
+    /// Puts the rotate hint in the middle of the bar below the game
+    private lazy var rotateHintCenterY = rotateHint.centerYAnchor.constraint(equalTo: view.bottomAnchor)
 
     /// Shown in the black bar below the game while the iPad is upright: the game is made for landscape
     /// (iPadOS doesn't let an app keep itself in landscape, so in portrait it shows with bars)
@@ -55,11 +65,10 @@ class GameViewController: UIViewController {
         let gameHeight = bounds.width * Scene.sceneSize.height / Scene.sceneSize.width
         let barHeight = (bounds.height - gameHeight) / 2
         rotateHint.isHidden = barHeight < 100
-        let size = rotateHint.systemLayoutSizeFitting(CGSize(width: bounds.width - 64, height: barHeight),
-                                                      withHorizontalFittingPriority: .required,
-                                                      verticalFittingPriority: .fittingSizeLevel)
-        rotateHint.frame = CGRect(x: 32, y: bounds.maxY - barHeight / 2 - size.height / 2,
-                                  width: bounds.width - 64, height: size.height)
+        // (only when it changes: changing it lays out the view again)
+        if rotateHintCenterY.constant != -barHeight / 2 {
+            rotateHintCenterY.constant = -barHeight / 2
+        }
     }
     
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
